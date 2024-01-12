@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>W3 Cheat Sheet</title>
+	<link rel="shortcut icon" type="image/png" href="Cheat sheet/cheat.png">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		body{
+			background-color: lightblue;
+			font-family: castellar;
+			animation: fade 1s;
+		}
+		header{
+			text-align: center;
+			font-size: 100px;
+			text-shadow: 2px 2px 5px white;
+		}
+		footer{
+			text-align: center;
+		}
+		table,th,td{
+			border: 1px solid black;
+		border-collapse: collapse;
+        font-family: cursive;
+        padding: 30px;
+        text-align: center;
+        font-size: 25px;
+        width: 100;
+        background-color: lightgreen;
+		}
+		table{
+			border-collapse: collapse;
+  			width: 100%;
+		}
+ h1{
+    cursor:pointer;
+    text-align: center;
+
+}
+a{
+ text-decoration: none;
+ color: black;
+}
+@keyframes fade{
+		from{
+
+			opacity: 0;
+			transform: translate3d(0, 100%, 0);
+		}
+		to{
+			opacity: 1;
+			transform: none;
+		}
+	}
+	</style>
+
+</head>
+<body>
+	<header><a href="CheatSheet.html">Bootsrap</a></header>
+	<br>
+	<h1 onclick="down()">Alerts</h1>
+		<div id="mu">
+	<table>
+		<tr>
+ <th>Class</th>
+ <th>Descriptions</th>
+ </tr>
+  <tr>
+    <td>.alert</td>
+    <td>Creates an alert message box</td>
+  </tr>
+  <tr>
+  	<td>.alert-danger</td>
+  	<td>Red alert. Indicates a dangerous or potentially negative action</td>
+  </tr>
+<tr>
+	<td>.alert-dark</td>
+	<td>Dark alert. Dark grey alert box</td>
+</tr>
+<tr>
+	<td>.alert-dismissible</td>
+	<td>Indicates a closable alert box. Together with the .close class, this class is used to close the alert (adds extra padding)</td>
+</tr>
+<tr>
+	<td>.alert-heading</td>
+	<td>Adds color:inherit to the specified element</td>
+</tr>
+<tr>
+	<td>.alert-info</td>
+	<td>Teal alert. Indicates a neutral informative change or action</td>
+</tr>
+<tr>
+	<td>.alert-light</td>
+	<td>Light alert. Light grey alert box</td>
+</tr>
+<tr>
+	<td>.alert-link</td>
+	<td>Used on links inside alerts to provide matching colored links</td>
+</tr>
+<tr>
+	<td>.alert-primary</td>
+	<td>Blue alert. Indicates an important action</td>
+</tr>
+<tr>
+	<td>.alert-secondary</td>
+	<td>Grey alert. Indicates a "less" important action</td>
+</tr>
+<tr>
+	<td>.alert-success</td>
+	<td>Green alert. Indicates a successful or positive action</td>
+</tr>
+<tr>
+	<td>.alert-warning</td>
+	<td>Yellow alert. Indicates caution should be taken with this action</td>
+</tr>
+<tr>
+	<td>.fade</td>
+	<td>Adds a fading effect when closing an alert box</td>
+</tr>
+
+  </table>
+</div>
+  <script>
+			function down() {
+				var x= document.getElementById("mu");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+
+	<h1 onclick="down1()">Badges</h1>
+		<div id="mu1">
+	<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Description</th>
+			</tr>
+			<tr>
+				<td>.badge</td>
+				<td>Creates a circular badge (grey circle - often used as a numerical indicator)</td>
+			</tr>
+			<tr>
+				<td>.badge-danger</td>
+				<td>Red badge. Indicates a dangerous or potentially negative action</td>
+			</tr>
+			<tr>
+				<td>.badge-dark</td>
+				<td>Dark badge. Dark grey alert box</td>
+			</tr>
+			<tr>
+				<td>.badge-info</td>
+				<td>Teal badge. Indicates a neutral informative change or action</td>
+			</tr>
+			<tr>
+				<td>.badge-light</td>
+				<td>Light badge. Light grey alert box</td>
+			</tr>
+			<tr>
+				<td>.badge-pill</td>
+				<td>Makes a badge more round</td>
+			</tr>
+			<tr>
+				<td>.badge-primary</td>
+				<td>Blue badge. Indicates an important action</td>
+			</tr>
+			<tr>
+				<td>.badge-secondary</td>
+				<td>Grey badge. Indicates a "less" important action</td>
+			</tr>
+			<tr>
+				<td>.badge-success</td>
+				<td>Green badge. Indicates a successful or positive action</td>
+			</tr>
+			<tr>
+				<td>.badge-warning</td>
+				<td>Yellow badge. Indicates caution should be taken with this action</td>
+			</tr>
+
+	</table>
+	</div>
+	<script>
+			function down1() {
+				var x= document.getElementById("mu1");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down2()">Button Groups</h1>
+		<div id="mu2">
+	<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Description</th>
+			</tr>
+			<tr>
+				<td>.btn-group</td>
+				<td>Groups buttons together on a single line</td>
+			</tr>
+			<tr>
+				<td>.btn-group-lg</td>
+				<td>Large button group (makes all buttons in a button group larger - increased font-size and padding)</td>
+			</tr>
+			<tr>
+				<td>.btn-group-sm</td>
+				<td>Small button group (makes all buttons in a button group smaller)</td>
+			</tr>
+			<tr>
+				<td>.btn-group-vertical</td>
+				<td>Makes a button group appear vertically stacked</td>
+			</tr>
+			<tr>
+				<td>.btn-toolbar</td>
+				<td>Combine sets of button groups into button toolbars for more complex components</td>
+			</tr>
+
+
+	</table>
+		</div>
+	<script>
+			function down2() {
+				var x= document.getElementById("mu2");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down3()">Buttons</h1>
+		<div id="mu3">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Description</th>
+			</tr>
+			<tr>
+				<td>.active</td>
+				<td>Adds a dark-blue background color to simulate a "pressed" button</td>
+			</tr>
+			<tr>
+				<td>.btn</td>
+				<td>Creates a basic button (gray background and rounded corners)</td>
+			</tr>
+			<tr>
+				<td>.btn-block</td>
+				<td>Creates a block level button that spans the entire width of the parent element</td>
+			</tr>
+			<tr>
+				<td>.btn-dark</td>
+				<td>Dark grey button</td>
+			</tr>
+			<tr>
+				<td>.btn-danger	</td>
+				<td>Red button. Indicates danger or a negative action</td>
+			</tr>
+			<tr>
+				<td>.btn-info</td>
+				<td>Teal button. Represents a neutral informative change or action</td>
+			</tr>
+			<tr>
+				<td>.btn-light</td>
+				<td>Light grey button</td>
+			</tr>
+			<tr>
+				<td>.btn-link</td>
+				<td>Makes a button look like a link (get button behavior)</td>
+			</tr>
+			<tr>
+				<td>.btn-lg</td>
+				<td>Large button</td>
+			</tr>
+			<tr>
+				<td>.btn-outline-dark</td>
+				<td>Dark grey bordered/outlined button</td>
+			</tr>
+			<tr>
+				<td>.btn-outline-danger</td>
+				<td>Red bordered/outlined button. Indicates danger or a negative action</td>
+			</tr>
+			<tr>
+				<td>.btn-outline-info</td>
+				<td>Teal bordered/outlined button. Represents a neutral informative change or action</td>
+			</tr>
+			<tr>
+				<td>.btn-outline-light</td>
+				<td>Light grey bordered/outlined button</td>
+			</tr>
+			<tr>
+				<td>.btn-outline-primary</td>
+				<td>Blue bordered/outlined button.</td>
+			</tr>
+			<tr>
+				<td>.btn-outline-secondary</td>
+				<td>Grey bordered/outlined button. Indicates a "less" important action</td>
+			</tr>
+			<tr>
+				<td>.btn-outline-success</td>
+				<td>Green bordered/outlined button. Indicates success or a positive action</td>
+			</tr>
+			<tr>
+				<td>.btn-outline-warning</td>
+				<td>Orange bordered/outlined button. Represents warning or a negative action</td>
+			</tr>
+			<tr>
+				<td>.btn-primary</td>
+				<td>Blue button. Indicates a something important</td>
+			</tr>
+			<tr>
+				<td>.btn-sm</td>
+				<td>Small button</td>
+			</tr>
+			<tr>
+				<td>.btn-secondary</td>
+				<td>Grey button. Indicates a "less" important action</td>
+			</tr>
+			<tr>
+				<td>.btn-success</td>
+				<td>Green button. Indicates success or a positive action</td>
+			</tr>
+			<tr>
+				<td>.btn-warning</td>
+				<td>Orange button. Represents warning or a negative action</td>
+			</tr>
+			<tr>
+				<td>.disabled</td>
+				<td>Disables a button (adds opacity and a "no-parking-sign" icon on hover)</td>
+			</tr>
+		</table>
+		</div>
+	<script>
+			function down3() {
+				var x= document.getElementById("mu3");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down4()">Cards</h1>
+		<div id="mu4">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Description</th>
+			</tr>
+			<tr>
+				<td>.card</td>
+				<td>Creates a card</td>
+			</tr>
+			<tr>
+				<td>.card-body</td>
+				<td>Container for card content</td>
+			</tr>
+			<tr>
+				<td>.card-columns</td>
+				<td>Container to create a masonry-like grid of cards.</td>
+			</tr>
+			<tr>
+				<td>.card-danger</td>
+				<td>Adds a red background color to the card. Represents danger or a negative action.</td>
+			</tr>
+			<tr>
+				<td>.card-dark</td>
+				<td>Adds a grey background color to the card.</td>
+			</tr>
+			<tr>
+				<td>.card-deck</td>
+				<td>Container to create a grid of cards that are of equal height and width</td>
+			</tr>
+			<tr>
+				<td>.card-footer</td>
+				<td>Card footer</td>
+			</tr>
+			<tr>
+				<td>.card-group</td>
+				<td>Container to create a grid of cards that are of equal height and width, without side margins</td>
+			</tr>
+			<tr>
+				<td>.card-header</td>
+				<td>Card header</td>
+			</tr>
+			<tr>
+				<td>.card-header-tabs</td>
+				<td>Styles navigation tabs inside the card header</td>
+			</tr>
+			<tr>
+				<td>.card-header-pills</td>
+				<td>Styles navigation pills inside the card header</td>
+			</tr>
+			<tr>
+				<td>.card-img-bottom</td>
+				<td>Place the image at the bottom inside a card</td>
+			</tr>
+			<tr>
+				<td>.card-img-overlay</td>
+				<td>Turns an image into a card background. Often used to add text on top of the image</td>
+			</tr>
+			<tr>
+				<td>.card-img-top</td>
+				<td>Place the image at the top inside a card</td>
+			</tr>
+			<tr>
+				<td>.card-info</td>
+				<td>Adds a teal background color to the card. Represents some information</td>
+			</tr>
+			<tr>
+				<td>.card-light</td>
+				<td>Adds a light grey background color to the card</td>
+			</tr>
+			<tr>
+				<td>.card-link</td>
+				<td>Adds a blue color to any link and a hover effect inside the card</td>
+			</tr>
+			<tr>
+				<td>.card-primary</td>
+				<td>Adds a blue background color to the card. Represents something important</td>
+			</tr>
+			<tr>
+				<td>.card-secondary</td>
+				<td>Adds a grey background color to the card. Represents something "less" important</td>
+			</tr>
+			<tr>
+				<td>.card-subtitle</td>
+				<td>The .card-subtitle is used after a .card-title, and adds the following to an element: margin-top: -.375rem; margin-bottom: 0;</td>
+			</tr>
+			<tr>
+				<td>.card-success</td>
+				<td>Adds a green background color to the card. Indicates success or a positive action</td>
+			</tr>
+			<tr>
+				<td>.card-text</td>
+				<td>Used to remove bottom margins for a p element if it is the last child (or the only one), inside .card-body</td>
+			</tr>
+			<tr>
+				<td>.card-title</td>
+				<td>Adds a title to any heading element inside the card</td>
+			</tr>
+			<tr>
+				<td>.card-warning</td>
+				<td>Adds a yellow/orange background color to the card. Represents a warning or a negative action</td>
+			</tr>
+			<tr>
+				<td>.active</td>
+				<td></td>
+			</tr>
+
+		</table>
+		</div>
+	<script>
+			function down4() {
+				var x= document.getElementById("mu4");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down5()">Carousel</h1>
+		<div id="mu5">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Description</th>
+			</tr>
+			<tr>
+				<td>.active</td>
+				<td>Displays/shows the current carousel item</td>
+			</tr>
+			<tr>
+				<td>.carousel</td>
+				<td>Creates a carousel (slideshow)</td>
+			</tr>
+
+			<tr>
+				<td>.carousel-caption</td>
+				<td>Creates a caption text for each slide in the carousel</td>
+			</tr>
+
+			<tr>
+				<td>.carousel-control-next</td>
+				<td>Container for "next" carousel/item link</td>
+			</tr>
+
+			<tr>
+				<td>.carousel-control-next-icon</td>
+				<td>Used together with .carousel-control-next to create a "next" icon/button (right-pointed arrow)</td>
+			</tr>
+
+			<tr>
+				<td>.carousel-control-prev</td>
+				<td>Container for "previous" carousel/item link</td>
+			</tr>
+			<tr>
+				<td>.carousel-control-prev-icon</td>
+				<td>Used together with .carousel-control-prev to create a "previous" icon/button (left-pointed arrow)</td>
+			</tr>
+			<tr>
+				<td>.carousel-indicators</td>
+				<td>Adds little dots/indicators at the bottom of each slide (which indicates how many slides there is in the carousel, and which slide the user are currently viewing)</td>
+			</tr>
+			<tr>
+				<td>.carousel-inner</td>
+				<td>Container for slide items</td>
+			</tr>
+			<tr>
+				<td>.carousel-item</td>
+				<td>Specifies the content of each slide</td>
+			</tr>
+			
+		</table>
+		</div>
+	<script>
+			function down5() {
+				var x= document.getElementById("mu5");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down6()">Collapse</h1>
+		<div id="mu6">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Description</th>
+			</tr>
+			<tr>
+				<td>.collapse</td>
+				<td>Indicates collapsible content - which can be hidden or shown on demand</td>
+			</tr>
+			<tr>
+				<td>Indicates collapsible content - which can be hidden or shown on demand</td>
+				<td>Show the collapsible content by default</td>
+			</tr>
+
+		</table>
+		</div>
+	<script>
+			function down6() {
+				var x= document.getElementById("mu6");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down7()">Colors</h1>
+		<div id="mu7">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Description</th>
+			</tr>
+			<tr>
+				<td>.bg-danger</td>
+				<td>Adds a red background color to an element. Represents danger or a negative action</td>
+			</tr>
+			<tr>
+				<td>.bg-dark</td>
+				<td>Adds a dark grey background color to an element</td>
+			</tr>
+			<tr>
+				<td>.bg-info</td>
+				<td>Adds a teal background color to an element. Represents some information</td>
+			</tr>
+			<tr>
+				<td>.bg-light</td>
+				<td>Adds a light grey background color to an element</td>
+			</tr>
+			<tr>
+				<td>.badge-primary</td>
+				<td>Adds a blue background color to an element. Represents something important</td>
+			</tr>
+			<tr>
+				<td>.bg-secondary</td>
+				<td>Adds a grey background color to an element. Indicates a "less" important action</td>
+			</tr>
+			<tr>
+				<td>.bg-success</td>
+				<td>Adds a green background color to an element. Indicates success or a positive action</td>
+			</tr>
+			<tr>
+				<td>.bg-warning</td>
+				<td>Adds a yellow/orange background color to an element. Represents a warning or a negative action</td>
+			</tr>
+			<tr>
+				<td>.text-danger</td>
+				<td>Red text color. Indicates danger</td>
+			</tr>
+			<tr>
+				<td>.text-info</td>
+				<td>Light-blue text color. Indicates information</td>
+			</tr>
+			<tr>
+				<td>.text-light</td>
+				<td>Light grey text color</td>
+			</tr>
+			<tr>
+				<td>.text-muted</td>
+				<td>Grey text color</td>
+			</tr>
+			<tr>
+				<td>.text-primary</td>
+				<td>Blue text color. Indicates something important</td>
+			</tr>
+			<tr>
+				<td>.text-secondary</td>
+				<td>Grey text color. Indicates something "less" important</td>
+			</tr>
+			<tr>
+				<td>.text-success</td>
+				<td>Green text color. Indicates success</td>
+			</tr>
+			<tr>
+				<td>.text-warning</td>
+				<td>Yellow/orange text color. Indicates warning</td>
+			</tr>
+			<tr>
+				<td>.text-white</td>
+				<td>White text color</td>
+			</tr>
+
+
+		</table>
+		</div>
+	<script>
+			function down7() {
+				var x= document.getElementById("mu7");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down8()">Containers</h1>
+		<div id="mu8">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Description</th>
+			</tr>
+			<tr>
+				<td>.container</td>
+				<td>Fixed width container with widths determined by screen sites. Equal margin on the left and right.</td>
+			</tr>
+			<tr>
+				<td>.container-fluid</td>
+				<td>A container that spans the full width of the screen</td>
+			</tr>
+		
+
+		</table>
+		</div>
+	<script>
+			function down8() {
+				var x= document.getElementById("mu8");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down9()">Custom Forms</h1>
+		<div id="mu9">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Descriptions</th>
+			</tr>
+			<tr>
+				<td>.custom-checkbox</td>
+				<td>A wrapper/container for custom checkboxes</td>
+			</tr>
+			<tr>
+				<td>.custom-control</td>
+				<td>A wrapper/container for custom forms</td>
+			</tr>
+			<tr>
+				<td>.custom-control-input</td>
+				<td>.custom-control-input</td>
+			</tr>
+			<tr>
+				<td>.custom-control-inline</td>
+				<td>Inline (horizontally - side by side) customized form controls</td>
+			</tr>
+				<tr>
+				<td>.custom-control-label</td>
+				<td>Customized label, when used together with a custom form control</td>
+			</tr>
+			<tr>
+				<td>.custom-file</td>
+				<td>Customized file upload</td>
+			</tr>
+				<tr>
+				<td>.custom-file-input</td>
+				<td>Customized file upload</td>
+			</tr>
+			<tr>
+				<td>.custom-file-label</td>
+				<td>Customized file label</td>
+			</tr>
+			<tr>
+				<td>.custom-radio</td>
+				<td>A wrapper/container for custom radio buttons</td>
+			</tr>
+			<tr>
+				<td>.custom-range</td>
+				<td>Customized range control</td>
+			</tr>
+			<tr>
+				<td>.custom-select</td>
+				<td>Customized select menu</td>
+			</tr>
+			<tr>
+				<td>.custom-select-lg</td>
+				<td>Large customized select menu</td>
+			</tr>
+			<tr>
+				<td>.custom-select-sm</td>
+				<td>Small customized select menu</td>
+			</tr>
+			<tr>
+				<td>.custom-switch</td>
+				<td>Customized toggle switch</td>
+			</tr>
+			
+		</table>
+		</div>
+	<script>
+			function down9() {
+				var x= document.getElementById("mu9");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down10()">Dropdowns</h1>
+		<div id="mu10">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Description</th>
+			</tr>
+			<tr>
+				<td>.active</td>
+				<td>Adds a blue background color to the active dropdown item in a dropdown</td>
+			</tr>
+			<tr>
+				<td>.disabled</td>
+				<td>Disables a dropdown item (adds a grey text color and a "no-parking-sign" icon on hover)</td>
+			</tr>
+			<tr>
+				<td>.dropdown</td>
+				<td>Creates a toggleable menu that allows the user to choose one value from a predefined list</td>
+			</tr>
+			<tr>
+				<td>.dropdown-divider</td>
+				<td>Used to separate links in the dropdown menu with a thin horizontal border</td>
+			</tr>
+			<tr>
+				<td>.dropdown-header</td>
+				<td>Used to add headers inside the dropdown menu</td>
+			</tr>
+			<tr>
+				<td>.dropdown-item-text	</td>
+				<td>Used to add plain text to a dropdown item, or used on links for default link styling</td>
+			</tr>
+			<tr>
+				<td>.dropdown-menu</td>
+				<td>Adds the default styles for the dropdown menu container</td>
+			</tr>
+			<tr>
+				<td>.dropdown-menu-right</td>
+				<td>Right-aligns a dropdown menu</td>
+			</tr>
+			<tr>
+				<td>.dropdown-toggle</td>
+				<td>Used on the button that should hide and show (toggle) the dropdown menu</td>
+			</tr>
+			<tr>
+				<td>.dropleft</td>
+				<td>Left-aligns the dropdown</td>
+			</tr>
+			<tr>
+				<td>.dropright</td>
+				<td>Right-aligns the dropdown</td>
+			</tr>
+			<tr>
+				<td>.dropup</td>
+				<td>Indicates a dropup menu (upwards instead of downwards)</td>
+			</tr>
+
+		</table>
+		</div>
+	<script>
+			function down10() {
+				var x= document.getElementById("mu10");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+  <footer>All Reserved &copy; Kushirukito</footer>
+</body>
+</html>

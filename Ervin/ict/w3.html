@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>W3 Cheat Sheet</title>
+	<link rel="shortcut icon" type="image/png" href="Cheat sheet/cheat.png">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		body{
+			background-color: lightgreen;
+			font-family: castellar;
+			animation: fade 1s;
+		}
+		header{
+			text-align: center;
+			font-size: 100px;
+			text-shadow: 2px 2px 5px white;
+		}
+		footer{
+			text-align: center;
+		}
+		table,th,td{
+			border: 1px solid black;
+		border-collapse: collapse;
+        font-family: cursive;
+        padding: 30px;
+        text-align: center;
+        font-size: 25px;
+        width: 100;
+        background-color: lightblue;
+		}
+		table{
+			border-collapse: collapse;
+  			width: 100%;
+		}
+ h1{
+    cursor:pointer;
+    text-align: center;
+
+}
+a{
+ text-decoration: none;
+ color: black;
+}
+@keyframes fade{
+		from{
+
+			opacity: 0;
+			transform: translate3d(0, 100%, 0);
+		}
+		to{
+			opacity: 1;
+			transform: none;
+		}
+	}
+	</style>
+
+</head>
+<body>
+	<header><a href="CheatSheet.html">W3.CSS</a></header>
+	<br>
+	<h1 onclick="down()">Container Classes</h1>
+		<div id="mu">
+	<table>
+		<tr>
+ <th>Class</th>
+ <th>Defines</th>
+ </tr>
+  <tr>
+    <td>w3-container</td>
+    <td>HTML container with 16px left and right padding<br> Used as Heading<br> Used as Footer</td>
+  </tr>
+  <tr>
+  	<td>w3-panel</td>
+  	<td>HTML container with 16px left and right padding and 16px top and bottom margin<br>
+ 	Used to display a note<br>
+ 	Used to display a quote</td>
+  </tr>
+<tr>
+	<td>w3-badge</td>
+	<td>Circular badge</td>
+</tr>
+<tr>
+	<td>w3-tag</td>
+	<td>Rectangular tag</td>
+</tr>
+<tr>
+	<td>w3-ul</td>
+	<td>Unordered list</td>
+</tr>
+<tr>
+	<td>w3-display-container</td>
+	<td>Container for w3-display-classes (enables positioning of elements inside the container)</td>
+</tr>
+<tr>
+	<td>w3-block</td>
+	<td>Class that can be used to define a full width for any element</td>
+</tr>
+<tr>
+	<td>w3-code</td>
+	<td>Code container</td>
+</tr>
+<tr>
+	<td>w3-codespan</td>
+	<td>Inline code container (for code snippets)</td>
+</tr>
+<tr>
+	<td>w3-content</td>
+	<td>Container for fixed size centered content</td>
+</tr>
+<tr>
+	<td>w3-auto</td>
+	<td>Container for responsive size centered content</td>
+</tr>
+<tr>
+	<td>w3-stretch</td>
+	<td>Class that removes right and left margins (especially useful for stretching padded rows (w3-row-padding))</td>
+</tr>
+
+  </table>
+</div>
+  <script>
+			function down() {
+				var x= document.getElementById("mu");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+
+	<h1 onclick="down1()">Table Classes</h1>
+		<div id="mu1">
+	<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Defines</th>
+			</tr>
+			<tr>
+				<td>w3-table</td>
+				<td>Container for an HTML table</td>
+			</tr>
+			<tr>
+				<td>w3-striped</td>
+				<td>Striped table</td>
+			</tr>
+			<tr>
+				<td>w3-border</td>
+				<td>Bordered table</td>
+			</tr>
+			<tr>
+				<td>w3-bordered</td>
+				<td>Bordered lines</td>
+			</tr>
+			<tr>
+				<td>w3-centered</td>
+				<td>Centered table</td>
+			</tr>
+			<tr>
+				<td>w3-hoverable</td>
+				<td>Hoverable table</td>
+			</tr>
+			<tr>
+				<td>w3-table-all</td>
+				<td>All properties set	
+ 					With w3-striped, w3-border, and w3-bordered<br>
+ 					With colored head<br>
+ 					With w3-responsive<br>
+ 					With w3-tiny<br>
+ 					With w3-small<br>
+ 					With w3-large<br>
+ 					With w3-xlarge<br>
+ 					With w3-xxlarge<br>
+ 					With w3-xxxlarg<br>	
+ 					With color<br>
+ 					With w3-jumbo
+ 				</td>
+			</tr>
+			<tr>
+				<td>w3-responsive</td>
+				<td>Creates a responsive table</td>
+			</tr>
+
+	</table>
+	</div>
+	<script>
+			function down1() {
+				var x= document.getElementById("mu1");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down2()">Card Classes</h1>
+		<div id="mu2">
+	<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Defines</th>
+			</tr>
+			<tr>
+				<td>w3-card</td>
+				<td>Same as w3-card-2</td>
+			</tr>
+			<tr>
+				<td>w3-card-2</td>
+				<td>Container for any HTML content (2px bordered shadow)</td>
+			</tr>
+			<tr>
+				<td>w3-card-4</td>
+				<td>Container for any HTML content (4px bordered shadow)</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+			</tr>
+
+
+	</table>
+		</div>
+	<script>
+			function down2() {
+				var x= document.getElementById("mu2");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down3()">Responsive Classes</h1>
+		<div id="mu3">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Defines</th>
+			</tr>
+			<tr>
+				<td>w3-row</td>
+				<td>Container for one row of fluid responsive content</td>
+			</tr>
+			<tr>
+				<td>w3-row-padding</td>
+				<td>Row where all columns have a default padding</td>
+			</tr>
+			<tr>
+				<td>w3-auto</td>
+				<td>Container for responsive size centered content</td>
+			</tr>
+			<tr>
+				<td>w3-stretch</td>
+				<td>Class that removes right and left margins</td>
+			</tr>
+			<tr>
+				<td>w3-half	</td>
+				<td>Half (1/2) screen column container</td>
+			</tr>
+			<tr>
+				<td>w3-third</td>
+				<td>Third (1/3) screen column container</td>
+			</tr>
+			<tr>
+				<td>w3-twothird</td>
+				<td>Two third (2/3) screen column container</td>
+			</tr>
+			<tr>
+				<td>w3-quarter</td>
+				<td>Quarter (1/4) screen column container</td>
+			</tr>
+			<tr>
+				<td>w3-threequarter</td>
+				<td>Three quarters (3/4) screen column container</td>
+			</tr>
+			<tr>
+				<td>w3-col</td>
+				<td>Column container for any HTML content</td>
+			</tr>
+			<tr>
+				<td>w3-rest</td>
+				<td>Occupies the rest of the column width</td>
+			</tr>
+			<tr>
+				<td>l1 - l12</td>
+				<td>Responsive sizes for large screens</td>
+			</tr>
+			<tr>
+				<td>m1 - m12</td>
+				<td>Responsive sizes for medium screens</td>
+			</tr>
+			<tr>
+				<td>s1 - s12</td>
+				<td>Responsive sizes for small screens</td>
+			</tr>
+			<tr>
+				<td>w3-hide-small</td>
+				<td>Hide content on small screens (less than 601px)</td>
+			</tr>
+			<tr>
+				<td>w3-hide-medium</td>
+				<td>Hide content on medium screens</td>
+			</tr>
+			<tr>
+				<td>w3-hide-large</td>
+				<td>Hide content on large screens (larger than 992px)</td>
+			</tr>
+			<tr>
+				<td>w3-image</td>
+				<td>Responsive image</td>
+			</tr>
+			<tr>
+				<td>w3-mobile</td>
+				<td>Adds mobile-first responsiveness to any element.
+					Displays elements as block elements on mobile devices.	
+				</td>
+			</tr>
+
+		</table>
+		</div>
+	<script>
+			function down3() {
+				var x= document.getElementById("mu3");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down4()">Layout Classes</h1>
+		<div id="mu4">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Defines</th>
+			</tr>
+			<tr>
+				<td>w3-cell-row</td>
+				<td>Container for layout columns (cells).</td>
+			</tr>
+			<tr>
+				<td>w3-cell</td>
+				<td>Layout column (cell).</td>
+			</tr>
+			<tr>
+				<td>w3-cell-top</td>
+				<td>Aligns content at the top of a column (cell).</td>
+			</tr>
+			<tr>
+				<td>w3-cell-middle</td>
+				<td>Aligns content at the vertical middle of a column (cell).</td>
+			</tr>
+			<tr>
+				<td>w3-cell-bottom</td>
+				<td>Aligns content at the bottom of a column (cell).</td>
+			</tr>
+
+		</table>
+		</div>
+	<script>
+			function down4() {
+				var x= document.getElementById("mu4");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down5()">Bar Classes-Navigation</h1>
+		<div id="mu5">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Defines</th>
+			</tr>
+			<tr>
+				<td>w3-bar</td>
+				<td>Horizontal bar</td>
+			</tr>
+			<tr>
+				<td>w3-bar-block</td>
+				<td>Vertical bar</td>
+			</tr>
+
+			<tr>
+				<td>w3-bar-item</td>
+				<td>Provides common style for bar items</td>
+			</tr>
+
+			<tr>
+				<td>w3-sidebar</td>
+				<td>Side bar<br>
+				 	A side bar can contain all types of content<br>	
+				 	A side bar overlaying main content	<br>
+				 	A side bar overlaying all main content	<br>
+				 	A side bar shifting main content to the right<br>	
+				 	A side bar with an overlay background	<br>
+				 	A Side bar on the right side
+				 </td>
+			</tr>
+
+			<tr>
+				<td>w3-collapse</td>
+				<td>Used together with w3-sidebar to create a fully automatic responsive side navigation. For this class to work, the page content must be within a "w3-main" class</td>
+			</tr>
+
+			<tr>
+				<td>w3-main</td>
+				<td>Container for page content when using the w3-collapse class for responsive side navigations<br>
+ 					Fully automatic right-sided responsive side navigation
+ 				</td>
+			</tr>
+
+
+		</table>
+		</div>
+	<script>
+			function down5() {
+				var x= document.getElementById("mu5");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down6()">Dropdown Classes</h1>
+		<div id="mu6">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Defines</th>
+			</tr>
+			<tr>
+				<td>w3-dropdown-click</td>
+				<td>Clickable dropdown element</td>
+			</tr>
+			<tr>
+				<td>w3-dropdown-hover</td>
+				<td>Hoverable dropdown element<br>	
+				 	Hoverable dropdown element (used in w3-bar)	<br>
+				 	Hoverable dropdown element (used in w3-bar-block)	<br>
+				 	Hoverable dropdown element (used in w3-sidebar)<br>
+				 </td>
+			</tr>
+
+		</table>
+		</div>
+	<script>
+			function down6() {
+				var x= document.getElementById("mu6");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down7()">Button Classes</h1>
+		<div id="mu7">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Defines</th>
+			</tr>
+			<tr>
+				<td>w3-button</td>
+				<td>Rectangular button with grey background color on hover</td>
+			</tr>
+			<tr>
+				<td>w3-btn</td>
+				<td>Rectangular button with shadows on hover</td>
+			</tr>
+			<tr>
+				<td>w3-circle</td>
+				<td>Can be used to create a circular button</td>
+			</tr>
+			<tr>
+				<td>w3-ripple</td>
+				<td>Rectangular button with ripple effect	<br>
+ 					Circular floating button with ripple effect</td>
+			</tr>
+			<tr>
+				<td>w3-bar</td>
+				<td>Can be used to group elements (like buttons) in an horizontal bar</td>
+			</tr>
+			<tr>
+				<td>w3-block</td>
+				<td>Class that can be used to define a full width w3-button	<br>
+				 	Full width w3-btn	<br>
+				 	Full width circular button
+				</td>
+			</tr>
+
+		</table>
+		</div>
+	<script>
+			function down7() {
+				var x= document.getElementById("mu7");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down8()">Input Classes</h1>
+		<div id="mu8">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Defines</th>
+			</tr>
+			<tr>
+				<td>w3-input</td>
+				<td>Input elements	<br>
+				 	Input form as a card	<br>
+				 	Input elements (top labels)	<br>
+				 	Input elements (bottom labels)</td>
+			</tr>
+			<tr>
+				<td>w3-check</td>
+				<td>Checkbox input type</td>
+			</tr>
+			<tr>
+				<td>w3-radio</td>
+				<td>Radio input type</td>
+			</tr>
+			<tr>
+				<td>w3-select</td>
+				<td>Input select element</td>
+			</tr>
+			<tr>
+				<td>w3-animate-input</td>
+				<td>Animates the width of an input to 100%</td>
+			</tr>
+
+
+		</table>
+		</div>
+	<script>
+			function down8() {
+				var x= document.getElementById("mu8");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down9()">Modal Classes</h1>
+		<div id="mu9">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Defines</th>
+			</tr>
+			<tr>
+				<td>w3-modal</td>
+				<td>Modal container</td>
+			</tr>
+			<tr>
+				<td>w3-modal-content</td>
+				<td>Modal pop-up element</td>
+			</tr>
+			<tr>
+				<td>w3-tooltip</td>
+				<td>Tooltip element</td>
+			</tr>
+			<tr>
+				<td>w3-text</td>
+				<td>Tooltip text</td>
+			</tr>
+
+		</table>
+		</div>
+	<script>
+			function down9() {
+				var x= document.getElementById("mu9");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+		<h1 onclick="down10()">Animation Classes</h1>
+		<div id="mu10">
+		<table>
+			<tr>
+ 				<th>Class</th>
+ 				<th>Defines</th>
+			</tr>
+			<tr>
+				<td>w3-animate-top</td>
+				<td>Animates an element from the top -300px to 0px</td>
+			</tr>
+			<tr>
+				<td>w3-animate-left</td>
+				<td>Animates an element from left -300px to 0px</td>
+			</tr>
+			<tr>
+				<td>w3-animate-bottom</td>
+				<td>Animates an element from the bottom -300px to 0px</td>
+			</tr>
+			<tr>
+				<td>w3-animate-right</td>
+				<td>Animates an element from right -300px to 0px</td>
+			</tr>
+			<tr>
+				<td>w3-animate-opacity</td>
+				<td>Animates an element's opacity from 0 to 1</td>
+			</tr>
+			<tr>
+				<td>w3-animate-zoom</td>
+				<td>Animates an element from 0 to 100% in size</td>
+			</tr>
+			<tr>
+				<td>w3-animate-fading</td>
+				<td>Animates an element's opacity from 0 to 1 and 1 to 0 (fades in AND out)</td>
+			</tr>
+			<tr>
+				<td>w3-spin</td>
+				<td>Spin an icon 360 degrees	<br>
+ 					Spin any element 360 degrees
+ 				</td>
+			</tr>
+			<tr>
+				<td>w3-animate-input</td>
+				<td>Animates the width of an input field to 100%</td>
+			</tr>
+
+		</table>
+		</div>
+	<script>
+			function down10() {
+				var x= document.getElementById("mu10");
+				if (x.style.display=== "none") {
+					x.style.display ="block"
+				}
+				else{
+					x.style.display="none"
+				}
+			}
+		</script>
+  <footer>All Reserved &copy; Kushirukito</footer>
+</body>
+</html>
