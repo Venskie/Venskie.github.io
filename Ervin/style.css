@@ -1,0 +1,277 @@
+html, body{
+		font-family: sans-serif;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		overflow-x: hidden;
+}
+
+footer{
+	position: relative;
+	text-align:center;
+	color: black;
+	padding: 70px 15px;
+
+}
+
+
+/* ----- BG Picture----*/
+.hero{
+	background: url('Ervin_BG.png') center no-repeat;
+	position: relative;
+	height: 100%;
+  width: 100%;
+  display: table;
+  background-size: cover;
+}
+
+/*------------------------Container-------------*/
+
+.background-overlay:before {
+  content: '';
+  background-color: rgba(0, 0, 0, 0.5);
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+.hero-content {
+  color: #ffffff;
+  display: table-cell;
+  vertical-align: middle;
+  position: relative;
+}
+.hero-content h1 {
+  width: 100%;
+  padding: 0 15px;
+  font-size: 40px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 auto;
+  text-transform: uppercase;
+}
+
+.hero-content p {
+  padding: 0 15px;
+  margin: 30px auto 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.hero-content .hero-job {
+  font-size: 18px;
+}
+
+.hero-content .hero-job span {
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ffffff;
+}
+
+.hero-content .hero-job-desc {
+  font-size: 14px;
+  max-width: 700px;
+}
+
+
+
+/*-----------------------Navbar-----------------------------*/
+header {
+	background-color:#7393B3;
+	padding: 25px;
+	overflow-x: hidden;
+	
+}
+#main-nav{
+	color: black;
+	padding: 10px;
+	text-align: center;
+	z-index: 1;
+	position: relative;
+	overflow-x: hidden;
+}
+.sticky{
+	position: fixed;
+	top: 0;
+	width: 100%;
+}
+.sticky + .pinfo{
+	padding: 60px;
+}
+nav ul{
+		padding: 0;
+    margin: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+	}
+nav li{
+		display: inline-block;
+		margin: 0 10px;
+    opacity: .5;
+
+	}
+nav a{
+		text-decoration: none;
+    color: white;
+    text-transform: uppercase;
+    display: block;
+    font-weight: 600;
+    letter-spacing: .2em;
+    font-size: 25px;
+		text-align: center;
+	}
+ nav a:hover{
+     text-decoration: none;
+     color: white;
+ }
+ nav a:active{
+ 			text-decoration: underline;
+ }
+
+
+@media only screen and (max-width: 600px) {
+  nav ul li {
+    display: block;
+    margin: 10px 0;
+  }
+}
+@media only screen and (max-width: 480px) {
+  img {
+    width: 100%;
+  }
+}
+
+/*-----------------End of Navbar-----------------------------------*/
+/*---------------------Aboout--------------------*/
+.pinfo{
+	background: #FEF9F3;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	display: table;
+}
+/*-----------------End of About------------------*/
+/*------------------------Projects-------------------------*/
+.old-projects {
+			max-width: 960px;
+			margin: 0 auto;
+			padding: 20px;
+			overflow-x: hidden;
+		}
+		 h2{
+			text-align: center;
+			color:#7393B3 ;
+			font-size: 25px;
+		}
+		p{
+			text-align: center;
+			font-size: 15px;
+		}
+
+		.project {
+			background-color: #fff;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+			margin-bottom: 20px;
+			padding: 20px;
+			position: relative;
+		}
+
+		.project:hover .overlay {
+			opacity: 1;
+		}
+
+		.project img {
+			max-width: 100%;
+			height: auto;
+		}
+
+		.overlay {
+			background-color: rgba(0,0,0,0.5);
+			color: #fff;
+			font-size: 24px;
+			font-weight: bold;
+			left: 0;
+			opacity: 0;
+			padding: 20px;
+			position: absolute;
+			text-align: center;
+			top: 0;
+			transition: opacity 0.3s ease;
+			width: 100%;
+			height: 100%;
+			justify-content: center;
+			display: flex;
+			align-items: center;
+			overflow-x: hidden;
+		}
+
+		.overlay a{
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+
+		.overlay:hover {
+			cursor: pointer;
+		}
+
+		.overlay a {
+			color: #fff;
+			text-decoration: none;
+		}
+
+		.overlay a:hover {
+			text-decoration: underline;
+		}
+
+/*---------------End of Projects--------------------------*/
+
+/*--------------Social Media----------------------*/
+
+.contact-div{
+		background-color:transparent;
+		font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 2.5rem;
+    text-align: center;
+    padding-top: 50px;
+}
+
+.fa{
+ padding: 15px;
+  font-size: 30px;
+  width: 25px;
+  text-align: center;
+  text-decoration: none;
+  margin: 5px 2px;
+  border-radius: 50%;
+  max-width: 460px;
+}
+.fa:hover {
+    opacity: 0.7;
+}
+
+.fa-facebook {
+  background: #3B5998;
+  color: white;
+}
+.fa-instagram {
+  background: #125688;
+  color: white;
+}
+.fa-linkedin {
+  background: #007bb5;
+  color: white;
+}
+
+/*------------------------end of social media-----------------*/
+
+/*-----------End Nav------------------*/
+.end-nav{
+	text
+}
+/*-----------End of endNav------------------*/

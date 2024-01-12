@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="style.css">
+<style>
+
+body {
+  margin: 0;
+  font-size: 28px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.header {
+  background-color: #f1f1f1;
+  padding: 30px;
+  text-align: center;
+}
+
+#navbar {
+  overflow: hidden;
+  background-color: #333;
+}
+
+#navbar a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+#navbar a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+#navbar a.active {
+  background-color: #04AA6D;
+  color: white;
+}
+
+.content {
+  padding: 16px;
+}
+
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.sticky + .content {
+  padding-top: 60px;
+}
+</style>
+</head>
+<body>
+<div id="First" class="hero background-overlay">
+    <div class="hero-content">
+          <h1>I am Ervin Regaspi</h1>
+          <p class="hero-job"><span>I'M A FUTURE DEVELOPER</span></p>
+    </div>
+  </div>
+<div id="main-nav">
+  <a class="active" href="javascript:void(0)">Home</a>
+  <a href="javascript:void(0)">News</a>
+  <a href="javascript:void(0)">Contact</a>
+</div>
+
+<div id="About" class="pinfo">
+    
+  </div>
+
+    <div id="Projects" class="old-projects">
+        <h2>MY OLD PROJECTS</h2>
+        <p>This works are from school projects and work immersion</p>
+          <div class="project">
+              <img src="img/Project/1stProject.png" alt="Project 1">
+                <div class="overlay">
+                  <a href="Ervin M/ict.html">View Project</a>
+                </div>
+          </div>
+
+          <div class="project">
+              <img src="img/Project/2ndProject.png" alt="Project 2">
+                <div class="overlay">
+                  <a href="ict/CheatSheet.html">View Project</a>
+                </div>
+          </div>
+
+          <div class="project">
+              <img src="img/Project/3rdProject.png" alt="Project 3">
+                <div class="overlay">
+                  <a href="Website/index-4.html">View Project</a>
+                </div>
+          </div>
+    </div>
+
+
+  <header id="Social media" class="scl-media">
+  </header>
+  <footer>All Reserved &copy; Ervin Regaspi</footer>
+
+<script>
+window.onscroll = function() {myFunction()};
+
+var navbar = document.getElementById("main-nav");
+var sticky = navbar.offsetTop;
+
+function myFunction() {
+  if (window.pageYOffset >= sticky) {
+    navbar.classList.add("sticky")
+  } else {
+    navbar.classList.remove("sticky");
+  }
+}
+</script>
+
+</body>
+</html>
