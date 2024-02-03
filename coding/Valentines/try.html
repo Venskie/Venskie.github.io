@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Button Size Toggle</title>
+<style>
+  /* Style to make buttons look nice */
+  .button-wrapper {
+    display: inline-block;
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  button:nth-child(2) {
+    font-size: 16px; /* Initial font size */
+  }
+</style>
+</head>
+<body>
+  <div class="button-wrapper">
+    <button id="noButton">No</button>
+    <button id="yesButton">Yes</button>
+  </div>
+
+  <script>
+    // Get references to the buttons and wrapper
+    const buttonWrapper = document.querySelector('.button-wrapper');
+    const noButton = document.getElementById('noButton');
+    const yesButton = document.getElementById('yesButton');
+
+    // Add event listener to the "No" button
+    noButton.addEventListener('click', function() {
+      // Double the font size of the "Yes" button
+      yesButton.style.fontSize = parseInt(getComputedStyle(yesButton).fontSize) * 2 + 'px';
+      // Adjust the wrapper width accordingly
+      buttonWrapper.style.width = (buttonWrapper.offsetWidth + 10) + 'px';
+    });
+  </script>
+</body>
+</html>
