@@ -1,0 +1,27 @@
+Install ka ng Pycharm
+Ito link:
+https://www.youtube.com/watch?v=KN6vHY-3F9E
+
+Gawa ka ng project mo.
+Ito pano gumawa ng project
+https://www.youtube.com/watch?v=W5p8v4yhxjk
+(Kapag gagawa ka project Ilagay mo sa same folder yung Excel File)
+
+
+Install mo yung Pandas
+Ito Link:
+https://www.youtube.com/watch?v=OU5TF5lbY4c
+
+
+
+Ito Code
+import pandas as pd
+
+df = pd.read_excel('Example_Data.xlsx') #Lagay mo dito yung pangalan ng excel file mo.
+                                #Mas okay kung itong python file mo and yung excel is magkasama
+print("Original Data")
+print(df)
+
+Final_result = df.sort_values('Name')#Sort mo dito (name, age , gender , etc)
+print("\nSorted Name")#Edit mo nalang din to
+print(Final_result)
