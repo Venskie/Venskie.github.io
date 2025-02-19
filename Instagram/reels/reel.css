@@ -1,0 +1,204 @@
+body{
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+    color: #000000;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-family: Arial, Helvetica, sans-serif;
+    scroll-behavior: smooth;
+}
+
+.main{
+    display: flex;
+    flex-direction: row;
+}
+
+/* sidebar */
+.sidebar{
+    height: 100vh;
+    width: 15%;
+    padding-left: 20px;
+    border-right: 0.1px #697565 solid;
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden; /* Sidebar content scrolls if it overflows */
+    position: sticky; /* Makes the sidebar stick to the viewport */
+    top: 0; /* Sticks it to the top of the viewport */
+    
+}
+
+.bottom{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 15%;
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
+    padding-bottom: 10px;
+}
+.sidebar-item{
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: left;
+    border-radius: 10px;
+    transition: background-color 0.3s, transform 0.3s;
+    font-size: 25px;
+    color: #000000;
+    cursor: pointer;
+    text-decoration: none;
+}
+.sidebar-text{
+    font-size: 20px;
+    padding-left: 10px;
+    text-align: center;
+   
+}
+
+.active{
+    font-weight: 1000;
+    text-decoration: none;
+}
+.sidebar-item:hover{
+    background-color: #f0f0f0;
+}
+
+/* Content */
+.content{
+    width: 85%;
+    height: 100%;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    /* border-right: 0.1px #697565 solid; */
+    /* border-left: 0.1px #697565 solid; */
+    margin-bottom: 50px;
+    scroll-behavior: smooth;
+}
+
+
+.reels{
+    width: 40%;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.reels-content{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+
+.reels-canva{
+    width: 80%;
+    height: 90vh;
+    background-color: #000000;
+    box-shadow: 10px 10px 25px 7px grey;
+    position: relative;
+    overflow: hidden;
+}
+
+.reels-canva video{
+    width: 100%;
+    height:100%;
+    object-fit: contain;
+}
+
+.reels-reaction{
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px;
+    font-size: 30px;
+    font-weight: 200;
+    margin-bottom: 10px;
+}
+
+.reaction-text{
+    justify-content: center;
+    text-align: center;
+}
+.text{
+    font-size: 15px;
+}
+
+.video-info{
+    font-size: 15px;
+    position: absolute;
+    bottom:70px;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 10px;
+    display: none;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+.reels-canva:hover .video-info{
+    display: block;
+    opacity: 1;
+}
+  /* popup */
+
+  /* Styling for the More button popup menu */
+.popup-menu {
+    display: none; /* Initially hidden */
+    position: absolute;
+    bottom: 0; /* Adjust based on the position of your sidebar item */
+    left: 20px; /* Center align horizontally */
+    background: #fff;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1000;
+    padding: 10px 0;
+    width: 200px;
+    height: 100px;
+    align-items: center;
+    text-align: center;
+    padding: 10px 15px;
+    overflow: hidden;
+   
+}
+
+/* Individual menu items */
+.popup-item {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #ddd;
+    transition: background 0.2s;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+
+}
+
+/* Hover effect for menu items */
+.popup-item:hover {
+    background: #f4f4f4;
+}
+
+/* Last item doesn't have a bottom border */
+.popup-item:last-child {
+    border-bottom: none;
+}
+
+
+
+
