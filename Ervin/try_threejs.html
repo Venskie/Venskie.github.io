@@ -5,256 +5,290 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
   <title>Real-Time ASL Words Tracker</title>
   <style>
-    body { margin:0; overflow:hidden; background:#000; font-family:Arial; color:white; touch-action: none; }
-    canvas { position:absolute; top:0; left:0; z-index:1; }
-    #info {
-      position:absolute; top:10px; left:10px; right:10px; z-index:10; background:rgba(0,0,0,0.75);
-      padding:15px; border-radius:12px; max-width:420px; margin:0 auto; font-size:14px;
+    body { 
+      margin:0; 
+      overflow:hidden; 
+      background:#000; 
+      font-family:Arial, sans-serif; 
+      color:white; 
+      touch-action: none; 
     }
-    #detected { font-size:32px; color:#0f0; font-weight:bold; }
-    #phrase { font-size:22px; color:#f0f; margin:12px 0; min-height:30px; }
+    #video {
+      position: fixed;
+      top: 50%; left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      object-fit: cover;
+    }
+    canvas { 
+      position: absolute; 
+      top: 0; left: 0; 
+      width: 100%; 
+      height: 100%; 
+      z-index: 2;
+      pointer-events: none;
+    }
+    #info {
+      position: absolute; 
+      top: 10px; left: 10px; right: 10px; 
+      z-index: 10; 
+      background: rgba(0,0,0,0.75);
+      padding: 15px; 
+      border-radius: 12px; 
+      max-width: 420px; 
+      margin: 0 auto; 
+      font-size: 14px;
+    }
+    #detected { font-size: 32px; color: #0f0; font-weight: bold; }
+    #phrase { font-size: 22px; color: #f0f; margin: 12px 0; min-height: 30px; }
     button { 
-      margin:8px 0; padding:12px 20px; background:#0066ff; color:white; 
-      border:none; border-radius:8px; cursor:pointer; font-size:18px; width:100%;
+      margin: 8px 0; 
+      padding: 12px 20px; 
+      background: #0066ff; 
+      color: white; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 18px; 
+      width: 100%;
     }
     .grid { 
-      display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:15px; font-size:12px; 
+      display: grid; 
+      grid-template-columns: repeat(4,1fr); 
+      gap: 8px; 
+      margin-top: 15px; 
+      font-size: 12px; 
     }
     .grid strong { grid-column: span 4; }
   </style>
 </head>
 <body>
 
-<canvas id="canvas"></canvas>
+  <!-- Visible video feed (centered & scaled) -->
+  <video id="video" playsinline muted autoplay></video>
 
-<div id="info">
-  <h2>ASL Words Tracker</h2>
-  <button id="startBtn">Start Camera</button>
-  <div>Word: <span id="detected">None</span></div>
-  <div>Confidence: <span id="conf">0%</span></div>
-  <div id="phrase">Start signing...</div>
-  <button id="clear">Clear Phrase</button>
-  <div class="grid">
-    <strong>Supported Words:</strong>
-    HELLO THANKYOU PLEASE YES NO LOVE EAT DRINK HOME HELP
+  <!-- Three.js canvas for 3D hand overlay -->
+  <canvas id="canvas"></canvas>
+
+  <div id="info">
+    <h2>ASL Words Tracker</h2>
+    <button id="startBtn">Start Camera</button>
+    <div>Word: <span id="detected">None</span></div>
+    <div>Confidence: <span id="conf">0%</span></div>
+    <div id="phrase">Start signing...</div>
+    <button id="clear">Clear Phrase</button>
+    <div class="grid">
+      <strong>Supported Words:</strong>
+      HELLO THANKYOU PLEASE YES NO LOVE EAT DRINK HOME HELP
+    </div>
   </div>
-</div>
 
-<!-- Libraries -->
-<script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+  <!-- Libraries -->
+  <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
 
-<script type="module">
-  // Three.js Setup
-  const scene = new THREE.Scene();
-  const camera3D = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 100);
-  const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('canvas'), antialias:true, alpha:true});
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setClearColor(0x000000, 0);
-  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-  dirLight.position.set(0, 1, 1);
-  scene.add(dirLight);
+  <script type="module">
+    // Three.js Setup
+    const scene = new THREE.Scene();
+    const camera3D = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100);
+    const renderer = new THREE.WebGLRenderer({
+      canvas: document.getElementById('canvas'),
+      antialias: true,
+      alpha: true,                  // Critical for transparency
+      preserveDrawingBuffer: true
+    });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setClearColor(0x000000, 0);  // Fully transparent
 
-  const handGroup = new THREE.Group();
-  scene.add(handGroup);
-  camera3D.position.z = 1.5;
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(0, 1, 2);
+    scene.add(dirLight);
 
-  const spheres = [];
-  for(let i = 0; i < 21; i++) {
-    const geo = new THREE.SphereGeometry(0.008, 12, 10);
-    const mat = new THREE.MeshBasicMaterial({color: 0x00ff88});
-    const s = new THREE.Mesh(geo, mat);
-    handGroup.add(s);
-    spheres.push(s);
-  }
+    const handGroup = new THREE.Group();
+    scene.add(handGroup);
+    camera3D.position.z = 1.5;
 
-  // Elements
-  const video = document.createElement('video');
-  video.playsInline = true;
-  video.muted = true;
-  video.autoplay = true;
-  video.style.display = 'none';
-  document.body.appendChild(video);
-
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
-
-  // Model & Vocabulary
-  const VOCAB = ['NONE','HELLO','THANKYOU','PLEASE','YES','NO','LOVE','EAT','DRINK','HOME','HELP'];
-  const SEQ_LEN = 24;
-  const FEATURE_DIM = 63;
-  let sequence = [];
-  let prevWrist = null;
-  let phrase = [];
-  let lastWordTime = 0;
-
-  const model = tf.sequential({
-    layers: [
-      tf.layers.lstm({units: 64, inputShape: [SEQ_LEN, FEATURE_DIM], returnSequences: false}),
-      tf.layers.dense({units: 32, activation: 'relu'}),
-      tf.layers.dropout({rate: 0.3}),
-      tf.layers.dense({units: VOCAB.length, activation: 'softmax'})
-    ]
-  });
-
-  async function loadModel() {
-    try {
-      await model.loadWeights('https://raw.githubusercontent.com/victordibia/handtrack.js/master/examples/asl/model.json');
-      console.log("ASL Model loaded successfully");
-    } catch(e) {
-      console.warn("Could not load model, using random weights (lower accuracy)");
-    }
-  }
-
-  function normalizeLandmarks(landmarks) {
-    if (!landmarks) return null;
-    const wrist = landmarks[0];
-    return landmarks.map(p => ({
-      x: p.x - wrist.x,
-      y: p.y - wrist.y,
-      z: (p.z || 0) - (wrist.z || 0)
-    }));
-  }
-
-  function extractFeatures(landmarks) {
-    const norm = normalizeLandmarks(landmarks);
-    if (!norm) return null;
-    return norm.flatMap(p => [p.x, p.y, p.z]);
-  }
-
-  async function predictWord() {
-    if (sequence.length < SEQ_LEN) return null;
-    const input = tf.tensor3d([sequence.slice(-SEQ_LEN)], [1, SEQ_LEN, FEATURE_DIM]);
-    const pred = model.predict(input);
-    const values = await pred.data();
-    input.dispose(); pred.dispose();
-    const maxIdx = values.indexOf(Math.max(...values));
-    const confidence = values[maxIdx];
-    return confidence > 0.65 ? {word: VOCAB[maxIdx], conf: confidence} : null;
-  }
-
-  // MediaPipe Hands
-  const hands = new Hands({locateFile: (file) => 
-    `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-  hands.setOptions({
-    maxNumHands: 1,
-    modelComplexity: 1,
-    minDetectionConfidence: 0.7,
-    minTrackingConfidence: 0.7
-  });
-
-  hands.onResults(async (results) => {
-    ctx.save();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-
-    if (results.multiHandLandmarks && results.multiHandLandmarks[0]) {
-      const landmarks = results.multiHandLandmarks[0];
-
-      // Draw 2D skeleton
-      drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {color: '#00ff00', lineWidth: 4});
-      drawLandmarks(ctx, landmarks, {color: '#ff0088', radius: 6});
-
-      // Update 3D hand
-      handGroup.visible = true;
-      landmarks.forEach((lm, i) => {
-        spheres[i].position.set(
-          -(lm.x - 0.5) * 1.4,
-          -(lm.y - 0.5) * 1.4,
-          (lm.z || 0) * 3
-        );
-      });
-
-      // Feature extraction
-      const feats = extractFeatures(landmarks);
-      if (feats) sequence.push(feats);
-      if (sequence.length > SEQ_LEN * 4) sequence.shift();
-
-      // Motion-based word segmentation
-      const wrist = landmarks[0];
-      let motion = 0;
-      if (prevWrist) {
-        motion = Math.hypot(wrist.x - prevWrist.x, wrist.y - prevWrist.y);
-      }
-      prevWrist = wrist;
-
-      if (motion < 0.015 && sequence.length >= SEQ_LEN && performance.now() - lastWordTime > 900) {
-        const result = await predictWord();
-        if (result && result.word !== 'NONE') {
-          phrase.push(result.word);
-          document.getElementById('detected').textContent = result.word;
-          document.getElementById('conf').textContent = (result.conf * 100).toFixed(0) + '%';
-          document.getElementById('phrase').textContent = phrase.join(' ') || 'Start signing...';
-          lastWordTime = performance.now();
-          sequence = sequence.slice(-SEQ_LEN); // Keep some context
-        }
-      }
-    } else {
-      handGroup.visible = false;
-      prevWrist = null;
+    const spheres = [];
+    for (let i = 0; i < 21; i++) {
+      const geo = new THREE.SphereGeometry(0.012, 16, 12);
+      const mat = new THREE.MeshBasicMaterial({ color: 0x00ff88 });
+      const s = new THREE.Mesh(geo, mat);
+      handGroup.add(s);
+      spheres.push(s);
     }
 
-    ctx.restore();
-    renderer.render(scene, camera3D);
-  });
+    // Elements
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
 
-  // ========== CAMERA START (ONLY AFTER USER TAP) ==========
-  let cameraInstance = null;
+    // Model & Vocabulary
+    const VOCAB = ['NONE','HELLO','THANKYOU','PLEASE','YES','NO','LOVE','EAT','DRINK','HOME','HELP'];
+    const SEQ_LEN = 24;
+    const FEATURE_DIM = 63;  // 21 landmarks × 3 (x,y,z)
+    let sequence = [];
+    let prevWrist = null;
+    let phrase = [];
+    let lastWordTime = 0;
 
-  async function startCamera() {
-    const btn = document.getElementById('startBtn');
-    btn.textContent = "Starting...";
-    btn.disabled = true;
-
-    await loadModel();
-
-    cameraInstance = new Camera(video, {
-      onFrame: async () => {
-        await hands.send({image: video});
-      },
-      width: 640,
-      height: 480,
-      facingMode: "environment" // use "user" for front camera
+    const model = tf.sequential({
+      layers: [
+        tf.layers.lstm({ units: 64, inputShape: [SEQ_LEN, FEATURE_DIM], returnSequences: false }),
+        tf.layers.dense({ units: 32, activation: 'relu' }),
+        tf.layers.dropout({ rate: 0.3 }),
+        tf.layers.dense({ units: VOCAB.length, activation: 'softmax' })
+      ]
     });
 
-    try {
-      await cameraInstance.start();
-      btn.textContent = "Camera Running";
-      btn.style.background = "#00aa00";
-    } catch (err) {
-      console.error(err);
-      btn.textContent = "Camera Failed";
-      btn.style.background = "#aa0000";
+    async function loadModel() {
+      try {
+        await model.loadWeights('https://raw.githubusercontent.com/victordibia/handtrack.js/master/examples/asl/model.json');
+        console.log("ASL Model loaded");
+      } catch (e) {
+        console.warn("Model failed to load – using random weights (lower accuracy)", e);
+      }
     }
-  }
 
-  document.getElementById('startBtn').addEventListener('click', startCamera);
-  document.getElementById('clear').onclick = () => {
-    phrase = [];
-    document.getElementById('phrase').textContent = 'Start signing...';
-  };
+    function normalizeLandmarks(landmarks) {
+      if (!landmarks) return null;
+      const wrist = landmarks[0];
+      return landmarks.map(p => ({
+        x: p.x - wrist.x,
+        y: p.y - wrist.y,
+        z: (p.z || 0) - (wrist.z || 0)
+      }));
+    }
 
-  // Resize handler
-  window.addEventListener('resize', () => {
-    camera3D.aspect = innerWidth / innerHeight;
-    camera3D.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-  });
+    function extractFeatures(landmarks) {
+      const norm = normalizeLandmarks(landmarks);
+      if (!norm) return null;
+      return norm.flatMap(p => [p.x, p.y, p.z]);
+    }
 
-  // Animation loop
-  function animate() {
-    requestAnimationFrame(animate);
-    renderer.render(scene, camera3D);
-  }
-  animate();
-</script>
+    async function predictWord() {
+      if (sequence.length < SEQ_LEN) return null;
+      const input = tf.tensor3d([sequence.slice(-SEQ_LEN)], [1, SEQ_LEN, FEATURE_DIM]);
+      const pred = model.predict(input);
+      const values = await pred.data();
+      input.dispose(); pred.dispose();
+      const maxIdx = values.indexOf(Math.max(...values));
+      const confidence = values[maxIdx];
+      return confidence > 0.65 ? { word: VOCAB[maxIdx], conf: confidence } : null;
+    }
+
+    // MediaPipe Hands
+    const hands = new Hands({ locateFile: (file) => 
+      `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
+    hands.setOptions({
+      maxNumHands: 1,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.7,
+      minTrackingConfidence: 0.7
+    });
+
+    hands.onResults(async (results) => {
+      if (results.multiHandLandmarks && results.multiHandLandmarks[0]) {
+        const landmarks = results.multiHandLandmarks[0];
+
+        // Update 3D hand model
+        handGroup.visible = true;
+        landmarks.forEach((lm, i) => {
+          spheres[i].position.set(
+            -(lm.x - 0.5) * 2.8,
+            -(lm.y - 0.5) * 2.8,
+            (lm.z || 0) * 6
+          );
+        });
+
+        // Feature extraction
+        const feats = extractFeatures(landmarks);
+        if (feats) sequence.push(feats);
+        if (sequence.length > SEQ_LEN * 4) sequence.shift();
+
+        // Motion-based segmentation
+        const wrist = landmarks[0];
+        let motion = 0;
+        if (prevWrist) {
+          motion = Math.hypot(wrist.x - prevWrist.x, wrist.y - prevWrist.y);
+        }
+        prevWrist = wrist;
+
+        if (motion < 0.015 && sequence.length >= SEQ_LEN && performance.now() - lastWordTime > 900) {
+          const result = await predictWord();
+          if (result && result.word !== 'NONE') {
+            phrase.push(result.word);
+            document.getElementById('detected').textContent = result.word;
+            document.getElementById('conf').textContent = (result.conf * 100).toFixed(0) + '%';
+            document.getElementById('phrase').textContent = phrase.join(' ') || 'Start signing...';
+            lastWordTime = performance.now();
+            sequence = sequence.slice(-SEQ_LEN);
+          }
+        }
+      } else {
+        handGroup.visible = false;
+        prevWrist = null;
+      }
+
+      renderer.render(scene, camera3D);
+    });
+
+    // Camera Start
+    let cameraInstance = null;
+    async function startCamera() {
+      const btn = document.getElementById('startBtn');
+      btn.textContent = "Starting...";
+      btn.disabled = true;
+
+      await loadModel();
+
+      cameraInstance = new Camera(video, {
+        onFrame: async () => {
+          await hands.send({ image: video });
+        },
+        width: 640,
+        height: 480,
+        facingMode: "environment"  // change to "user" for selfie mode
+      });
+
+      try {
+        await cameraInstance.start();
+        btn.textContent = "Camera On";
+        btn.style.background = "#00aa00";
+      } catch (err) {
+        console.error(err);
+        btn.textContent = "Camera Failed";
+        btn.style.background = "#aa0000";
+      }
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startCamera);
+    document.getElementById('clear').onclick = () => {
+      phrase = [];
+      document.getElementById('phrase').textContent = 'Start signing...';
+    };
+
+    // Resize
+    window.addEventListener('resize', () => {
+      camera3D.aspect = innerWidth / innerHeight;
+      camera3D.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera3D);
+    }
+    animate();
+  </script>
 </body>
 </html>
