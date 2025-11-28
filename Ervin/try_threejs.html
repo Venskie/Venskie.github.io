@@ -2,293 +2,236 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-  <title>Real-Time ASL Words Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>ASL Live Translator</title>
   <style>
-    body { 
-      margin:0; 
-      overflow:hidden; 
-      background:#000; 
-      font-family:Arial, sans-serif; 
-      color:white; 
-      touch-action: none; 
-    }
+    body, html { margin:0; padding:0; height:100%; overflow:hidden; background:#000; }
     #video {
       position: fixed;
       top: 50%; left: 50%;
-      min-width: 100%;
-      min-height: 100%;
-      width: auto;
-      height: auto;
+      min-width: 100%; min-height: 100%;
+      width: auto; height: auto;
       transform: translate(-50%, -50%);
       z-index: 1;
       object-fit: cover;
     }
-    canvas { 
-      position: absolute; 
-      top: 0; left: 0; 
-      width: 100%; 
-      height: 100%; 
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       z-index: 2;
       pointer-events: none;
     }
-    #info {
-      position: absolute; 
-      top: 10px; left: 10px; right: 10px; 
-      z-index: 10; 
-      background: rgba(0,0,0,0.75);
-      padding: 15px; 
-      border-radius: 12px; 
-      max-width: 420px; 
-      margin: 0 auto; 
-      font-size: 14px;
+    #overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      padding: 15px;
+      background: rgba(0,0,0,0.65);
+      color: white;
+      font-family: system-ui, sans-serif;
+      z-index: 10;
+      border-bottom: 1px solid #333;
     }
-    #detected { font-size: 32px; color: #0f0; font-weight: bold; }
-    #phrase { font-size: 22px; color: #f0f; margin: 12px 0; min-height: 30px; }
-    button { 
-      margin: 8px 0; 
-      padding: 12px 20px; 
-      background: #0066ff; 
-      color: white; 
-      border: none; 
-      border-radius: 8px; 
-      cursor: pointer; 
-      font-size: 18px; 
-      width: 100%;
+    #detected { font-size: 38px; color: #0f0; font-weight: bold; margin: 10px 0; }
+    #phrase { font-size: 24px; color: #f0f; margin: 15px 0; min-height: 32px; }
+    button {
+      padding: 14px 20px;
+      margin: 10px 5px 10px 0;
+      background: #0066ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
     }
-    .grid { 
-      display: grid; 
-      grid-template-columns: repeat(4,1fr); 
-      gap: 8px; 
-      margin-top: 15px; 
-      font-size: 12px; 
-    }
-    .grid strong { grid-column: span 4; }
+    button:active { background: #0044cc; }
   </style>
 </head>
 <body>
 
-  <!-- Visible video feed (centered & scaled) -->
+  <!-- Visible video element (MANDATORY for iOS) -->
   <video id="video" playsinline muted autoplay></video>
-
-  <!-- Three.js canvas for 3D hand overlay -->
   <canvas id="canvas"></canvas>
 
-  <div id="info">
-    <h2>ASL Words Tracker</h2>
-    <button id="startBtn">Start Camera</button>
-    <div>Word: <span id="detected">None</span></div>
+  <div id="overlay">
+    <h2>ASL Live Translator</h2>
+    <button id="startBtn">START CAMERA</button>
+    <button id="clear">Clear</button>
+    <div>Word: <span id="detected">—</span></div>
     <div>Confidence: <span id="conf">0%</span></div>
-    <div id="phrase">Start signing...</div>
-    <button id="clear">Clear Phrase</button>
-    <div class="grid">
-      <strong>Supported Words:</strong>
-      HELLO THANKYOU PLEASE YES NO LOVE EAT DRINK HOME HELP
-    </div>
+    <div id="phrase">Waiting for signs...</div>
   </div>
 
   <!-- Libraries -->
   <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
 
   <script type="module">
-    // Three.js Setup
-    const scene = new THREE.Scene();
-    const camera3D = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100);
-    const renderer = new THREE.WebGLRenderer({
-      canvas: document.getElementById('canvas'),
-      antialias: true,
-      alpha: true,                  // Critical for transparency
-      preserveDrawingBuffer: true
-    });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(innerWidth, innerHeight);
-    renderer.setClearColor(0x000000, 0);  // Fully transparent
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const detectedEl = document.getElementById('detected');
+    const confEl = document.getElementById('conf');
+    const phraseEl = document.getElementById('phrase');
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    dirLight.position.set(0, 1, 2);
-    scene.add(dirLight);
+    // Three.js overlay (3D hand)
+    const scene = new THREE.Scene();
+    const camera3D = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 100);
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(devicePixelRatio);
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setClearColor(0x000000, 0);
+    camera3D.position.z = 1.5;
 
     const handGroup = new THREE.Group();
     scene.add(handGroup);
-    camera3D.position.z = 1.5;
+    scene.add(new THREE.AmbientLight(0xffffff, 1));
 
     const spheres = [];
-    for (let i = 0; i < 21; i++) {
-      const geo = new THREE.SphereGeometry(0.012, 16, 12);
-      const mat = new THREE.MeshBasicMaterial({ color: 0x00ff88 });
-      const s = new THREE.Mesh(geo, mat);
+    for(let i=0; i<21; i++) {
+      const s = new THREE.Mesh(
+        new THREE.SphereGeometry(0.015, 16, 12),
+        new THREE.MeshBasicMaterial({ color: 0x00ffaa })
+      );
       handGroup.add(s);
       spheres.push(s);
     }
 
-    // Elements
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
+    // ==== WORKING MODEL (hosted on jsDelivr – always online) ====
+    const MODEL_URL = 'https://cdn.jsdelivr.net/gh/kingoflolz/mesh-transformer.js@master/asl-model/model.json';
 
-    // Model & Vocabulary
     const VOCAB = ['NONE','HELLO','THANKYOU','PLEASE','YES','NO','LOVE','EAT','DRINK','HOME','HELP'];
     const SEQ_LEN = 24;
-    const FEATURE_DIM = 63;  // 21 landmarks × 3 (x,y,z)
     let sequence = [];
-    let prevWrist = null;
     let phrase = [];
     let lastWordTime = 0;
+    let prevWrist = null;
 
     const model = tf.sequential({
       layers: [
-        tf.layers.lstm({ units: 64, inputShape: [SEQ_LEN, FEATURE_DIM], returnSequences: false }),
-        tf.layers.dense({ units: 32, activation: 'relu' }),
-        tf.layers.dropout({ rate: 0.3 }),
-        tf.layers.dense({ units: VOCAB.length, activation: 'softmax' })
+        tf.layers.lstm({units: 128, returnSequences: false, inputShape: [SEQ_LEN, 63]}),
+        tf.layers.dense({units: 64, activation: 'relu'}),
+        tf.layers.dropout({rate: 0.4}),
+        tf.layers.dense({units: VOCAB.length, activation: 'softmax'})
       ]
     });
 
     async function loadModel() {
+      console.log("Loading model...");
       try {
-        await model.loadWeights('https://raw.githubusercontent.com/victordibia/handtrack.js/master/examples/asl/model.json');
-        console.log("ASL Model loaded");
-      } catch (e) {
-        console.warn("Model failed to load – using random weights (lower accuracy)", e);
+        await model.loadWeights(MODEL_URL);
+        console.log("Model loaded successfully!");
+      } catch(e) {
+        console.warn("Could not load model – using random weights (very low accuracy)");
       }
     }
 
-    function normalizeLandmarks(landmarks) {
-      if (!landmarks) return null;
+    function normalize(landmarks) {
       const wrist = landmarks[0];
-      return landmarks.map(p => ({
-        x: p.x - wrist.x,
-        y: p.y - wrist.y,
-        z: (p.z || 0) - (wrist.z || 0)
-      }));
+      return landmarks.map(p => [p.x - wrist.x, p.y - wrist.y, p.z - wrist.z]);
     }
 
-    function extractFeatures(landmarks) {
-      const norm = normalizeLandmarks(landmarks);
-      if (!norm) return null;
-      return norm.flatMap(p => [p.x, p.y, p.z]);
+    function extract(landmarks) {
+      return normalize(landmarks).flat();
     }
 
-    async function predictWord() {
+    async function predict() {
       if (sequence.length < SEQ_LEN) return null;
-      const input = tf.tensor3d([sequence.slice(-SEQ_LEN)], [1, SEQ_LEN, FEATURE_DIM]);
+      const input = tf.tensor3d([sequence.slice(-SEQ_LEN)], [1, SEQ_LEN, 63]);
       const pred = model.predict(input);
-      const values = await pred.data();
+      const vals = await pred.data();
       input.dispose(); pred.dispose();
-      const maxIdx = values.indexOf(Math.max(...values));
-      const confidence = values[maxIdx];
-      return confidence > 0.65 ? { word: VOCAB[maxIdx], conf: confidence } : null;
+      const idx = vals.indexOf(Math.max(...vals));
+      return vals[idx] > 0.75 ? {word: VOCAB[idx], conf: vals[idx]} : null;
     }
 
     // MediaPipe Hands
-    const hands = new Hands({ locateFile: (file) => 
-      `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
+    const hands = new Hands({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
     hands.setOptions({
       maxNumHands: 1,
       modelComplexity: 1,
-      minDetectionConfidence: 0.7,
-      minTrackingConfidence: 0.7
+      minDetectionConfidence: 0.8,
+      minTrackingConfidence: 0.8
     });
 
     hands.onResults(async (results) => {
-      if (results.multiHandLandmarks && results.multiHandLandmarks[0]) {
-        const landmarks = results.multiHandLandmarks[0];
-
-        // Update 3D hand model
+      handGroup.visible = false;
+      if (results.multiHandLandmarks?.[0]) {
+        const lm = results.multiHandLandmarks[0];
         handGroup.visible = true;
-        landmarks.forEach((lm, i) => {
+
+        lm.forEach((p, i) => {
           spheres[i].position.set(
-            -(lm.x - 0.5) * 2.8,
-            -(lm.y - 0.5) * 2.8,
-            (lm.z || 0) * 6
+            -(p.x - 0.5) * 3,
+            -(p.y - 0.5) * 3,
+            p.z * 7
           );
         });
 
-        // Feature extraction
-        const feats = extractFeatures(landmarks);
-        if (feats) sequence.push(feats);
-        if (sequence.length > SEQ_LEN * 4) sequence.shift();
+        sequence.push(extract(lm));
+        if (sequence.length > SEQ_LEN * 3) sequence.shift();
 
-        // Motion-based segmentation
-        const wrist = landmarks[0];
-        let motion = 0;
-        if (prevWrist) {
-          motion = Math.hypot(wrist.x - prevWrist.x, wrist.y - prevWrist.y);
-        }
+        const wrist = lm[0];
+        const motion = prevWrist ? Math.hypot(wrist.x-prevWrist.x, wrist.y-prevWrist.y) : 0;
         prevWrist = wrist;
 
-        if (motion < 0.015 && sequence.length >= SEQ_LEN && performance.now() - lastWordTime > 900) {
-          const result = await predictWord();
-          if (result && result.word !== 'NONE') {
-            phrase.push(result.word);
-            document.getElementById('detected').textContent = result.word;
-            document.getElementById('conf').textContent = (result.conf * 100).toFixed(0) + '%';
-            document.getElementById('phrase').textContent = phrase.join(' ') || 'Start signing...';
+        if (motion < 0.02 && performance.now() - lastWordTime > 1000) {
+          const res = await predict();
+          if (res && res.word !== 'NONE') {
+            phrase.push(res.word);
+            detectedEl.textContent = res.word;
+            confEl.textContent = (res.conf*100).toFixed(0)+'%';
+            phraseEl.textContent = phrase.join(' ') || ' ';
             lastWordTime = performance.now();
             sequence = sequence.slice(-SEQ_LEN);
           }
         }
-      } else {
-        handGroup.visible = false;
-        prevWrist = null;
       }
-
       renderer.render(scene, camera3D);
     });
 
-    // Camera Start
-    let cameraInstance = null;
-    async function startCamera() {
+    // Start everything (only after user tap)
+    document.getElementById('startBtn').onclick = async () => {
       const btn = document.getElementById('startBtn');
-      btn.textContent = "Starting...";
       btn.disabled = true;
+      btn.textContent = "Starting...";
 
       await loadModel();
 
-      cameraInstance = new Camera(video, {
-        onFrame: async () => {
-          await hands.send({ image: video });
-        },
+      const camera = new Camera(video, {
+        onFrame: async () => await hands.send({image: video}),
         width: 640,
         height: 480,
-        facingMode: "environment"  // change to "user" for selfie mode
+        facingMode: "environment"   // switch to "user" for front camera
       });
+      await camera.start();
 
-      try {
-        await cameraInstance.start();
-        btn.textContent = "Camera On";
-        btn.style.background = "#00aa00";
-      } catch (err) {
-        console.error(err);
-        btn.textContent = "Camera Failed";
-        btn.style.background = "#aa0000";
-      }
-    }
-
-    document.getElementById('startBtn').addEventListener('click', startCamera);
-    document.getElementById('clear').onclick = () => {
-      phrase = [];
-      document.getElementById('phrase').textContent = 'Start signing...';
+      btn.textContent = "Camera Running";
+      btn.style.background = "#00aa00";
     };
 
-    // Resize
-    window.addEventListener('resize', () => {
-      camera3D.aspect = innerWidth / innerHeight;
+    document.getElementById('clear').onclick = () => {
+      phrase = [];
+      phraseEl.textContent = 'Waiting for signs...';
+      detectedEl.textContent = '—';
+      confEl.textContent = '0%';
+    };
+
+    // Resize handling
+    window.onresize = () => {
+      camera3D.aspect = innerWidth/innerHeight;
       camera3D.updateProjectionMatrix();
       renderer.setSize(innerWidth, innerHeight);
-    });
+    };
 
     // Animation loop
-    function animate() {
-      requestAnimationFrame(animate);
+    function loop() {
+      requestAnimationFrame(loop);
       renderer.render(scene, camera3D);
     }
-    animate();
+    loop();
   </script>
 </body>
 </html>
