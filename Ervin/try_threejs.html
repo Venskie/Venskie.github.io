@@ -11,7 +11,7 @@
       top: 50%; left: 50%;
       min-width: 100%; min-height: 100%;
       width: auto; height: auto;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scaleX(-1);
       z-index: 1;
       object-fit: cover;
     }
@@ -21,45 +21,55 @@
       width: 100%; height: 100%;
       z-index: 2;
       pointer-events: none;
+      transform: scaleX(-1);
     }
     #overlay {
       position: fixed;
       top: 0; left: 0; right: 0;
       padding: 15px;
-      background: rgba(0,0,0,0.65);
+      background: rgba(0,0,0,0.7);
       color: white;
       font-family: system-ui, sans-serif;
       z-index: 10;
-      border-bottom: 1px solid #333;
     }
-    #detected { font-size: 38px; color: #0f0; font-weight: bold; margin: 10px 0; }
-    #phrase { font-size: 24px; color: #f0f; margin: 15px 0; min-height: 32px; }
+    h2 { margin:0 0 10px 0; }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0;
+    }
     button {
-      padding: 14px 20px;
-      margin: 10px 5px 10px 0;
+      flex: 1;
+      padding: 14px;
       background: #0066ff;
       color: white;
       border: none;
       border-radius: 10px;
-      font-size: 18px;
+      font-size: 16px;
       cursor: pointer;
     }
-    button:active { background: #0044cc; }
+    button:active, button.active { background: #00aa00 !important; }
+    #detected { font-size: 38px; color: #0f0; font-weight: bold; margin: 10px 0; }
+    #phrase { font-size: 24px; color: #f0f; margin: 15px 0; min-height: 32px; }
   </style>
 </head>
 <body>
 
-  <!-- Visible video element (MANDATORY for iOS) -->
   <video id="video" playsinline muted autoplay></video>
   <canvas id="canvas"></canvas>
 
   <div id="overlay">
     <h2>ASL Live Translator</h2>
-    <button id="startBtn">START CAMERA</button>
-    <button id="clear">Clear</button>
-    <div>Word: <span id="detected">—</span></div>
+    
+    <div class="btn-group">
+      <button id="frontBtn" class="active">Front Camera</button>
+      <button id="backBtn">Back Camera</button>
+    </div>
+    <button id="clear" style="background:#d42828;">Clear Text</button>
+
+    <div>Current word: <span id="detected">—</span></div>
     <div>Confidence: <span id="conf">0%</span></div>
-    <div id="phrase">Waiting for signs...</div>
+    <div id="phrase">Ready — choose camera and sign!</div>
   </div>
 
   <!-- Libraries -->
@@ -76,7 +86,7 @@
     const confEl = document.getElementById('conf');
     const phraseEl = document.getElementById('phrase');
 
-    // Three.js overlay (3D hand)
+    // Three.js 3D hand overlay
     const scene = new THREE.Scene();
     const camera3D = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 100);
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -99,15 +109,11 @@
       spheres.push(s);
     }
 
-    // ==== WORKING MODEL (hosted on jsDelivr – always online) ====
+    // Model & vocab
     const MODEL_URL = 'https://cdn.jsdelivr.net/gh/kingoflolz/mesh-transformer.js@master/asl-model/model.json';
-
     const VOCAB = ['NONE','HELLO','THANKYOU','PLEASE','YES','NO','LOVE','EAT','DRINK','HOME','HELP'];
     const SEQ_LEN = 24;
-    let sequence = [];
-    let phrase = [];
-    let lastWordTime = 0;
-    let prevWrist = null;
+    let sequence = [], phrase = [], lastWordTime = 0, prevWrist = null;
 
     const model = tf.sequential({
       layers: [
@@ -119,22 +125,19 @@
     });
 
     async function loadModel() {
-      console.log("Loading model...");
+      console.log("Loading ASL model...");
       try {
         await model.loadWeights(MODEL_URL);
-        console.log("Model loaded successfully!");
+        console.log("Model ready!");
       } catch(e) {
-        console.warn("Could not load model – using random weights (very low accuracy)");
+        console.warn("Model failed – low accuracy mode");
       }
     }
-
-    function normalize(landmarks) {
-      const wrist = landmarks[0];
-      return landmarks.map(p => [p.x - wrist.x, p.y - wrist.y, p.z - wrist.z]);
-    }
+    loadModel();
 
     function extract(landmarks) {
-      return normalize(landmarks).flat();
+      const wrist = landmarks[0];
+      return landmarks.flatMap(p => [p.x - wrist.x, p.y - wrist.y, p.z - wrist.z]);
     }
 
     async function predict() {
@@ -156,12 +159,13 @@
       minTrackingConfidence: 0.8
     });
 
+    let currentCamera = null;
+
     hands.onResults(async (results) => {
       handGroup.visible = false;
       if (results.multiHandLandmarks?.[0]) {
         const lm = results.multiHandLandmarks[0];
         handGroup.visible = true;
-
         lm.forEach((p, i) => {
           spheres[i].position.set(
             -(p.x - 0.5) * 3,
@@ -174,7 +178,7 @@
         if (sequence.length > SEQ_LEN * 3) sequence.shift();
 
         const wrist = lm[0];
-        const motion = prevWrist ? Math.hypot(wrist.x-prevWrist.x, wrist.y-prevWrist.y) : 0;
+        const motion = prevWrist ? Math.hypot(wrist.x - prevWrist.x, wrist.y - prevWrist.y) : 1;
         prevWrist = wrist;
 
         if (motion < 0.02 && performance.now() - lastWordTime > 1000) {
@@ -182,8 +186,8 @@
           if (res && res.word !== 'NONE') {
             phrase.push(res.word);
             detectedEl.textContent = res.word;
-            confEl.textContent = (res.conf*100).toFixed(0)+'%';
-            phraseEl.textContent = phrase.join(' ') || ' ';
+            confEl.textContent = (res.conf*100).toFixed(0) + '%';
+            phraseEl.textContent = phrase.join(' ') || ' ';
             lastWordTime = performance.now();
             sequence = sequence.slice(-SEQ_LEN);
           }
@@ -192,41 +196,49 @@
       renderer.render(scene, camera3D);
     });
 
-    // Start everything (only after user tap)
-    document.getElementById('startBtn').onclick = async () => {
-      const btn = document.getElementById('startBtn');
-      btn.disabled = true;
-      btn.textContent = "Starting...";
-
-      await loadModel();
-
-      const camera = new Camera(video, {
+    // === CAMERA SWITCHER ===
+    async function startCamera(mode) {
+      if (currentCamera) currentCamera.stop();
+      
+      currentCamera = new Camera(video, {
         onFrame: async () => await hands.send({image: video}),
         width: 640,
         height: 480,
-        facingMode: "environment"   // switch to "user" for front camera
+        facingMode: mode  // "user" = front, "environment" = back
       });
-      await camera.start();
+      await currentCamera.start();
+    }
 
-      btn.textContent = "Camera Running";
-      btn.style.background = "#00aa00";
+    document.getElementById('frontBtn').onclick = async () => {
+      document.getElementById('frontBtn').classList.add('active');
+      document.getElementById('backBtn').classList.remove('active');
+      await startCamera("user");
+    };
+
+    document.getElementById('backBtn').onclick = async () => {
+      document.getElementById('backBtn').classList.add('active');
+      document.getElementById('frontBtn').classList.remove('active');
+      await startCamera("environment");
     };
 
     document.getElementById('clear').onclick = () => {
       phrase = [];
-      phraseEl.textContent = 'Waiting for signs...';
+      phraseEl.textContent = 'Ready — choose camera and sign!';
       detectedEl.textContent = '—';
       confEl.textContent = '0%';
     };
 
-    // Resize handling
+    // Auto-start with front camera
+    window.onload = () => document.getElementById('frontBtn').click();
+
+    // Resize
     window.onresize = () => {
       camera3D.aspect = innerWidth/innerHeight;
       camera3D.updateProjectionMatrix();
       renderer.setSize(innerWidth, innerHeight);
     };
 
-    // Animation loop
+    // Render loop
     function loop() {
       requestAnimationFrame(loop);
       renderer.render(scene, camera3D);
