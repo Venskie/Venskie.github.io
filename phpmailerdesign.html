@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Log Request - Action Required</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f9;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid #e0e6ed;
+           
+        }
+        .header {
+            background: linear-gradient(105deg, #9B0028 0%, #DC0025 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .header p {
+            margin: 10px 0 0;
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        .content {
+            padding: 40px 40px;
+            color: #333333;
+            line-height: 1.7;
+        }
+        .content h2 {
+            color: #2d3748;
+            font-size: 22px;
+            margin-top: 0;
+        }
+        /* RED ACCENT BOX */
+        .highlight-box {
+            background-color: #fdf2f4;
+            border-left: 6px solid #DC0025;
+            padding: 22px;
+            margin: 28px 0;
+            border-radius: 0 10px 10px 0;
+            font-size: 15px;
+        }
+        /* RED BUTTON – now matches your brand */
+        .btn {
+            display: inline-block;
+            background: linear-gradient(105deg, #9B0028 0%, #DC0025 100%);
+            color: white !important;
+            text-decoration: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 17px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(155, 0, 40, 0.4);
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(155, 0, 40, 0.5);
+        }
+        /* RED BADGE */
+        .badge {
+            display: inline-block;
+            background: #DC0025;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+        .footer {
+            background-color: #2d3748;
+            color: #a0aec0;
+            padding: 30px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    
+        @media (max-width: 600px) {
+            .container { margin: 15px; border-radius: 10px; }
+            .content { padding: 30px 25px; }
+            .header { padding: 30px 20px; }
+            .header h1 { font-size: 24px; }
+        }
+        .col-md-6{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: start;
+        }
+
+        img{
+            height: 100px;
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+        
+            <div class="col-md-6">
+                <h1>Safety Forms</h1>
+                <p>Safety Form Approval Required</p>
+            </div>
+            
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="badge">ACTION REQUIRED</div>
+            
+            <h2>Hello,</h2>
+            <p>A new safety findings has been submitted and requires your confirmation and evaluation.</p>
+            
+            <div class="highlight-box">
+                <strong>Trial for Safety Forms</strong><br>
+                Please review and take appropriate action as the First Approver.
+            </div>
+
+            <div style="text-align: center;">
+                <a href="http://10.73.130.194//safetyforms/first_approver?id=60" 
+                   class="btn" 
+                   target="_blank">
+                   Review & Approve Form
+                </a>
+            </div>
+
+            <p>If the button above doesn't work, you can also click this link:<br>
+            <a href="https://10.73.130.194//safetyforms/first_approver?id=60" 
+               style="color: #667eea; word-break: break-all;">
+                Safety Forms for Approver
+            </a></p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>THIS IS AN AUTO-GENERATED EMAIL — PLEASE DO NOT REPLY</strong></p>
+            <p>© 2025 Denso PH. All rights reserved.<br>
+             Safety Department</p>
+        </div>
+    </div>
+</body>
+</html>
