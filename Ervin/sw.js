@@ -45,3 +45,25 @@ self.addEventListener('fetch', e => {
     })
   );
 });
+
+
+self.addEventListener('sync', event => {
+  if (event.tag === 'sync-emergencies') {
+    event.waitUntil(syncEmergencies());
+  }
+});
+
+async function syncEmergencies() {
+  const db = await idb.openDB('emergency-queue', 1);
+  const submissions = await db.getAll('submissions');
+  
+  for (const sub of submissions) {
+    try {
+      await fetch('/api/emergency', { method: 'POST', body: JSON.stringify(sub) });
+      await db.delete('submissions', sub.id);
+    } catch (err) {
+      console.log('Sync failed, retrying later');
+      return;
+    }
+  }
+}
