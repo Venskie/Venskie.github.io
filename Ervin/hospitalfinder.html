@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Hospital Finder - Laguna</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .language-switcher {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .lang-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .lang-btn:hover, .lang-btn.active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Main Content */
+        main {
+            padding: 2rem 0;
+        }
+
+        .search-section {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        input, select, textarea {
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        /* Emergency Button */
+        .emergency-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 1rem;
+            transition: var(--transition);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+
+        .emergency-btn:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        /* Map Section */
+        .map-section {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        #map {
+            height: 400px;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+        }
+
+        .hospital-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .hospital-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .hospital-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .hospital-info h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .hospital-address {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hospital-contact {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        .hospital-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .capacity-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .capacity-fill {
+            height: 100%;
+            transition: var(--transition);
+        }
+
+        .capacity-low { background: var(--success-color); }
+        .capacity-medium { background: var(--warning-color); }
+        .capacity-high { background: var(--primary-color); }
+
+        /* Emergency Form Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            max-width: 600px;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-modal:hover {
+            color: var(--dark-color);
+        }
+
+        .triage-priority {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        .priority-critical { background: #dc3545; color: white; }
+        .priority-high { background: #fd7e14; color: white; }
+        .priority-medium { background: #ffc107; color: #212529; }
+        .priority-low { background: #28a745; color: white; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .hospital-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .hospital-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Offline Indicator */
+        .offline-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none;
+            animation: slideInRight 0.3s ease;
+            z-index: 3000;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .notification.error {
+            background: var(--primary-color);
+        }
+
+        .notification.warning {
+            background: var(--warning-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-hospital"></i>
+                    <span data-translate="appTitle">Emergency Hospital Finder</span>
+                </div>
+                <div class="language-switcher">
+                    <button class="lang-btn active" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="tl">TL</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="search-section">
+            <h2 data-translate="findHospital">Find Nearby Hospital</h2>
+            <form class="search-form" id="searchForm">
+                <div class="form-group">
+                    <label for="location" data-translate="location">Your Location</label>
+                    <input type="text" id="location" placeholder="Enter your location or use current location" required>
+                </div>
+                <div class="form-group">
+                    <label for="emergencyType" data-translate="emergencyType">Emergency Type</label>
+                    <select id="emergencyType" required>
+                        <option value="" data-translate="selectEmergency">Select Emergency Type</option>
+                        <option value="general" data-translate="generalEmergency">General Emergency</option>
+                        <option value="heart" data-translate="heartEmergency">Heart Attack</option>
+                        <option value="stroke" data-translate="strokeEmergency">Stroke</option>
+                        <option value="trauma" data-translate="traumaEmergency">Trauma Injury</option>
+                        <option value="child" data-translate="childEmergency">Child Emergency</option>
+                        <option value="maternity" data-translate="maternityEmergency">Maternity</option>
+                        <option value="covid" data-translate="covidEmergency">COVID-19</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-search"></i>
+                        <span data-translate="search">Search</span>
+                    </button>
+                </div>
+            </form>
+            <button class="emergency-btn" id="emergencyBtn">
+                <i class="fas fa-phone-alt"></i>
+                <span data-translate="emergencyCall">EMERGENCY - Call Now!</span>
+            </button>
+        </section>
+
+        <section class="map-section">
+            <h2 data-translate="mapView">Hospital Map</h2>
+            <div id="map"></div>
+        </section>
+
+        <section class="results-section" id="resultsSection">
+            <h2 data-translate="nearbyHospitals">Nearby Hospitals</h2>
+            <div id="hospitalResults"></div>
+        </section>
+    </main>
+
+    <!-- Emergency Contact Modal -->
+    <div class="modal" id="emergencyModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2 data-translate="emergencyContact">Emergency Contact Form</h2>
+            <form id="emergencyForm">
+                <div class="form-group">
+                    <label for="patientName" data-translate="patientName">Patient Name</label>
+                    <input type="text" id="patientName" required>
+                </div>
+                <div class="form-group">
+                    <label for="patientAge" data-translate="patientAge">Patient Age</label>
+                    <input type="number" id="patientAge" min="0" max="120" required>
+                </div>
+                <div class="form-group">
+                    <label for="emergencyTypeForm" data-translate="emergencyType">Emergency Type</label>
+                    <select id="emergencyTypeForm" required>
+                        <option value="" data-translate="selectEmergency">Select Emergency Type</option>
+                        <option value="general" data-translate="generalEmergency">General Emergency</option>
+                        <option value="heart" data-translate="heartEmergency">Heart Attack</option>
+                        <option value="stroke" data-translate="strokeEmergency">Stroke</option>
+                        <option value="trauma" data-translate="traumaEmergency">Trauma Injury</option>
+                        <option value="child" data-translate="childEmergency">Child Emergency</option>
+                        <option value="maternity" data-translate="maternityEmergency">Maternity</option>
+                        <option value="covid" data-translate="covidEmergency">COVID-19</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="symptoms" data-translate="symptoms">Symptoms Description</label>
+                    <textarea id="symptoms" rows="4" placeholder="Describe the symptoms..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="arrivalTime" data-translate="arrivalTime">Estimated Arrival Time</label>
+                    <input type="datetime-local" id="arrivalTime" required>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-paper-plane"></i>
+                    <span data-translate="submitEmergency">Submit Emergency</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div class="offline-indicator" id="offlineIndicator">
+        <i class="fas fa-wifi-slash"></i>
+        <span data-translate="offlineMode">Offline Mode</span>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Hospital Database for Laguna, Philippines
+        const hospitalsDatabase = {
+            "hospitals": [
+                {
+                    "id": 1,
+                    "name": "Laguna Provincial Hospital",
+                    "address": "P. Gomez Street, Santa Cruz, Laguna",
+                    "contact": {
+                        "phone": "+63 49 532 1234",
+                        "emergency": "+63 917 123 4567"
+                    },
+                    "services": ["general", "heart", "stroke", "trauma", "maternity", "covid"],
+                    "capacity": {
+                        "current": 85,
+                        "max": 200,
+                        "icu": 12,
+                        "emergency": 15
+                    },
+                    "coordinates": {
+                        "lat": 14.2417,
+                        "lng": 121.3267
+                    },
+                    "specializations": ["General Medicine", "Emergency Medicine", "Obstetrics"],
+                    "responseTime": 15
+                },
+                {
+                    "id": 2,
+                    "name": "St. Luke's Medical Center - Calamba",
+                    "address": "Brgy. Paciano Rizal, Calamba, Laguna",
+                    "contact": {
+                        "phone": "+63 49 502 5000",
+                        "emergency": "+63 917 889 0000"
+                    },
+                    "services": ["general", "heart", "stroke", "child", "covid"],
+                    "capacity": {
+                        "current": 120,
+                        "max": 150,
+                        "icu": 20,
+                        "emergency": 10
+                    },
+                    "coordinates": {
+                        "lat": 14.2186,
+                        "lng": 121.1750
+                    },
+                    "specializations": ["Cardiology", "Neurology", "Pediatrics"],
+                    "responseTime": 10
+                },
+                {
+                    "id": 3,
+                    "name": "Calamba Doctors' Hospital",
+                    "address": "Brgy. Real, Calamba, Laguna",
+                    "contact": {
+                        "phone": "+63 49 502 8888",
+                        "emergency": "+63 917 777 8888"
+                    },
+                    "services": ["general", "heart", "trauma", "child"],
+                    "capacity": {
+                        "current": 95,
+                        "max": 120,
+                        "icu": 15,
+                        "emergency": 8
+                    },
+                    "coordinates": {
+                        "lat": 14.2250,
+                        "lng": 121.1500
+                    },
+                    "specializations": ["Cardiology", "Pediatrics", "Trauma"],
+                    "responseTime": 12
+                },
+                {
+                    "id": 4,
+                    "name": "De La Salle University Medical Center",
+                    "address": "Dasmariñas East, Dasmariñas, Cavite (Near Laguna Border)",
+                    "contact": {
+                        "phone": "+63 46 416 5000",
+                        "emergency": "+63 917 500 5000"
+                    },
+                    "services": ["general", "heart", "stroke", "child", "covid"],
+                    "capacity": {
+                        "current": 200,
+                        "max": 300,
+                        "icu": 30,
+                        "emergency": 20
+                    },
+                    "coordinates": {
+                        "lat": 14.3167,
+                        "lng": 120.9333
+                    },
+                    "specializations": ["Cardiology", "Neurology", "Pediatrics", "Infectious Diseases"],
+                    "responseTime": 8
+                },
+                {
+                    "id": 5,
+                    "name": "San Pablo Doctors' Hospital",
+                    "address": "C. P. Garcia Avenue, San Pablo, Laguna",
+                    "contact": {
+                        "phone": "+63 49 562 1111",
+                        "emergency": "+63 917 111 2222"
+                    },
+                    "services": ["general", "heart", "stroke", "maternity"],
+                    "capacity": {
+                        "current": 75,
+                        "max": 100,
+                        "icu": 10,
+                        "emergency": 12
+                    },
+                    "coordinates": {
+                        "lat": 14.0667,
+                        "lng": 121.3333
+                    },
+                    "specializations": ["Cardiology", "Obstetrics", "General Medicine"],
+                    "responseTime": 18
+                },
+                {
+                    "id": 6,
+                    "name": "Makati Medical Center - Laguna Extension",
+                    "address": "Brgy. San Francisco, Biñan, Laguna",
+                    "contact": {
+                        "phone": "+63 49 510 1234",
+                        "emergency": "+63 917 234 5678"
+                    },
+                    "services": ["general", "heart", "child", "maternity"],
+                    "capacity": {
+                        "current": 110,
+                        "max": 140,
+                        "icu": 18,
+                        "emergency": 15
+                    },
+                    "coordinates": {
+                        "lat": 14.3583,
+                        "lng": 121.1500
+                    },
+                    "specializations": ["Cardiology", "Pediatrics", "Obstetrics"],
+                    "responseTime": 10
+                },
+                {
+                    "id": 7,
+                    "name": "Los Baños Doctors' Hospital",
+                    "address": "Brgy. Bambang, Los Baños, Laguna",
+                    "contact": {
+                        "phone": "+63 49 536 7777",
+                        "emergency": "+63 917 777 7777"
+                    },
+                    "services": ["general", "trauma", "child"],
+                    "capacity": {
+                        "current": 60,
+                        "max": 80,
+                        "icu": 8,
+                        "emergency": 10
+                    },
+                    "coordinates": {
+                        "lat": 14.1833,
+                        "lng": 121.2500
+                    },
+                    "specializations": ["Pediatrics", "Trauma", "General Medicine"],
+                    "responseTime": 20
+                },
+                {
+                    "id": 8,
+                    "name": "Santa Rosa Doctors' Hospital",
+                    "address": "Brgy. San Roque, Santa Rosa, Laguna",
+                    "contact": {
+                        "phone": "+63 49 580 9999",
+                        "emergency": "+63 917 999 8888"
+                    },
+                    "services": ["general", "heart", "stroke", "maternity", "covid"],
+                    "capacity": {
+                        "current": 130,
+                        "max": 160,
+                        "icu": 22,
+                        "emergency": 18
+                    },
+                    "coordinates": {
+                        "lat": 14.3167,
+                        "lng": 121.1500
+                    },
+                    "specializations": ["Cardiology", "Neurology", "Obstetrics", "Infectious Diseases"],
+                    "responseTime": 12
+                },
+                {
+                    "id": 9,
+                    "name": "Philippine General Hospital - Laguna Extension",
+                    "address": "Brgy. San Nicolas, Santa Cruz, Laguna",
+                    "contact": {
+                        "phone": "+63 49 532 5555",
+                        "emergency": "+63 917 555 5555"
+                    },
+                    "services": ["general", "heart", "stroke", "trauma", "covid"],
+                    "capacity": {
+                        "current": 150,
+                        "max": 200,
+                        "icu": 25,
+                        "emergency": 20
+                    },
+                    "coordinates": {
+                        "lat": 14.2417,
+                        "lng": 121.3267
+                    },
+                    "specializations": ["Cardiology", "Neurology", "Trauma", "Infectious Diseases"],
+                    "responseTime": 15
+                },
+                {
+                    "id": 10,
+                    "name": "Makati Medical City - South Luzon",
+                    "address": "Brgy. Don Juancito, Calauan, Laguna",
+                    "contact": {
+                        "phone": "+63 49 810 3333",
+                        "emergency": "+63 917 333 4444"
+                    },
+                    "services": ["general", "heart", "stroke", "child", "maternity"],
+                    "capacity": {
+                        "current": 90,
+                        "max": 120,
+                        "icu": 16,
+                        "emergency": 14
+                    },
+                    "coordinates": {
+                        "lat": 14.1833,
+                        "lng": 121.3667
+                    },
+                    "specializations": ["Cardiology", "Neurology", "Pediatrics", "Obstetrics"],
+                    "responseTime": 25
+                },
+                {
+                    "id": 11,
+                    "name": "San Pedro Doctors' Hospital",
+                    "address": "Brgy. San Vicente, San Pedro, Laguna",
+                    "contact": {
+                        "phone": "+63 49 511 6666",
+                        "emergency": "+63 917 666 7777"
+                    },
+                    "services": ["general", "heart", "child"],
+                    "capacity": {
+                        "current": 70,
+                        "max": 90,
+                        "icu": 12,
+                        "emergency": 8
+                    },
+                    "coordinates": {
+                        "lat": 14.3417,
+                        "lng": 121.0333
+                    },
+                    "specializations": ["Cardiology", "Pediatrics", "General Medicine"],
+                    "responseTime": 15
+                },
+                {
+                    "id": 12,
+                    "name": "Alabang Medical Center - Laguna Branch",
+                    "address": "Brgy. San Francisco, Cabuyao, Laguna",
+                    "contact": {
+                        "phone": "+63 49 540 8888",
+                        "emergency": "+63 917 888 9999"
+                    },
+                    "services": ["general", "trauma", "child", "maternity"],
+                    "capacity": {
+                        "current": 85,
+                        "max": 110,
+                        "icu": 14,
+                        "emergency": 12
+                    },
+                    "coordinates": {
+                        "lat": 14.2250,
+                        "lng": 120.9500
+                    },
+                    "specializations": ["Pediatrics", "Obstetrics", "Tra"],
+                    "responseTime": 18
+                }
+            ]
+        };
+
+        // Language translations
+        const translations = {
+            en: {
+                appTitle: "Emergency Hospital Finder",
+                findHospital: "Find Nearby Hospital",
+                location: "Your Location",
+                emergencyType: "Emergency Type",
+                selectEmergency: "Select Emergency Type",
+                generalEmergency: "General Emergency",
+                heartEmergency: "Heart Attack",
+                strokeEmergency: "Stroke",
+                traumaEmergency: "Trauma Injury",
+                childEmergency: "Child Emergency",
+                maternityEmergency: "Maternity",
+                covidEmergency: "COVID-19",
+                search: "Search",
+                emergencyCall: "EMERGENCY - Call Now!",
+                mapView: "Hospital Map",
+                nearbyHospitals: "Nearby Hospitals",
+                emergencyContact: "Emergency Contact Form",
+                patientName: "Patient Name",
+                patientAge: "Patient Age",
+                symptoms: "Symptoms Description",
+                arrivalTime: "Estimated Arrival Time",
+                submitEmergency: "Submit Emergency",
+                offlineMode: "Offline Mode",
+                distance: "Distance",
+                capacity: "Capacity",
+                responseTime: "Response Time",
+                specialties: "Specialties",
+                callNow: "Call Now",
+                getDirections: "Get Directions",
+                critical: "Critical",
+                high: "High",
+                medium: "Medium",
+                low: "Low"
+            },
+            tl: {
+                appTitle: "Tagapahanap ng ospital sa Emerhensiya",
+                findHospital: "Hanapin ang Malapit na Ospital",
+                location: "Lokasyon Mo",
+                emergencyType: "Uri ng Emerhensiya",
+                selectEmergency: "Pumili ng Uri ng Emerhensiya",
+                generalEmergency: "Karaniwang Emerhensiya",
+                heartEmergency: "Atake sa Puso",
+                strokeEmergency: "Stroke",
+                traumaEmergency: "Sakit sa Trauma",
+                childEmergency: "Emerhensiya sa Bata",
+                maternityEmergency: "Pagbubuntis",
+                covidEmergency: "COVID-19",
+                search: "Hanapin",
+                emergencyCall: "EMERHENSYA - Tawagan Na!",
+                mapView: "Mapa ng Ospital",
+                nearbyHospitals: "Mga Malapit na Ospital",
+                emergencyContact: "Forma ng Contact sa Emerhensiya",
+                patientName: "Pangalan ng Pasyente",
+                patientAge: "Edad ng Pasyente",
+                symptoms: "Paglalarawan ng Mga sintomas",
+                arrivalTime: "Inaasahang Oras ng Pagdating",
+                submitEmergency: "Isumbit ang Emerhensiya",
+                offlineMode: "Mode sa Offline",
+                distance: "Distansya",
+                capacity: "Kapasidad",
+                responseTime: "Oras ng Pagtugon",
+                specialties: "Especialidad",
+                callNow: "Tawagan Na",
+                getDirections: "Kumuha ng Direksyon",
+                critical: "Kritikal",
+                high: "Matindi",
+                medium: "Katiyakan",
+                low: "Mababa"
+            }
+        };
+
+        // Global variables
+        let map;
+        let userLocation = { lat: 14.2186, lng: 121.1750 }; // Default to Calamba
+        let currentLanguage = 'en';
+        let markers = [];
+        let emergencyMarkers = [];
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMap();
+            setupEventListeners();
+            checkOnlineStatus();
+            loadHospitalData();
+            setDefaultDateTime();
+        });
+
+        // Initialize Leaflet map
+        function initializeMap() {
+            map = L.map('map').setView([userLocation.lat, userLocation.lng], 12);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            // Add user location marker
+            L.marker([userLocation.lat, userLocation.lng])
+                .addTo(map)
+                .bindPopup('Your Location')
+                .openPopup();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search form
+            document.getElementById('searchForm').addEventListener('submit', handleSearch);
+            
+            // Emergency button
+            document.getElementById('emergencyBtn').addEventListener('click', openEmergencyModal);
+            
+            // Modal close
+            document.getElementById('closeModal').addEventListener('click', closeEmergencyModal);
+            
+            // Emergency form
+            document.getElementById('emergencyForm').addEventListener('submit', handleEmergencySubmit);
+            
+            // Language switcher
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', switchLanguage);
+            });
+            
+            // Location input click for geolocation
+            document.getElementById('location').addEventListener('click', requestGeolocation);
+            
+            // Online/Offline detection
+            window.addEventListener('online', checkOnlineStatus);
+            window.addEventListener('offline', checkOnlineStatus);
+        }
+
+        // Handle search form submission
+        function handleSearch(e) {
+            e.preventDefault();
+            
+            const location = document.getElementById('location').value;
+            const emergencyType = document.getElementById('emergencyType').value;
+            
+            if (!location || !emergencyType) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Get user coordinates (simplified - in real app would use geocoding)
+            const userCoords = getUserCoordinates(location);
+            
+            if (userCoords) {
+                userLocation = userCoords;
+                updateMapCenter(userCoords);
+                searchNearbyHospitals(userCoords, emergencyType);
+            } else {
+                showNotification('Location not found', 'error');
+            }
+        }
+
+        // Get user coordinates (simplified version)
+        function getUserCoordinates(location) {
+            // In a real application, you would use a geocoding service
+            // For demo purposes, we'll use some predefined locations
+            const locations = {
+                'calamba': { lat: 14.2186, lng: 121.1750 },
+                'san pablo': { lat: 14.0667, lng: 121.3333 },
+                'sta cruz': { lat: 14.2417, lng: 121.3267 },
+                'biñan': { lat: 14.3583, lng: 121.1500 },
+                'los baños': { lat: 14.1833, lng: 121.2500 },
+                'sta rosa': { lat: 14.3167, lng: 121.1500 },
+                'cabuyao': { lat: 14.2250, lng: 120.9500 },
+                'san pedro': { lat: 14.3417, lng: 121.0333 }
+            };
+            
+            const key = location.toLowerCase();
+            return locations[key] || userLocation;
+        }
+
+        // Update map center
+        function updateMapCenter(coords) {
+            map.setView([coords.lat, coords.lng], 13);
+            
+            // Update user location marker
+            if (markers.length > 0) {
+                map.removeLayer(markers[0]);
+                markers = [];
+            }
+            
+            const userMarker = L.marker([coords.lat, coords.lng])
+                .addTo(map)
+                .bindPopup('Your Location')
+                .openPopup();
+            
+            markers.push(userMarker);
+        }
+
+        // Search for nearby hospitals
+        function searchNearbyHospitals(userCoords, emergencyType) {
+            const nearbyHospitals = hospitalsDatabase.hospitals
+                .map(hospital => {
+                    const distance = calculateDistance(
+                        userCoords.lat, userCoords.lng,
+                        hospital.coordinates.lat, hospital.coordinates.lng
+                    );
+                    
+                    const hasService = hospital.services.includes(emergencyType);
+                    const capacityScore = calculateCapacityScore(hospital.capacity.current, hospital.capacity.max);
+                    const responseScore = hospital.responseTime;
+                    
+                    // Calculate priority score (lower is better)
+                    const priorityScore = distance * 0.4 + (100 - capacityScore) * 0.4 + responseScore * 0.2;
+                    
+                    return {
+                        ...hospital,
+                        distance: distance,
+                        priorityScore: priorityScore,
+                        hasService: hasService,
+                        capacityScore: capacityScore
+                    };
+                })
+                .filter(hospital => hospital.hasService)
+                .sort((a, b) => a.priorityScore - b.priorityScore)
+                .slice(0, 10);
+            
+            displayResults(nearbyHospitals);
+            displayHospitalsOnMap(nearbyHospitals);
+            
+            // Show results section
+            document.getElementById('resultsSection').style.display = 'block';
+            
+            // Scroll to results
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Calculate distance between two coordinates (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the Earth in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Calculate capacity score (0-100, higher is better)
+        function calculateCapacityScore(current, max) {
+            return Math.round(((max - current) / max) * 100);
+        }
+
+        // Display search results
+        function displayResults(hospitals) {
+            const resultsContainer = document.getElementById('hospitalResults');
+            resultsContainer.innerHTML = '';
+            
+            hospitals.forEach(hospital => {
+                const hospitalCard = createHospitalCard(hospital);
+                resultsContainer.appendChild(hospitalCard);
+            });
+        }
+
+        // Create hospital card element
+        function createHospitalCard(hospital) {
+            const card = document.createElement('div');
+            card.className = 'hospital-card';
+            
+            const capacityClass = hospital.capacityScore > 70 ? 'capacity-low' :
+                                 hospital.capacityScore > 40 ? 'capacity-medium' : 'capacity-high';
+            
+            const priorityClass = getPriorityClass(hospital.priorityScore);
+            
+            card.innerHTML = `
+                <div class="hospital-header">
+                    <div class="hospital-info">
+                        <h3>${hospital.name} <span class="triage-priority ${priorityClass}">${getPriorityText(hospital.priorityScore)}</span></h3>
+                        <div class="hospital-address">
+                            <i class="fas fa-map-marker-alt"></i> ${hospital.address}
+                        </div>
+                        <div class="hospital-contact">
+                            <i class="fas fa-phone"></i> ${hospital.contact.phone} | 
+                            <i class="fas fa-ambulance"></i> ${hospital.contact.emergency}
+                        </div>
+                    </div>
+                    <div class="hospital-actions">
+                        <button class="btn btn-secondary" onclick="callHospital(${hospital.id})">
+                            <i class="fas fa-phone"></i> ${translate('callNow')}
+                        </button>
+                        <button class="btn" onclick="getDirections(${hospital.coordinates.lat}, ${hospital.coordinates.lng})">
+                            <i class="fas fa-directions"></i> ${translate('getDirections')}
+                        </button>
+                    </div>
+                </div>
+                <div class="hospital-details">
+                    <div class="detail-item">
+                        <i class="fas fa-route"></i>
+                        <strong>${translate('distance')}:</strong> ${hospital.distance.toFixed(1)} km
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-users"></i>
+                        <strong>${translate('capacity')}:</strong> ${hospital.capacity.current}/${hospital.capacity.max}
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-clock"></i>
+                        <strong>${translate('responseTime')}:</strong> ${hospital.responseTime} min
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-stethoscope"></i>
+                        <strong>${translate('specialties')}:</strong> ${hospital.specializations.join(', ')}
+                    </div>
+                </div>
+                <div class="capacity-bar">
+                    <div class="capacity-fill ${capacityClass}" style="width: ${hospital.capacityScore}%"></div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Get priority class based on score
+        function getPriorityClass(score) {
+            if (score < 30) return 'priority-critical';
+            if (score < 50) return 'priority-high';
+            if (score < 70) return 'priority-medium';
+            return 'priority-low';
+        }
+
+        // Get priority text based on score
+        function getPriorityText(score) {
+            if (score < 30) return translate('critical');
+            if (score < 50) return translate('high');
+            if (score < 70) return translate('medium');
+            return translate('low');
+        }
+
+        // Display hospitals on map
+        function displayHospitalsOnMap(hospitals) {
+            // Clear existing markers
+            emergencyMarkers.forEach(marker => map.removeLayer(marker));
+            emergencyMarkers = [];
+            
+            // Add new markers
+            hospitals.forEach(hospital => {
+                const marker = L.marker([hospital.coordinates.lat, hospital.coordinates.lng])
+                    .addTo(map)
+                    .bindPopup(`
+                        <strong>${hospital.name}</strong><br>
+                        ${hospital.address}<br>
+                        Capacity: ${hospital.capacity.current}/${hospital.capacity.max}<br>
+                        Distance: ${hospital.distance.toFixed(1)} km
+                    `);
+                
+                emergencyMarkers.push(marker);
+            });
+        }
+
+        // Call hospital function
+        function callHospital(hospitalId) {
+            const hospital = hospitalsDatabase.hospitals.find(h => h.id === hospitalId);
+            if (hospital) {
+                window.open(`tel:${hospital.contact.emergency}`, '_self');
+            }
+        }
+
+        // Get directions function
+        function getDirections(lat, lng) {
+            const destination = `${lat},${lng}`;
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}`;
+            window.open(url, '_blank');
+        }
+
+        // Emergency modal functions
+        function openEmergencyModal() {
+            document.getElementById('emergencyModal').style.display = 'block';
+        }
+
+        function closeEmergencyModal() {
+            document.getElementById('emergencyModal').style.display = 'none';
+        }
+
+        // Handle emergency form submission
+        function handleEmergencySubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                patientName: document.getElementById('patientName').value,
+                patientAge: document.getElementById('patientAge').value,
+                emergencyType: document.getElementById('emergencyTypeForm').value,
+                symptoms: document.getElementById('symptoms').value,
+                arrivalTime: document.getElementById('arrivalTime').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Save to localStorage for offline access
+            saveEmergencyData(formData);
+            
+            // Show success notification
+            showNotification('Emergency information submitted successfully!', 'success');
+            
+            // Close modal and reset form
+            closeEmergencyModal();
+            document.getElementById('emergencyForm').reset();
+            
+            // In a real application, this would send data to a server
+            console.log('Emergency data:', formData);
+        }
+
+        // Save emergency data to localStorage
+        function saveEmergencyData(data) {
+            let emergencyData = JSON.parse(localStorage.getItem('emergencyData') || '[]');
+            emergencyData.push(data);
+            localStorage.setItem('emergencyData', JSON.stringify(emergencyData));
+        }
+
+        // Language switching
+        function switchLanguage(e) {
+            const lang = e.target.dataset.lang;
+            currentLanguage = lang;
+            
+            // Update active button
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            e.target.classList.add('active');
+            
+            // Update translations
+            updateTranslations();
+        }
+
+        // Update all text elements with current language
+        function updateTranslations() {
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.dataset.translate;
+                if (translations[currentLanguage][key]) {
+                    element.textContent = translations[currentLanguage][key];
+                }
+            });
+        }
+
+        // Translate function
+        function translate(key) {
+            return translations[currentLanguage][key] || key;
+        }
+
+        // Request geolocation
+        function requestGeolocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        document.getElementById('location').value = `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`;
+                        updateMapCenter(userLocation);
+                    },
+                    (error) => {
+                        showNotification('Unable to get your location', 'error');
+                    }
+                );
+            } else {
+                showNotification('Geolocation is not supported by this browser', 'error');
+            }
+        }
+
+        // Check online/offline status
+        function checkOnlineStatus() {
+            const offlineIndicator = document.getElementById('offlineIndicator');
+            if (navigator.onLine) {
+                offlineIndicator.style.display = 'none';
+                // Simulate real-time capacity updates
+                simulateCapacityUpdates();
+            } else {
+                offlineIndicator.style.display = 'flex';
+                showNotification('You are in offline mode. Some features may be limited.', 'warning');
+            }
+        }
+
+        // Simulate real-time capacity updates
+        function simulateCapacityUpdates() {
+            // In a real application, this would fetch data from a server
+            setInterval(() => {
+                hospitalsDatabase.hospitals.forEach(hospital => {
+                    // Random capacity change
+                    const change = Math.floor(Math.random() * 10) - 5; // -5 to +5
+                    hospital.capacity.current = Math.max(0, Math.min(
+                        hospital.capacity.max,
+                        hospital.capacity.current + change
+                    ));
+                });
+            }, 30000); // Update every 30 seconds
+        }
+
+        // Load hospital data from localStorage or use default
+        function loadHospitalData() {
+            const savedData = localStorage.getItem('hospitalData');
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    // Validate and merge data
+                    Object.assign(hospitalsDatabase, parsedData);
+                } catch (e) {
+                    console.error('Error loading hospital data:', e);
+                }
+            }
+        }
+
+        // Set default date and time for emergency form
+        function setDefaultDateTime() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('arrivalTime').value = now.toISOString().slice(0, 16);
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (map) {
+                map.invalidateSize();
+            }
+        });
+
+        // Service Worker registration for offline functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
