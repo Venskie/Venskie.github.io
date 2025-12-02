@@ -1,2 +1,9 @@
+AI COMPANION LIST
 New AI
 https://www.aetherio.dev/
+
+Old
+chatgpt
+grok.com
+plexity.ai
+
