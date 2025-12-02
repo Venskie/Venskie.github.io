@@ -1,0 +1,207 @@
+The backend is working
+
+```php
+<?php
+include 'assets/php/db_connect.php';
+header('Content-Type: application/json; charset=utf-8');
+date_default_timezone_set('Asia/Manila');
+// At the top of your PHP script
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+// Initialize variables
+$id = null;
+$data = null;
+$error = '';
+
+$response = [
+    'success' => false,
+    'message' => '',
+    'icon' => 'error',
+    'title' => 'Error',
+    'findings_id' => null,
+    'confirmation' => ''
+];
+// === HANDLE POST (Form Submission) ===
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $id                        = $_POST['id'] ?? null;
+        $rank                      = trim($_POST['rank'] ?? '');
+        $approver1confirmation     = trim($_POST['approver1confirmation'] ?? '');
+        $confirmLower              = strtolower($approver1confirmation);
+        
+        // === Replace match() wit  h if-else (compatible with PHP 7+) ===
+        if (in_array($confirmLower, ['approved', 'approve', 'yes', '1'])) {
+            $approver_1_status = 'done';
+            $response['icon'] = 'success';
+            $response['title'] = 'Approved';
+            $response['confirmation'] = 'approved';
+            $confirmtoemail = true;
+        } elseif (in_array($confirmLower, ['denied', 'deny', 'no', 'rejected', '0'])) {
+            $approver_1_status = 'denied';
+            $response['icon'] = 'error';
+            $response['title'] = 'Denied';
+            $response['confirmation'] = 'denied';
+            $confirmtoemail = false;
+        } else {
+            $approver_1_status = ''; // or 'pending'
+        }
+
+
+
+        if ($approver1confirmation === 'approved') {
+            $final_status = '';
+        } elseif ($approver1confirmation === 'denied') {
+            $final_status = 'denied';
+        } else {
+            $final_status = 'pending';
+        }
+
+        $approver1remarks = trim($_POST['approver1remarks'] ?? ''); // Fixed name
+
+        $stmt = $pdo->prepare("SELECT approver_1_confirmation, approver_2_confirmation, findings_id FROM test WHERE id =?");
+        $stmt->execute([$id]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $findingsid = trim($data['findings_id']);
+        // Validation
+        if (!$id || !is_numeric($id)) {
+            throw new Exception("Invalid or missing record ID.");
+        }
+
+        if ($rank === '') {
+            throw new Exception("Please select a Risk Ranking.");
+        }
+
+        if ($approver1confirmation === '') {
+            throw new Exception("Please confirm the finding (Accept/Reject).");
+        }
+
+        $now = date('Y-m-d H:i:s');
+        // Update Query
+        $sql = "UPDATE test 
+                SET ranking = ?,
+                    approver_1_confirmation = ?,
+                    approver_1_comment = ?,
+                    approver_1_status = ?,
+                    findings_status = ?,
+                    approver_1_confirmation_at = ?
+                    
+                WHERE id = ?";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$rank, $approver1confirmation, $approver1remarks, $approver_1_status, $final_status, $now, $id
+        ]);
+
+        if ($stmt->rowCount() > 0) {
+            $response['success'] = true;
+            $response['message'] = "Findings Approved Successfully! Sent to the next Approver!";
+            $response['findings_id'] = $findingsid;
+
+            if($confirmtoemail){
+                $info = [
+                    'rank'                      => $rank,
+                    'findings_id'                => $findingsid
+    
+                ];
+                require_once 'assets/composer/phpmailer/sendtomail/sq_sendtoemail.php';
+                $emailSent = sendtoemail($info);
+                if ($emailSent) {
+                    $response['message'] .= " Notification email sent.";
+                } else {
+                    $response['message'] .= " Saved, but email failed to send.";
+                    error_log("Email failed for findings_id: $findingsid");
+                }
+            } else {
+                error_log("PHPMailer failed to send approval email for findings ID: $findingsid");
+            }
+          
+        } else {
+            $response['message'] = "No changes were made.";
+        }
+
+    } catch (Exception $e) {
+        $response['message'] = $e->getMessage();
+        error_log("Second Approver Error (ID: $id): " . $e->getMessage());
+    }
+    
+}
+
+
+echo json_encode($response);
+    exit;   // or die();
+
+// === HANDLE GET (Display Form) ===
+if ($_SERVER['REQUEST_METHOD'] === 'GET' || !isset($_POST['id'])) {
+    $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+
+    if (!$id) {
+        die('<div class="alert alert-danger text-center">Invalid or missing ID.</div>');
+    }
+
+    $stmt = $pdo->prepare("SELECT * FROM test WHERE id = ? LIMIT 1");
+    $stmt->execute([$id]);
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$data) {
+        die('<div class="alert alert-danger text-center">Record not found.</div>');
+    }
+}
+?>
+```
+
+but the sweetalert shows network error
+ 
+
+```php
+<script>
+document.getElementById('findingforms').addEventListener('submit', function(e) {
+    e.preventDefault(); // Stop normal submission
+
+    const formData = new FormData(this);
+
+    fetch('testingsafetyofficerside.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    }) // Get raw response first
+    .then(data => {
+        // Check if response contains our success marker
+        if (data.success) {
+            Swal.fire({
+                icon: data.icon,  // 'success' or 'error'
+                title: data.title, // "Approved" or "Denied"
+                text: `You ${data.confirmation} the Findings: ${data.findings_id}`,
+                customClass: {
+                    popup: 'swal2-popup--small'         // we'll use CSS below for full control
+                },     
+                timer: 3000,
+                showConfirmButton: false
+            })
+            // .then(() => {
+            //     document.getElementById('findingForm').reset(); // Optional: clear form
+            // });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed',
+                text: data.message || 'Something went wrong.',
+                footer: 'Please check your inputs and try again.'
+            });
+        }
+    })
+    .catch(err => {
+        console.error('Fetch error:', err);
+        Swal.fire({
+            icon: 'error',
+            title: 'Network Error',
+            text: 'Could not connect to server.'
+        });
+    });
+});
+</script>
+```
