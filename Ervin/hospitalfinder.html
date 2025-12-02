@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emergency Hospital Finder - Laguna</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <meta name="theme-color" content="#e74c3c">    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -1341,6 +1344,45 @@
                     });
             });
         }
+    </script>
+    <script src="https://unpkg.com/idb@7/build/umd.js"></script>
+    <script>
+        // indexeddb.js
+const dbPromise = idb.openDB('emergency-queue', 1, {
+  upgrade(db) {
+    db.createObjectStore('submissions', { keyPath: 'id', autoIncrement: true });
+  }
+});
+
+async function queueSubmission(data) {
+  const db = await dbPromise;
+  await db.add('submissions', {
+    ...data,
+    timestamp: new Date().toISOString(),
+    status: 'pending'
+  });
+
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    navigator.serviceWorker.ready.then(reg => {
+      reg.sync.register('sync-emergencies');
+    });
+  }
+}
+
+        let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallButton();
+});
+
+function showInstallButton() {
+  const btn = document.createElement('button');
+  btn.textContent = 'Install App';
+  btn.className = 'btn btn-success';
+  btn.onclick = () => deferredPrompt.prompt();
+  document.body.appendChild(btn);
+}
     </script>
 </body>
 </html>
