@@ -1,0 +1,71 @@
+Create a full-stack community participation platform with Vue.js 3 frontend and FastAPI backend. The application should allow users to earn merit points for activities like posting, commenting, and helping others.
+
+**Tech Stack:**
+- Frontend: Vue.js 3 with Composition API, Pinia for state management, Vue Router, Tailwind CSS
+- Backend: FastAPI with Python 3.10+, SQLAlchemy ORM, Pydantic for validation
+- Database: MySQL (specifying the final requirement)
+- Real-time: WebSockets using FastAPI's WebSocket support
+- Authentication: JWT with refresh tokens
+- File storage: Cloudinary integration for image uploads
+- Testing: Pytest for backend, Vitest for frontend
+- Containerization: Docker with docker-compose for full application stack
+
+**Core Features:**
+1. User authentication system with registration, login, password reset, and JWT tokens
+2. User profiles with avatars, bio, and point tracking
+3. Forum creation and categorization
+4. Post creation with rich text editor and image embedding
+5. Commenting system with nested replies and reactions
+6. Points system with different point values for activities
+7. Notification system for mentions, replies, and points
+8. Admin panel with:
+   - User management (ban, promote, adjust points)
+   - Forum moderation
+   - Analytics dashboard with:
+     * User statistics (signups, active users)
+     * Top participants leaderboard
+     * Popular forums tracking
+     * Activity heatmaps
+
+**Database Schema:**
+- Users (id, username, email, hashed_password, role, avatar_url, created_at, points)
+- Forums (id, name, description, creator_id, created_at, is_active)
+- Posts (id, title, content, user_id, forum_id, created_at, image_urls)
+- Comments (id, content, user_id, post_id, parent_id, created_at)
+- Points (id, user_id, points, activity_type, created_at)
+
+**API Requirements:**
+- RESTful endpoints for all CRUD operations
+- Authentication middleware
+- File upload endpoint for images with Cloudinary integration
+- WebSocket endpoint for real-time notifications
+- Rate limiting on sensitive endpoints
+
+**Frontend Requirements:**
+- Responsive design for mobile and desktop
+- Dark/light mode toggle
+- Real-time notifications
+- Infinite scroll for posts
+- Rich text editor for posts and comments
+- Image preview before upload
+- Loading states and error handling
+
+**Implementation Deliverables:**
+1. Complete source code with proper documentation
+2. Docker configuration for development and production
+3. Unit tests for both frontend and backend (minimum 80% coverage)
+4. API documentation with OpenAPI/Swagger
+5. Deployment guide with multiple environment options
+6. Step-by-step implementation guide with best practices
+7. CI/CD pipeline configuration using GitHub Actions
+8. Database migration scripts
+9. Environment configuration templates
+10. Performance optimization recommendations
+
+**Additional Requirements:**
+- Implement proper error handling and logging
+- Follow security best practices (CORS, XSS, CSRF protection)
+- Include rate limiting and request throttling
+- Implement caching strategy for frequently accessed data
+- Add accessibility features (WCAG compliance)
+- Include internationalization support (i18n)
