@@ -1,0 +1,118 @@
+-- Main table
+CREATE TABLE Safety_forms_main (
+    id SERIAL PRIMARY KEY,
+    findings_id VARCHAR(50) NOT NULL UNIQUE,
+    section VARCHAR(100),
+    date_audited DATE,
+    hazard_type VARCHAR(100),
+    findings TEXT,
+    approver_1 VARCHAR(100),
+    approver_2 VARCHAR(100),
+    related_pic VARCHAR(100),
+    related_dep VARCHAR(100),
+    finding_img TEXT,
+    created_by VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Approver Status (source of ranking)
+CREATE TABLE Safety_forms_approver_status (
+    id SERIAL PRIMARY KEY,
+    findings_id VARCHAR(50) NOT NULL,
+    ranking VARCHAR(20) NOT NULL,
+    
+    approver_1_confirmation VARCHAR(20) CHECK (approver_1_confirmation IN ('Pending', 'Denied', 'Approved')),
+    approver_1_comment TEXT,
+    approver_1_status VARCHAR(50),
+    
+    approver_2_confirmation VARCHAR(20) CHECK (approver_2_confirmation IN ('Pending', 'Denied', 'Approved')),
+    approver_2_comment TEXT,
+    approver_2_status VARCHAR(50),
+    
+    findings_status VARCHAR(20) CHECK (findings_status IN ('Pending', 'Denied', 'Approved')),
+    
+    approver_1_confirmation_at TIMESTAMP,
+    approver_2_confirmation_at TIMESTAMP,
+    
+    UNIQUE(findings_id, ranking),
+    FOREIGN KEY (findings_id) REFERENCES Safety_forms_main(findings_id) ON DELETE CASCADE
+);
+
+-- Action table
+CREATE TABLE Safety_forms_action (
+    id SERIAL PRIMARY KEY,
+    findings_id VARCHAR(50) NOT NULL,
+    ranking VARCHAR(20) NOT NULL,
+    
+    action_by_pic VARCHAR(100),
+    due_date DATE,
+    action_pic VARCHAR(100),
+    department_section VARCHAR(100),
+    action_pic_remarks TEXT,
+    action_pic_status VARCHAR(20) CHECK (action_pic_status IN ('Pending', 'Denied', 'Approved')),
+    action_pic_submit_at TIMESTAMP,
+    
+    FOREIGN KEY (findings_id, ranking) 
+        REFERENCES Safety_forms_approver_status(findings_id, ranking) 
+        ON DELETE CASCADE
+);
+
+-- Action Confirmation
+CREATE TABLE Safety_forms_action_confirmation (
+    id SERIAL PRIMARY KEY,
+    findings_id VARCHAR(50) NOT NULL,
+    ranking VARCHAR(20) NOT NULL,
+    
+    action_confirm_by VARCHAR(100),
+    action_confirm_by_remarks TEXT,
+    action_confirmation VARCHAR(20) CHECK (action_confirmation IN ('Pending', 'Denied', 'Approved')),
+    action_confirm_by_status VARCHAR(20) CHECK (action_confirm_by_status IN ('Pending', 'Denied', 'Approved')),
+    action_confirm_by_at TIMESTAMP,
+    
+    FOREIGN KEY (findings_id, ranking) 
+        REFERENCES Safety_forms_approver_status(findings_id, ranking) 
+        ON DELETE CASCADE
+);
+
+-- Yokoten Main
+CREATE TABLE Safety_forms_foryokoten (
+    id SERIAL PRIMARY KEY,
+    findings_id VARCHAR(50) NOT NULL,
+    ranking VARCHAR(20) NOT NULL,
+    
+    yokoten_safety_repre VARCHAR(100),
+    yokoten_status VARCHAR(20) CHECK (yokoten_status IN ('Pending', 'Denied', 'Approved')),
+    yokoten_date DATE,
+    yokoten_foryokoten VARCHAR(10) CHECK (yokoten_foryokoten IN ('No', 'Yes')),
+    yokoten_related_department TEXT,
+    
+    FOREIGN KEY (findings_id, ranking) 
+        REFERENCES Safety_forms_approver_status(findings_id, ranking) 
+        ON DELETE CASCADE
+);
+
+-- Yokoten Actions
+CREATE TABLE Safety_forms_foryokoten_actions (
+    id SERIAL PRIMARY KEY,
+    findings_id VARCHAR(50) NOT NULL,
+    ranking VARCHAR(20) NOT NULL,
+    
+    yokoten_action TEXT,
+    yokoten_action_duedate DATE,
+    yokoten_action_pic VARCHAR(100),
+    yokoten_departmentsection VARCHAR(100),
+    yokoten_remarks TEXT,
+    yokoten_action_status VARCHAR(20) CHECK (yokoten_action_status IN ('Pending', 'Denied', 'Approved')),
+    yokoten_action_at TIMESTAMP,
+    
+    FOREIGN KEY (findings_id, ranking) 
+        REFERENCES Safety_forms_approver_status(findings_id, ranking) 
+        ON DELETE CASCADE
+);
+
+-- Optional: Indexes for better performance
+CREATE INDEX idx_approver_status_findings ON Safety_forms_approver_status(findings_id);
+CREATE INDEX idx_action_findings_ranking ON Safety_forms_action(findings_id, ranking);
+CREATE INDEX idx_action_conf_findings_ranking ON Safety_forms_action_confirmation(findings_id, ranking);
+CREATE INDEX idx_yokoten_findings_ranking ON Safety_forms_foryokoten(findings_id, ranking);
+CREATE INDEX idx_yokoten_actions_findings_ranking ON Safety_forms_foryokoten_actions(findings_id, ranking);
