@@ -1,0 +1,34 @@
+Think as Web architecture, web developer, and project manager. Give me a detailed architecture of the system, from zero to the final point of the system. Give detailed insight based on the three job description mentioned.
+Main-App = laravel filament
+Iframed-app = vanilla php
+firebase/php-jwt version 5.2
+
+I have a project that has the main app and the iframed-app, i want the main app to give/generate jwt to the iframed app. Then the iframed app is a forms that after completing the forms, it sends email via php mailer to approvers. I want that if the approver click the url, with jwt, id, and sequence, it will redirect to the main app. The iframed app vanilla php uses this architecture for redirections: 
+ <?php
+                    // Sanitize inputs
+                    $findings_id = filter_input(INPUT_GET, 'findings_id', FILTER_SANITIZE_NUMBER_INT);
+                    $findings_id = trim($findings_id);
+                    
+                    $sequence = filter_input(INPUT_GET, 'sequence', FILTER_SANITIZE_NUMBER_INT);
+                    $sequence = trim($sequence);
+                    
+                    
+                    // Map sequence values to files
+                    $routes = [
+                        1 => 'assets/php/routes/first_approver.php',
+                        2 => 'assets/php/routes/second_approver.php',
+                        3 => 'assets/php/routes/actionbypic.php',
+                        4 => 'assets/php/routes/actionconfirmation.php',
+                        5 => 'assets/php/routes/foryokoten.php',
+                        6 => 'assets/php/routes/yokotensafetyrepre.php'
+                    ];
+                    
+                    
+                    // Include based on sequence, fallback if not found
+                    if (array_key_exists($sequence, $routes)) {
+                        include $routes[$sequence];
+                    } else {
+                        include 'assets/php/routes/report_finding.php';
+                    }
+                    ?>
+                </div>
