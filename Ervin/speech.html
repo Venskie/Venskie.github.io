@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Voice to Text Web App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        #controls {
+            margin: 30px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        select, button {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        select {
+            background: #fff;
+            border: 1px solid #ccc;
+        }
+        #startBtn {
+            background: #4CAF50;
+            color: white;
+        }
+        #stopBtn {
+            background: #f44336;
+            color: white;
+        }
+        #copyBtn, #clearBtn, #downloadBtn {
+            background: #2196F3;
+            color: white;
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        #transcriptContainer {
+            position: relative;
+            margin-top: 30px;
+        }
+        #transcript {
+            width: 100%;
+            min-height: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: white;
+            text-align: left;
+            white-space: pre-wrap;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        #final {
+            color: #000;
+        }
+        #interim {
+            color: #666;
+            font-style: italic;
+        }
+        #status {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .note {
+            font-size: 14px;
+            color: #666;
+            margin-top: 40px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <h1>Advanced Voice to Text Converter</h1>
+    <p>Speak clearly into your microphone. Final text appears in black, partial/in-progress text in gray.</p>
+
+    <div id="controls">
+        <label for="language">Language:</label>
+        <select id="language">
+            <option value="en-US">English (United States)</option>
+            <option value="en-GB">English (United Kingdom)</option>
+            <option value="en-AU">English (Australia)</option>
+            <option value="en-IN">English (India)</option>
+            <option value="es-ES">Spanish (Spain)</option>
+            <option value="es-MX">Spanish (Mexico)</option>
+            <option value="fr-FR">French (France)</option>
+            <option value="de-DE">German (Germany)</option>
+            <option value="it-IT">Italian (Italy)</option>
+            <option value="pt-BR">Portuguese (Brazil)</option>
+            <option value="pt-PT">Portuguese (Portugal)</option>
+            <option value="ja-JP">Japanese (Japan)</option>
+            <option value="ko-KR">Korean (Korea)</option>
+            <option value="zh-CN">Chinese (Simplified)</option>
+            <option value="zh-TW">Chinese (Traditional)</option>
+            <option value="ru-RU">Russian (Russia)</option>
+            <option value="ar-SA">Arabic (Saudi Arabia)</option>
+            <option value="hi-IN">Hindi (India)</option>
+            <option value="nl-NL">Dutch (Netherlands)</option>
+            <option value="sv-SE">Swedish (Sweden)</option>
+        </select>
+
+        <button id="startBtn">Start Listening</button>
+        <button id="stopBtn" disabled>Stop Listening</button>
+        <button id="copyBtn">Copy to Clipboard</button>
+        <button id="clearBtn">Clear Transcript</button>
+        <button id="downloadBtn">Download as .txt</button>
+    </div>
+
+    <div id="transcriptContainer">
+        <div id="transcript">
+            <span id="final"></span><span id="interim"></span>
+        </div>
+        <div id="status">Status: Ready</div>
+    </div>
+
+    <div class="note">
+        <strong>Notes:</strong><br>
+        • Best performance in <strong>Google Chrome</strong> or <strong>Microsoft Edge</strong> (Web Speech API).<br>
+        • Allow microphone access when prompted. Works on HTTPS or localhost.<br>
+        • Language support and accuracy vary by browser and language. Chrome supports the most languages.<br>
+        • In English, you can say commands like "period", "comma", "new line", "question mark" for punctuation.<br>
+        • Changing language while listening will automatically restart recognition.
+    </div>
+
+    <script>
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!SpeechRecognition) {
+            document.body.innerHTML = '<h1>Your browser does not support the Web Speech API.</h1><p>Please use Google Chrome or Microsoft Edge.</p>';
+            throw new Error("Unsupported browser");
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        const languageSelect = document.getElementById('language');
+        recognition.lang = languageSelect.value;
+
+        let finalTranscript = '';
+        let recognizing = false;
+
+        const finalSpan = document.getElementById('final');
+        const interimSpan = document.getElementById('interim');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const status = document.getElementById('status');
+
+        // Better sentence capitalization
+        function capitalizeSentences(text) {
+            return text.replace(/(^\s*|\.\s+|\?\s+|\!\s+)([a-z])/g, (match, separator, char) => {
+                return separator + char.toUpperCase();
+            });
+        }
+
+        recognition.onstart = () => {
+            recognizing = true;
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            status.textContent = 'Status: Listening...';
+            status.style.color = 'green';
+        };
+
+        recognition.onend = () => {
+            recognizing = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            status.textContent = 'Status: Ready';
+            status.style.color = '#333';
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error', event.error);
+            status.textContent = `Status: Error - ${event.error}`;
+            status.style.color = 'red';
+            recognizing = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        };
+
+        recognition.onresult = (event) => {
+            let interimTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                const transcriptPart = event.results[i][0].transcript;
+
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcriptPart + ' ';
+                    finalTranscript = capitalizeSentences(finalTranscript);
+                } else {
+                    interimTranscript += transcriptPart;
+                }
+            }
+
+            finalSpan.textContent = finalTranscript.trim();
+            interimSpan.textContent = interimTranscript;
+        };
+
+        // Start button
+        startBtn.onclick = () => {
+            finalTranscript = '';
+            finalSpan.textContent = '';
+            interimSpan.textContent = '';
+            recognition.start();
+        };
+
+        // Stop button
+        stopBtn.onclick = () => {
+            recognition.stop();
+        };
+
+        // Language change - auto restart if listening
+        languageSelect.addEventListener('change', () => {
+            recognition.lang = languageSelect.value;
+            if (recognizing) {
+                recognition.stop();
+                setTimeout(() => recognition.start(), 500); // Small delay to avoid conflicts
+            }
+        });
+
+        // Copy to clipboard (final + current interim)
+        copyBtn.onclick = () => {
+            const textToCopy = (finalSpan.textContent + ' ' + interimSpan.textContent).trim();
+            if (!textToCopy) {
+                alert('Nothing to copy yet!');
+                return;
+            }
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => copyBtn.textContent = 'Copy to Clipboard', 2000);
+            }).catch(() => {
+                alert('Copy failed - try selecting text manually');
+            });
+        };
+
+        // Clear transcript
+        clearBtn.onclick = () => {
+            finalTranscript = '';
+            finalSpan.textContent = '';
+            interimSpan.textContent = '';
+        };
+
+        // Download as .txt
+        downloadBtn.onclick = () => {
+            const textToDownload = (finalSpan.textContent + ' ' + interimSpan.textContent).trim();
+            if (!textToDownload) {
+                alert('Nothing to download yet!');
+                return;
+            }
+            const blob = new Blob([textToDownload], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `transcript_${new Date().toISOString().slice(0,10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+    </script>
+</body>
+</html>
