@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>AR Object Interaction - Computer Tracking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            overflow: hidden;
+            background: #000;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #ar-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            touch-action: none;
+        }
+
+        #ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .ui-panel {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            color: white;
+            pointer-events: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        #setup-panel {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            min-width: 350px;
+            max-width: 90vw;
+        }
+
+        #setup-panel h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .setup-step {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .setup-step h3 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .setup-step p {
+            color: #aaa;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .image-upload {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .image-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .upload-label {
+            display: block;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(0, 212, 255, 0.5);
+            border-radius: 8px;
+            color: #00d4ff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .image-upload:hover .upload-label {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: #00d4ff;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 150px;
+            margin-top: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+            min-height: 56px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #tracking-status {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 12px 20px;
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 200;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ff4444;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.tracking {
+            background: #44ff44;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        #interaction-panel {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            display: none;
+            min-width: 300px;
+            max-width: 90vw;
+        }
+
+        .interaction-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #00d4ff;
+            text-align: center;
+        }
+
+        .interaction-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .interaction-btn {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .interaction-btn:active {
+            transform: scale(0.95);
+            background: rgba(0, 212, 255, 0.2);
+        }
+
+        .interaction-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: #00d4ff;
+        }
+
+        #info-display {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            display: none;
+            max-width: 250px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            color: #aaa;
+        }
+
+        .info-value {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            display: none;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .floating-menu {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .menu-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-btn:active {
+            transform: scale(0.9);
+            background: rgba(0, 212, 255, 0.2);
+        }
+
+        .ar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .debug-info {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            color: #0f0;
+            font-family: monospace;
+            font-size: 12px;
+            display: none;
+        }
+
+        /* Sample marker styles */
+        .sample-marker {
+            width: 200px;
+            height: 200px;
+            background: white;
+            border: 2px solid #000;
+            display: none;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .marker-pattern {
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, #000, #000 10px, #fff 10px, #fff 20px),
+                repeating-linear-gradient(90deg, #000, #000 10px, #fff 10px, #fff 20px);
+            opacity: 0.8;
+        }
+
+        .marker-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="ar-container">
+        <div id="ui-overlay">
+            <div id="setup-panel" class="ui-panel">
+                <h1>🖥️ AR Object Tracking</h1>
+                
+                <div class="setup-step">
+                    <h3>Step 1: Choose Tracking Method</h3>
+                    <p>Select how you want to track your computer or object</p>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="showImageTracking()">Image Tracking</button>
+                        <button class="btn btn-secondary" onclick="showFaceTracking()">Face Tracking</button>
+                    </div>
+                </div>
+
+                <div id="image-tracking-section" style="display: none;">
+                    <div class="setup-step">
+                        <h3>Step 2: Upload Reference Image</h3>
+                        <p>Take or upload a clear photo of your computer screen or logo</p>
+                        <div class="image-upload">
+                            <input type="file" id="image-upload" accept="image/*" capture="environment">
+                            <label for="image-upload" class="upload-label">
+                                📷 Take Photo or Upload Image
+                            </label>
+                        </div>
+                        <img id="preview-image" class="preview-image" alt="Preview">
+                    </div>
+
+                    <div class="setup-step">
+                        <h3>Or Use Sample Marker</h3>
+                        <p>Print this marker and place it on your computer</p>
+                        <div class="sample-marker" id="sample-marker">
+                            <div class="marker-pattern"></div>
+                            <div class="marker-text">AR</div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="printMarker()">🖨️ Print Marker</button>
+                    </div>
+                </div>
+
+                <div id="face-tracking-section" style="display: none;">
+                    <div class="setup-step">
+                        <h3>Face Tracking Mode</h3>
+                        <p>This will track your face and place virtual objects around it</p>
+                    </div>
+                </div>
+
+                <button id="start-tracking-btn" class="btn" disabled>Start AR Tracking</button>
+            </div>
+
+            <div id="tracking-status">
+                <div class="status-indicator" id="status-indicator"></div>
+                <span id="status-text">Searching for object...</span>
+            </div>
+
+            <div id="interaction-panel">
+                <div class="interaction-title">🎮 Computer Controls</div>
+                <div class="interaction-buttons">
+                    <button class="interaction-btn" onclick="toggleScreen()">
+                        💻 Toggle Screen
+                    </button>
+                    <button class="interaction-btn" onclick="showKeyboard()">
+                        ⌨️ Virtual Keyboard
+                    </button>
+                    <button class="interaction-btn" onclick="showStats()">
+                        📊 Show Stats
+                    </button>
+                    <button class="interaction-btn" onclick="playAnimation()">
+                        🎬 Play Animation
+                    </button>
+                    <button class="interaction-btn" onclick="changeTheme()">
+                        🎨 Change Theme
+                    </button>
+                    <button class="interaction-btn" onclick="takeScreenshot()">
+                        📸 Screenshot
+                    </button>
+                </div>
+            </div>
+
+            <div id="info-display">
+                <div class="info-row">
+                    <span class="info-label">Object:</span>
+                    <span class="info-value" id="tracked-object">None</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Position:</span>
+                    <span class="info-value" id="object-position">0, 0, 0</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Rotation:</span>
+                    <span class="info-value" id="object-rotation">0°</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Distance:</span>
+                    <span class="info-value" id="object-distance">0m</span>
+                </div>
+            </div>
+
+            <div class="floating-menu" id="floating-menu">
+                <button class="menu-btn" onclick="toggleDebug()">🔧</button>
+                <button class="menu-btn" onclick="resetTracking()">🔄</button>
+                <button class="menu-btn" onclick="exitAR()">❌</button>
+            </div>
+
+            <div id="loading">
+                <div class="spinner"></div>
+                <div>Initializing AR Tracking...</div>
+            </div>
+
+            <div class="debug-info" id="debug-info">
+                <div>FPS: <span id="debug-fps">60</span></div>
+                <div>Tracking: <span id="debug-tracking">false</span></div>
+                <div>Objects: <span id="debug-objects">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        class ObjectTrackingAR {
+            constructor() {
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.arSession = null;
+                this.trackedImage = null;
+                this.trackedObject = null;
+                this.augmentationGroup = null;
+                this.trackingMode = 'image';
+                this.referenceImage = null;
+                this.isTracking = false;
+                this.frameCount = 0;
+                this.lastTime = performance.now();
+                
+                // Computer interaction elements
+                this.virtualScreen = null;
+                this.virtualKeyboard = null;
+                this.statsPanel = null;
+                this.particles = [];
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                document.getElementById('image-upload').addEventListener('change', (e) => this.handleImageUpload(e));
+                document.getElementById('start-tracking-btn').addEventListener('click', () => this.startAR());
+            }
+
+            showImageTracking() {
+                document.getElementById('image-tracking-section').style.display = 'block';
+                document.getElementById('face-tracking-section').style.display = 'none';
+                this.trackingMode = 'image';
+                this.checkStartButton();
+            }
+
+            showFaceTracking() {
+                document.getElementById('image-tracking-section').style.display = 'none';
+                document.getElementById('face-tracking-section').style.display = 'block';
+                this.trackingMode = 'face';
+                this.checkStartButton();
+            }
+
+            handleImageUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.getElementById('preview-image');
+                        img.src = e.target.result;
+                        img.style.display = 'block';
+                        this.referenceImage = e.target.result;
+                        this.checkStartButton();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            checkStartButton() {
+                const btn = document.getElementById('start-tracking-btn');
+                if (this.trackingMode === 'face' || this.referenceImage) {
+                    btn.disabled = false;
+                    btn.textContent = this.trackingMode === 'face' ? 'Start Face Tracking' : 'Start Image Tracking';
+                }
+            }
+
+            async startAR() {
+                if (!navigator.xr) {
+                    alert('WebXR is not supported on this device');
+                    return;
+                }
+
+                document.getElementById('setup-panel').style.display = 'none';
+                document.getElementById('loading').style.display = 'block';
+
+                try {
+                    // Create tracked image bitmap
+                    let trackedImage = null;
+                    if (this.trackingMode === 'image' && this.referenceImage) {
+                        const img = new Image();
+                        img.src = this.referenceImage;
+                        await new Promise(resolve => img.onload = resolve);
+                        
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        
+                        trackedImage = await createImageBitmap(canvas);
+                    }
+
+                    // Request AR session with appropriate features
+                    const sessionFeatures = this.trackingMode === 'face' 
+                        ? ['face-tracking']
+                        : ['image-tracking'];
+
+                    this.arSession = await navigator.xr.requestSession('immersive-ar', {
+                        requiredFeatures: sessionFeatures,
+                        optionalFeatures: ['dom-overlay'],
+                        domOverlay: { root: document.getElementById('ui-overlay') }
+                    });
+
+                    await this.setupScene();
+                    await this.setupTracking(trackedImage);
+                    
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('tracking-status').style.display = 'flex';
+                    document.getElementById('floating-menu').style.display = 'flex';
+                    document.getElementById('interaction-panel').style.display = 'block';
+                    document.getElementById('info-display').style.display = 'block';
+
+                } catch (error) {
+                    console.error('Error starting AR session:', error);
+                    this.showError('Failed to start AR tracking. Your device may not support this feature.');
+                }
+            }
+
+            async setupScene() {
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+                
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.xr.enabled = true;
+                this.renderer.xr.setSession(this.arSession);
+                document.getElementById('ar-container').appendChild(this.renderer.domElement);
+
+                // Lighting
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                this.scene.add(ambientLight);
+                
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                directionalLight.position.set(0, 5, 5);
+                this.scene.add(directionalLight);
+
+                // Create augmentation group
+                this.augmentationGroup = new THREE.Group();
+                this.scene.add(this.augmentationGroup);
+
+                window.addEventListener('resize', () => this.onWindowResize());
+            }
+
+            async setupTracking(trackedImage) {
+                if (this.trackingMode === 'image' && trackedImage) {
+                    // Setup image tracking
+                    const tracker = await this.arSession.requestImageTracker({
+                        trackedImages: [{ image: trackedImage, widthInMeters: 0.1 }]
+                    });
+
+                    this.trackedImage = tracker.getTrackedImage(0);
+                    this.trackedImage.addEventListener('track', (event) => this.onImageTracked(event));
+                    this.trackedImage.addEventListener('lose', () => this.onTrackingLost());
+                } else if (this.trackingMode === 'face') {
+                    // Setup face tracking
+                    const faceTracker = await this.arSession.requestFaceTracker();
+                    faceTracker.addEventListener('track', (event) => this.onFaceTracked(event));
+                    faceTracker.addEventListener('lose', () => this.onTrackingLost());
+                }
+
+                this.renderer.xr.setAnimationLoop((timestamp, frame) => {
+                    this.animate(timestamp, frame);
+                });
+            }
+
+            onImageTracked(event) {
+                this.isTracking = true;
+                const pose = event.pose;
+                
+                // Update augmentation group position
+                this.augmentationGroup.matrix.fromArray(pose.transform.matrix);
+                this.augmentationGroup.visible = true;
+                
+                // Create computer augmentation if not exists
+                if (!this.trackedObject) {
+                    this.createComputerAugmentation();
+                }
+                
+                // Update UI
+                document.getElementById('status-indicator').classList.add('tracking');
+                document.getElementById('status-text').textContent = 'Tracking computer...';
+                document.getElementById('tracked-object').textContent = 'Computer';
+                
+                this.updateTrackingInfo(pose);
+            }
+
+            onFaceTracked(event) {
+                this.isTracking = true;
+                const pose = event.pose;
+                
+                // Update augmentation group position
+                this.augmentationGroup.matrix.fromArray(pose.transform.matrix);
+                this.augmentationGroup.visible = true;
+                
+                // Create face augmentation if not exists
+                if (!this.trackedObject) {
+                    this.createFaceAugmentation();
+                }
+                
+                // Update UI
+                document.getElementById('status-indicator').classList.add('tracking');
+                document.getElementById('status-text').textContent = 'Tracking face...';
+                document.getElementById('tracked-object').textContent = 'Face';
+                
+                this.updateTrackingInfo(pose);
+            }
+
+            onTrackingLost() {
+                this.isTracking = false;
+                this.augmentationGroup.visible = false;
+                
+                document.getElementById('status-indicator').classList.remove('tracking');
+                document.getElementById('status-text').textContent = 'Searching for object...';
+                document.getElementById('tracked-object').textContent = 'None';
+            }
+
+            createComputerAugmentation() {
+                // Create virtual screen
+                const screenGeometry = new THREE.BoxGeometry(0.3, 0.2, 0.01);
+                const screenMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0x00ff00,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                this.virtualScreen = new THREE.Mesh(screenGeometry, screenMaterial);
+                this.virtualScreen.position.z = 0.05;
+                this.augmentationGroup.add(this.virtualScreen);
+
+                // Create virtual keyboard
+                const keyboardGeometry = new THREE.BoxGeometry(0.25, 0.08, 0.02);
+                const keyboardMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
+                this.virtualKeyboard = new THREE.Mesh(keyboardGeometry, keyboardMaterial);
+                this.virtualKeyboard.position.z = -0.1;
+                this.virtualKeyboard.position.y = -0.15;
+                this.augmentationGroup.add(this.virtualKeyboard);
+
+                // Create floating particles
+                for (let i = 0; i < 20; i++) {
+                    const particleGeometry = new THREE.SphereGeometry(0.005, 8, 8);
+                    const particleMaterial = new THREE.MeshBasicMaterial({ 
+                        color: new THREE.Color().setHSL(Math.random(), 1, 0.5),
+                        transparent: true,
+                        opacity: 0.8
+                    });
+                    const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+                    
+                    particle.position.set(
+                        (Math.random() - 0.5) * 0.4,
+                        (Math.random() - 0.5) * 0.3,
+                        Math.random() * 0.2
+                    );
+                    
+                    particle.userData = {
+                        velocity: new THREE.Vector3(
+                            (Math.random() - 0.5) * 0.001,
+                            (Math.random() - 0.5) * 0.001,
+                            (Math.random() - 0.5) * 0.001
+                        )
+                    };
+                    
+                    this.particles.push(particle);
+                    this.augmentationGroup.add(particle);
+                }
+
+                // Create stats panel
+                const panelGeometry = new THREE.PlaneGeometry(0.15, 0.1);
+                const canvas = document.createElement('canvas');
+                canvas.width = 256;
+                canvas.height = 128;
+                const context = canvas.getContext('2d');
+                context.fillStyle = '#000';
+                context.fillRect(0, 0, 256, 128);
+                context.fillStyle = '#0f0';
+                context.font = '20px monospace';
+                context.fillText('CPU: 45%', 10, 30);
+                context.fillText('RAM: 8.2GB', 10, 60);
+                context.fillText('GPU: 67%', 10, 90);
+                
+                const panelTexture = new THREE.CanvasTexture(canvas);
+                const panelMaterial = new THREE.MeshBasicMaterial({ 
+                    map: panelTexture,
+                    transparent: true,
+                    opacity: 0.9
+                });
+                this.statsPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+                this.statsPanel.position.set(0.2, 0.1, 0.01);
+                this.augmentationGroup.add(this.statsPanel);
+
+                this.trackedObject = this.augmentationGroup;
+            }
+
+            createFaceAugmentation() {
+                // Create virtual glasses
+                const glassesGeometry = new THREE.TorusGeometry(0.1, 0.02, 8, 20);
+                const glassesMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
+                
+                const leftLens = new THREE.Mesh(glassesGeometry, glassesMaterial);
+                leftLens.position.set(-0.06, 0, 0.05);
+                this.augmentationGroup.add(leftLens);
+                
+                const rightLens = new THREE.Mesh(glassesGeometry, glassesMaterial);
+                rightLens.position.set(0.06, 0, 0.05);
+                this.augmentationGroup.add(rightLens);
+                
+                // Create bridge
+                const bridgeGeometry = new THREE.CylinderGeometry(0.005, 0.005, 0.08);
+                const bridge = new THREE.Mesh(bridgeGeometry, glassesMaterial);
+                bridge.rotation.z = Math.PI / 2;
+                bridge.position.set(0, 0, 0.05);
+                this.augmentationGroup.add(bridge);
+
+                this.trackedObject = this.augmentationGroup;
+            }
+
+            updateTrackingInfo(pose) {
+                const position = pose.transform.position;
+                const rotation = pose.transform.orientation;
+                
+                document.getElementById('object-position').textContent = 
+                    `${position.x.toFixed(2)}, ${position.y.toFixed(2)}, ${position.z.toFixed(2)}`;
+                
+                const euler = new THREE.Euler().setFromQuaternion(rotation);
+                document.getElementById('object-rotation').textContent = 
+                    `${(euler.y * 180 / Math.PI).toFixed(0)}°`;
+                
+                const distance = Math.sqrt(position.x ** 2 + position.y ** 2 + position.z ** 2);
+                document.getElementById('object-distance').textContent = `${distance.toFixed(2)}m`;
+            }
+
+            animate(timestamp, frame) {
+                // Update FPS
+                this.frameCount++;
+                if (timestamp - this.lastTime >= 1000) {
+                    document.getElementById('debug-fps').textContent = this.frameCount;
+                    this.frameCount = 0;
+                    this.lastTime = timestamp;
+                }
+
+                // Animate particles
+                this.particles.forEach(particle => {
+                    particle.position.add(particle.userData.velocity);
+                    
+                    // Bounce off boundaries
+                    if (Math.abs(particle.position.x) > 0.2) particle.userData.velocity.x *= -1;
+                    if (Math.abs(particle.position.y) > 0.15) particle.userData.velocity.y *= -1;
+                    if (particle.position.z > 0.3 || particle.position.z < -0.1) particle.userData.velocity.z *= -1;
+                });
+
+                // Update debug info
+                document.getElementById('debug-tracking').textContent = this.isTracking;
+                document.getElementById('debug-objects').textContent = this.particles.length + 3;
+
+                this.renderer.render(this.scene, this.camera);
+            }
+
+            // Interaction methods
+            toggleScreen() {
+                if (this.virtualScreen) {
+                    this.virtualScreen.visible = !this.virtualScreen.visible;
+                }
+            }
+
+            showKeyboard() {
+                if (this.virtualKeyboard) {
+                    this.virtualKeyboard.visible = !this.virtualKeyboard.visible;
+                }
+            }
+
+            showStats() {
+                if (this.statsPanel) {
+                    this.statsPanel.visible = !this.statsPanel.visible;
+                }
+            }
+
+            playAnimation() {
+                if (this.trackedObject) {
+                    this.trackedObject.rotation.y += Math.PI / 4;
+                }
+            }
+
+            changeTheme() {
+                if (this.virtualScreen) {
+                    const colors = [0x00ff00, 0xff0000, 0x0000ff, 0xffff00, 0xff00ff];
+                    const currentColor = this.virtualScreen.material.color.getHex();
+                    const currentIndex = colors.indexOf(currentColor);
+                    const nextIndex = (currentIndex + 1) % colors.length;
+                    this.virtualScreen.material.color.setHex(colors[nextIndex]);
+                }
+            }
+
+            takeScreenshot() {
+                // Create a canvas to capture the scene
+                const canvas = document.createElement('canvas');
+                canvas.width = this.renderer.domElement.width;
+                canvas.height = this.renderer.domElement.height;
+                const context = canvas.getContext('2d');
+                
+                // Draw the renderer content
+                context.drawImage(this.renderer.domElement, 0, 0);
+                
+                // Download the image
+                const link = document.createElement('a');
+                link.download = 'ar-screenshot.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            }
+
+            toggleDebug() {
+                const debugInfo = document.getElementById('debug-info');
+                debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+            }
+
+            resetTracking() {
+                if (this.trackedObject) {
+                    this.trackedObject.rotation.set(0, 0, 0);
+                    this.trackedObject.position.set(0, 0, 0);
+                }
+            }
+
+            exitAR() {
+                if (this.arSession) {
+                    this.arSession.end();
+                }
+            }
+
+            showError(message) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('setup-panel').style.display = 'block';
+                const p = document.querySelector('#setup-panel p');
+                p.textContent = message;
+                p.style.color = '#ff6b6b';
+            }
+
+            onWindowResize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        }
+
+        // Global functions for button handlers
+        let arExperience;
+
+        function showImageTracking() {
+            arExperience.showImageTracking();
+        }
+
+        function showFaceTracking() {
+            arExperience.showFaceTracking();
+        }
+
+        function printMarker() {
+            const marker = document.getElementById('sample-marker');
+            marker.style.display = 'block';
+            window.print();
+            marker.style.display = 'none';
+        }
+
+        function toggleScreen() {
+            arExperience.toggleScreen();
+        }
+
+        function showKeyboard() {
+            arExperience.showKeyboard();
+        }
+
+        function showStats() {
+            arExperience.showStats();
+        }
+
+        function playAnimation() {
+            arExperience.playAnimation();
+        }
+
+        function changeTheme() {
+            arExperience.changeTheme();
+        }
+
+        function takeScreenshot() {
+            arExperience.takeScreenshot();
+        }
+
+        function toggleDebug() {
+            arExperience.toggleDebug();
+        }
+
+        function resetTracking() {
+            arExperience.resetTracking();
+        }
+
+        function exitAR() {
+            arExperience.exitAR();
+        }
+
+        // Initialize the AR experience
+        arExperience = new ObjectTrackingAR();
+    </script>
+</body>
+</html>
