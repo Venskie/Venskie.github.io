@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Camera AR Experience</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            overflow: hidden;
+            background: #000;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #ar-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            touch-action: none;
+        }
+
+        #camera-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        #ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .ui-panel {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            color: white;
+            pointer-events: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        #start-panel {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            min-width: 320px;
+            max-width: 90vw;
+        }
+
+        #start-panel h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .camera-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .camera-info h3 {
+            color: #ffd93d;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .camera-spec {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .spec-label {
+            color: #aaa;
+        }
+
+        .spec-value {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+            min-height: 56px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #camera-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            display: none;
+            min-width: 200px;
+        }
+
+        .control-item {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            border-radius: 2px;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #ffd93d;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .filter-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 215, 61, 0.2);
+        }
+
+        .filter-btn.active {
+            background: rgba(255, 215, 61, 0.3);
+            border-color: #ffd93d;
+        }
+
+        #camera-status {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recording-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff4444;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        #ar-tools {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            display: none;
+            min-width: 350px;
+            max-width: 90vw;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tool-btn {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .tool-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 215, 61, 0.2);
+        }
+
+        .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tool-btn.active {
+            background: rgba(255, 215, 61, 0.3);
+            border-color: #ffd93d;
+        }
+
+        .tool-label {
+            position: absolute;
+            bottom: -20px;
+            font-size: 10px;
+            color: #aaa;
+            white-space: nowrap;
+        }
+
+        #camera-info-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 12px;
+            border-radius: 10px;
+            color: #0f0;
+            font-family: monospace;
+            font-size: 11px;
+            display: none;
+            max-width: 200px;
+        }
+
+        .info-line {
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .info-label {
+            color: #888;
+        }
+
+        .info-value {
+            color: #0f0;
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            display: none;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #ffd93d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .focus-bracket {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 2px solid #ffd93d;
+            pointer-events: none;
+            display: none;
+            animation: focusPulse 1s ease-out;
+        }
+
+        @keyframes focusPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .focus-bracket::before,
+        .focus-bracket::after {
+            content: '';
+            position: absolute;
+            background: #ffd93d;
+        }
+
+        .focus-bracket::before {
+            width: 20px;
+            height: 2px;
+            left: -22px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .focus-bracket::after {
+            width: 20px;
+            height: 2px;
+            right: -22px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .exposure-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            pointer-events: none;
+            display: none;
+        }
+
+        .exposure-level {
+            height: 100%;
+            background: linear-gradient(90deg, #000 0%, #ffd93d 50%, #fff 100%);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .viewfinder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 150px;
+            border: 2px solid rgba(255, 215, 61, 0.5);
+            pointer-events: none;
+            display: none;
+        }
+
+        .viewfinder::before,
+        .viewfinder::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffd93d;
+        }
+
+        .viewfinder::before {
+            top: -2px;
+            left: -2px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .viewfinder::after {
+            bottom: -2px;
+            right: -2px;
+            border-left: none;
+            border-top: none;
+        }
+
+        /* Camera filter effects */
+        .filter-grayscale {
+            filter: grayscale(100%);
+        }
+
+        .filter-sepia {
+            filter: sepia(100%);
+        }
+
+        .filter-invert {
+            filter: invert(100%);
+        }
+
+        .filter-blur {
+            filter: blur(2px);
+        }
+
+        .filter-contrast {
+            filter: contrast(150%);
+        }
+
+        .filter-saturate {
+            filter: saturate(200%);
+        }
+
+        .filter-hue {
+            filter: hue-rotate(90deg);
+        }
+
+        @media (max-width: 768px) {
+            #camera-controls {
+                top: 10px;
+                right: 10px;
+                padding: 10px;
+                min-width: 160px;
+            }
+            
+            #ar-tools {
+                bottom: 20px;
+                padding: 15px;
+                min-width: 300px;
+            }
+            
+            .tool-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+            
+            .tool-btn {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="ar-container">
+        <video id="camera-preview" autoplay playsinline></video>
+        
+        <div class="camera-overlay">
+            <div class="focus-bracket" id="focus-bracket"></div>
+            <div class="exposure-indicator" id="exposure-indicator">
+                <div class="exposure-level" id="exposure-level"></div>
+            </div>
+            <div class="viewfinder" id="viewfinder"></div>
+        </div>
+
+        <div id="ui-overlay">
+            <div id="start-panel" class="ui-panel">
+                <h1>📸 Camera AR Experience</h1>
+                
+                <div class="camera-info">
+                    <h3>📷 Camera Capabilities</h3>
+                    <div class="camera-spec">
+                        <span class="spec-label">Device:</span>
+                        <span class="spec-value" id="device-name">Detecting...</span>
+                    </div>
+                    <div class="camera-spec">
+                        <span class="spec-label">Resolution:</span>
+                        <span class="spec-value" id="resolution">Detecting...</span>
+                    </div>
+                    <div class="camera-spec">
+                        <span class="spec-label">FPS:</span>
+                        <span class="spec-value" id="fps-cap">Detecting...</span>
+                    </div>
+                    <div class="camera-spec">
+                        <span class="spec-label">AR Support:</span>
+                        <span class="spec-value" id="ar-support">Detecting...</span>
+                    </div>
+                </div>
+
+                <button id="start-camera-btn" class="btn">🎥 Start Camera AR</button>
+            </div>
+
+            <div id="camera-status">
+                <div class="recording-indicator" id="recording-indicator"></div>
+                <span id="status-text">Camera Active</span>
+            </div>
+
+            <div id="camera-controls">
+                <div class="control-item">
+                    <div class="control-label">Zoom</div>
+                    <input type="range" class="slider" id="zoom-slider" min="1" max="10" step="0.1" value="1">
+                </div>
+                <div class="control-item">
+                    <div class="control-label">Brightness</div>
+                    <input type="range" class="slider" id="brightness-slider" min="0.5" max="2" step="0.1" value="1">
+                </div>
+                <div class="control-item">
+                    <div class="control-label">Contrast</div>
+                    <input type="range" class="slider" id="contrast-slider" min="0.5" max="2" step="0.1" value="1">
+                </div>
+                <div class="control-item">
+                    <div class="control-label">Camera Filters</div>
+                    <div class="filter-buttons">
+                        <button class="filter-btn" data-filter="none">Normal</button>
+                        <button class="filter-btn" data-filter="grayscale">B&W</button>
+                        <button class="filter-btn" data-filter="sepia">Sepia</button>
+                        <button class="filter-btn" data-filter="invert">Invert</button>
+                        <button class="filter-btn" data-filter="blur">Blur</button>
+                        <button class="filter-btn" data-filter="contrast">High C</button>
+                        <button class="filter-btn" data-filter="saturate">Vivid</button>
+                        <button class="filter-btn" data-filter="hue">Hue</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="ar-tools">
+                <div class="tool-grid">
+                    <button class="tool-btn" id="measure-btn" title="Measure">
+                        📏
+                        <span class="tool-label">Measure</span>
+                    </button>
+                    <button class="tool-btn" id="object-btn" title="Place Object">
+                        🎯
+                        <span class="tool-label">Object</span>
+                    </button>
+                    <button class="tool-btn" id="text-btn" title="Add Text">
+                        📝
+                        <span class="tool-label">Text</span>
+                    </button>
+                    <button class="tool-btn" id="draw-btn" title="Draw">
+                        ✏️
+                        <span class="tool-label">Draw</span>
+                    </button>
+                    <button class="tool-btn" id="focus-btn" title="Focus">
+                        🎯
+                        <span class="tool-label">Focus</span>
+                    </button>
+                    <button class="tool-btn" id="photo-btn" title="Photo">
+                        📸
+                        <span class="tool-label">Photo</span>
+                    </button>
+                    <button class="tool-btn" id="video-btn" title="Video">
+                        🎥
+                        <span class="tool-label">Video</span>
+                    </button>
+                    <button class="tool-btn" id="switch-btn" title="Switch Camera">
+                        🔄
+                        <span class="tool-label">Switch</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="camera-info-panel">
+                <div class="info-line">
+                    <span class="info-label">Zoom:</span>
+                    <span class="info-value" id="info-zoom">1.0x</span>
+                </div>
+                <div class="info-line">
+                    <span class="info-label">Brightness:</span>
+                    <span class="info-value" id="info-brightness">100%</span>
+                </div>
+                <div class="info-line">
+                    <span class="info-label">Contrast:</span>
+                    <span class="info-value" id="info-contrast">100%</span>
+                </div>
+                <div class="info-line">
+                    <span class="info-label">Filter:</span>
+                    <span class="info-value" id="info-filter">None</span>
+                </div>
+                <div class="info-line">
+                    <span class="info-label">FPS:</span>
+                    <span class="info-value" id="info-fps">30</span>
+                </div>
+            </div>
+
+            <div id="loading">
+                <div class="spinner"></div>
+                <div>Initializing Camera...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        class CameraARExperience {
+            constructor() {
+                this.video = document.getElementById('camera-preview');
+                this.stream = null;
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.arSession = null;
+                this.currentFilter = 'none';
+                this.isRecording = false;
+                this.mediaRecorder = null;
+                this.recordedChunks = [];
+                this.facingMode = 'environment';
+                this.frameCount = 0;
+                this.lastTime = performance.now();
+                this.objects = [];
+                this.selectedTool = null;
+                
+                this.init();
+            }
+
+            async init() {
+                await this.detectCameraCapabilities();
+                this.setupEventListeners();
+            }
+
+            async detectCameraCapabilities() {
+                // Detect device info
+                const userAgent = navigator.userAgent;
+                let deviceName = 'Unknown Device';
+                
+                if (/iPhone/i.test(userAgent)) {
+                    deviceName = 'iPhone';
+                } else if (/Android/i.test(userAgent)) {
+                    deviceName = 'Android';
+                } else if (/iPad/i.test(userAgent)) {
+                    deviceName = 'iPad';
+                }
+                
+                document.getElementById('device-name').textContent = deviceName;
+                
+                // Check camera capabilities
+                try {
+                    const devices = await navigator.mediaDevices.enumerateDevices();
+                    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                    
+                    if (videoDevices.length > 0) {
+                        // Try to get camera capabilities
+                        const stream = await navigator.mediaDevices.getUserMedia({ 
+                            video: { facingMode: 'environment' } 
+                        });
+                        const track = stream.getVideoTracks()[0];
+                        const settings = track.getSettings();
+                        
+                        document.getElementById('resolution').textContent = 
+                            `${settings.width}x${settings.height}`;
+                        
+                        // Estimate FPS based on common frame rates
+                        document.getElementById('fps-cap').textContent = '30/60';
+                        
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+                } catch (error) {
+                    console.error('Error detecting camera:', error);
+                    document.getElementById('resolution').textContent = 'Not available';
+                    document.getElementById('fps-cap').textContent = 'Not available';
+                }
+                
+                // Check AR support
+                const arSupport = 'xr' in navigator ? 'Yes' : 'No';
+                document.getElementById('ar-support').textContent = arSupport;
+            }
+
+            setupEventListeners() {
+                document.getElementById('start-camera-btn').addEventListener('click', () => this.startCamera());
+                
+                // Camera controls
+                document.getElementById('zoom-slider').addEventListener('input', (e) => {
+                    const zoom = parseFloat(e.target.value);
+                    this.applyZoom(zoom);
+                    document.getElementById('info-zoom').textContent = zoom.toFixed(1) + 'x';
+                });
+                
+                document.getElementById('brightness-slider').addEventListener('input', (e) => {
+                    const brightness = parseFloat(e.target.value);
+                    this.applyBrightness(brightness);
+                    document.getElementById('info-brightness').textContent = Math.round(brightness * 100) + '%';
+                });
+                
+                document.getElementById('contrast-slider').addEventListener('input', (e) => {
+                    const contrast = parseFloat(e.target.value);
+                    this.applyContrast(contrast);
+                    document.getElementById('info-contrast').textContent = Math.round(contrast * 100) + '%';
+                });
+                
+                // Filter buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.applyFilter(e.target.dataset.filter);
+                    });
+                });
+                
+                // AR tools
+                document.getElementById('measure-btn').addEventListener('click', () => this.selectTool('measure'));
+                document.getElementById('object-btn').addEventListener('click', () => this.selectTool('object'));
+                document.getElementById('text-btn').addEventListener('click', () => this.selectTool('text'));
+                document.getElementById('draw-btn').addEventListener('click', () => this.selectTool('draw'));
+                document.getElementById('focus-btn').addEventListener('click', () => this.manualFocus());
+                document.getElementById('photo-btn').addEventListener('click', () => this.takePhoto());
+                document.getElementById('video-btn').addEventListener('click', () => this.toggleVideo());
+                document.getElementById('switch-btn').addEventListener('click', () => this.switchCamera());
+                
+                // Touch events for focusing
+                this.video.addEventListener('click', (e) => this.handleVideoClick(e));
+                this.video.addEventListener('touchstart', (e) => this.handleVideoTouch(e));
+            }
+
+            async startCamera() {
+                document.getElementById('start-panel').style.display = 'none';
+                document.getElementById('loading').style.display = 'block';
+                
+                try {
+                    // Get camera stream with maximum quality
+                    const constraints = {
+                        video: {
+                            facingMode: this.facingMode,
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 },
+                            frameRate: { ideal: 60 }
+                        },
+                        audio: false
+                    };
+                    
+                    this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    this.video.srcObject = this.stream;
+                    
+                    // Wait for video to be ready
+                    await new Promise(resolve => {
+                        this.video.onloadedmetadata = resolve;
+                    });
+                    
+                    // Setup Three.js scene for AR overlay
+                    await this.setupARScene();
+                    
+                    // Show UI elements
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('camera-status').style.display = 'flex';
+                    document.getElementById('camera-controls').style.display = 'block';
+                    document.getElementById('ar-tools').style.display = 'block';
+                    document.getElementById('camera-info-panel').style.display = 'block';
+                    
+                    // Start animation loop
+                    this.animate();
+                    
+                } catch (error) {
+                    console.error('Error accessing camera:', error);
+                    this.showError('Failed to access camera. Please ensure you grant camera permissions.');
+                }
+            }
+
+            async setupARScene() {
+                // Create Three.js scene
+                this.scene = new THREE.Scene();
+                
+                // Setup camera matching video perspective
+                this.camera = new THREE.PerspectiveCamera(
+                    75,
+                    window.innerWidth / window.innerHeight,
+                    0.1,
+                    1000
+                );
+                
+                // Setup renderer
+                this.renderer = new THREE.WebGLRenderer({ 
+                    antialias: true, 
+                    alpha: true 
+                });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+                this.renderer.domElement.style.position = 'absolute';
+                this.renderer.domElement.style.top = '0';
+                this.renderer.domElement.style.left = '0';
+                this.renderer.domElement.style.pointerEvents = 'none';
+                this.renderer.domElement.style.zIndex = '10';
+                document.getElementById('ar-container').appendChild(this.renderer.domElement);
+                
+                // Add lighting
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                this.scene.add(ambientLight);
+                
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                directionalLight.position.set(0, 1, 1);
+                this.scene.add(directionalLight);
+                
+                // Handle resize
+                window.addEventListener('resize', () => this.onWindowResize());
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                // Update FPS
+                this.frameCount++;
+                const currentTime = performance.now();
+                if (currentTime - this.lastTime >= 1000) {
+                    document.getElementById('info-fps').textContent = this.frameCount;
+                    this.frameCount = 0;
+                    this.lastTime = currentTime;
+                }
+                
+                // Animate objects
+                this.objects.forEach(obj => {
+                    if (obj.userData.rotation) {
+                        obj.rotation.y += 0.01;
+                    }
+                });
+                
+                // Render AR overlay
+                if (this.renderer && this.scene && this.camera) {
+                    this.renderer.render(this.scene, this.camera);
+                }
+            }
+
+            handleVideoClick(event) {
+                const rect = this.video.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                
+                // Show focus bracket
+                this.showFocusBracket(x, y);
+                
+                // Attempt to focus (if supported)
+                this.focusAtPoint(x / rect.width, y / rect.height);
+            }
+
+            handleVideoTouch(event) {
+                event.preventDefault();
+                const touch = event.touches[0];
+                const rect = this.video.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                this.showFocusBracket(x, y);
+                this.focusAtPoint(x / rect.width, y / rect.height);
+            }
+
+            showFocusBracket(x, y) {
+                const bracket = document.getElementById('focus-bracket');
+                bracket.style.left = x + 'px';
+                bracket.style.top = y + 'px';
+                bracket.style.display = 'block';
+                
+                setTimeout(() => {
+                    bracket.style.display = 'none';
+                }, 1000);
+            }
+
+            async focusAtPoint(x, y) {
+                if (this.stream) {
+                    const track = this.stream.getVideoTracks()[0];
+                    if (track.getCapabilities().focusMode) {
+                        try {
+                            await track.applyConstraints({
+                                advanced: [{ focusMode: 'manual', pointsOfInterest: [x, y] }]
+                            });
+                        } catch (error) {
+                            console.log('Manual focus not supported');
+                        }
+                    }
+                }
+            }
+
+            manualFocus() {
+                // Show viewfinder for manual focus
+                const viewfinder = document.getElementById('viewfinder');
+                viewfinder.style.display = 'block';
+                
+                setTimeout(() => {
+                    viewfinder.style.display = 'none';
+                }, 2000);
+                
+                // Vibrate if supported
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(50);
+                }
+            }
+
+            applyZoom(zoom) {
+                if (this.stream) {
+                    const track = this.stream.getVideoTracks()[0];
+                    const capabilities = track.getCapabilities();
+                    
+                    if (capabilities.zoom) {
+                        track.applyConstraints({
+                            advanced: [{ zoom: zoom * 20 }] // Convert to 0-200 range
+                        }).catch(error => {
+                            console.log('Zoom not supported');
+                        });
+                    }
+                }
+            }
+
+            applyBrightness(brightness) {
+                this.video.style.filter = this.updateFilterString('brightness', brightness);
+            }
+
+            applyContrast(contrast) {
+                this.video.style.filter = this.updateFilterString('contrast', contrast);
+            }
+
+            applyFilter(filterName) {
+                this.currentFilter = filterName;
+                this.video.className = filterName === 'none' ? '' : `filter-${filterName}`;
+                document.getElementById('info-filter').textContent = 
+                    filterName.charAt(0).toUpperCase() + filterName.slice(1);
+            }
+
+            updateFilterString(property, value) {
+                const currentFilter = this.video.style.filter || '';
+                const regex = new RegExp(`${property}\\([^)]*\\)`);
+                const newFilter = `${property}(${value})`;
+                
+                if (regex.test(currentFilter)) {
+                    return currentFilter.replace(regex, newFilter);
+                } else {
+                    return currentFilter ? `${currentFilter} ${newFilter}` : newFilter;
+                }
+            }
+
+            selectTool(tool) {
+                // Remove previous selection
+                document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+                
+                // Select new tool
+                const toolBtn = document.getElementById(`${tool}-btn`);
+                if (toolBtn) {
+                    toolBtn.classList.add('active');
+                    this.selectedTool = tool;
+                }
+                
+                // Handle tool-specific actions
+                switch(tool) {
+                    case 'measure':
+                        this.startMeasurement();
+                        break;
+                    case 'object':
+                        this.placeObject();
+                        break;
+                    case 'text':
+                        this.addText();
+                        break;
+                    case 'draw':
+                        this.startDrawing();
+                        break;
+                }
+            }
+
+            startMeasurement() {
+                // Show measurement guide
+                const viewfinder = document.getElementById('viewfinder');
+                viewfinder.style.display = 'block';
+                
+                // Create measurement line
+                this.createMeasurementLine();
+                
+                setTimeout(() => {
+                    viewfinder.style.display = 'none';
+                }, 3000);
+            }
+
+            createMeasurementLine() {
+                const geometry = new THREE.BoxGeometry(0.01, 0.01, 0.5);
+                const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+                const line = new THREE.Mesh(geometry, material);
+                line.position.set(0, 0, -2);
+                line.userData.isMeasurement = true;
+                
+                this.scene.add(line);
+                this.objects.push(line);
+            }
+
+            placeObject() {
+                const geometries = [
+                    new THREE.BoxGeometry(0.1, 0.1, 0.1),
+                    new THREE.SphereGeometry(0.05, 32, 32),
+                    new THREE.ConeGeometry(0.05, 0.1, 8),
+                    new THREE.TorusGeometry(0.05, 0.02, 16, 100)
+                ];
+                
+                const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+                const material = new THREE.MeshPhongMaterial({ 
+                    color: Math.random() * 0xffffff 
+                });
+                
+                const object = new THREE.Mesh(geometry, material);
+                object.position.set(
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2,
+                    -2
+                );
+                object.userData.rotation = true;
+                
+                this.scene.add(object);
+                this.objects.push(object);
+                
+                // Vibrate feedback
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(100);
+                }
+            }
+
+            addText() {
+                // Create text sprite
+                const canvas = document.createElement('canvas');
+                canvas.width = 256;
+                canvas.height = 128;
+                const context = canvas.getContext('2d');
+                context.fillStyle = 'white';
+                context.font = '48px Arial';
+                context.fillText('AR Text', 10, 60);
+                
+                const texture = new THREE.CanvasTexture(canvas);
+                const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+                const sprite = new THREE.Sprite(spriteMaterial);
+                sprite.position.set(0, 0, -2);
+                sprite.scale.set(0.5, 0.25, 1);
+                
+                this.scene.add(sprite);
+                this.objects.push(sprite);
+            }
+
+            startDrawing() {
+                // Implement drawing functionality
+                console.log('Drawing mode activated');
+            }
+
+            takePhoto() {
+                // Create canvas to capture photo
+                const canvas = document.createElement('canvas');
+                canvas.width = this.video.videoWidth;
+                canvas.height = this.video.videoHeight;
+                const context = canvas.getContext('2d');
+                
+                // Draw video frame
+                context.drawImage(this.video, 0, 0);
+                
+                // Add timestamp
+                context.fillStyle = 'white';
+                context.font = '20px Arial';
+                context.fillText(new Date().toLocaleString(), 10, 30);
+                
+                // Download photo
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `ar-photo-${Date.now()}.jpg`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+                
+                // Flash effect
+                this.video.style.opacity = '0';
+                setTimeout(() => {
+                    this.video.style.opacity = '1';
+                }, 100);
+                
+                // Vibrate feedback
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(200);
+                }
+            }
+
+            toggleVideo() {
+                const videoBtn = document.getElementById('video-btn');
+                
+                if (!this.isRecording) {
+                    this.startRecording();
+                    videoBtn.classList.add('active');
+                    videoBtn.innerHTML = '⏹️<span class="tool-label">Stop</span>';
+                    document.getElementById('recording-indicator').style.display = 'block';
+                    document.getElementById('status-text').textContent = 'Recording...';
+                } else {
+                    this.stopRecording();
+                    videoBtn.classList.remove('active');
+                    videoBtn.innerHTML = '🎥<span class="tool-label">Video</span>';
+                    document.getElementById('recording-indicator').style.display = 'none';
+                    document.getElementById('status-text').textContent = 'Camera Active';
+                }
+            }
+
+            startRecording() {
+                const canvas = document.createElement('canvas');
+                canvas.width = this.video.videoWidth;
+                canvas.height = this.video.videoHeight;
+                const context = canvas.getContext('2d');
+                
+                const stream = canvas.captureStream(30);
+                this.mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+                
+                this.mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        this.recordedChunks.push(event.data);
+                    }
+                };
+                
+                this.mediaRecorder.onstop = () => {
+                    const blob = new Blob(this.recordedChunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `ar-video-${Date.now()}.webm`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    this.recordedChunks = [];
+                };
+                
+                // Draw frames to canvas
+                const drawFrame = () => {
+                    if (this.isRecording) {
+                        context.drawImage(this.video, 0, 0);
+                        requestAnimationFrame(drawFrame);
+                    }
+                };
+                
+                this.mediaRecorder.start();
+                this.isRecording = true;
+                drawFrame();
+            }
+
+            stopRecording() {
+                if (this.mediaRecorder && this.isRecording) {
+                    this.mediaRecorder.stop();
+                    this.isRecording = false;
+                }
+            }
+
+            async switchCamera() {
+                this.facingMode = this.facingMode === 'environment' ? 'user' : 'environment';
+                
+                if (this.stream) {
+                    this.stream.getTracks().forEach(track => track.stop());
+                }
+                
+                try {
+                    const constraints = {
+                        video: { facingMode: this.facingMode },
+                        audio: false
+                    };
+                    
+                    this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    this.video.srcObject = this.stream;
+                    
+                    // Vibrate feedback
+                    if ('vibrate' in navigator) {
+                        navigator.vibrate(100);
+                    }
+                } catch (error) {
+                    console.error('Error switching camera:', error);
+                }
+            }
+
+            onWindowResize() {
+                if (this.camera && this.renderer) {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                }
+            }
+
+            showError(message) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('start-panel').style.display = 'block';
+                const btn = document.getElementById('start-camera-btn');
+                btn.textContent = 'Retry';
+                btn.style.background = 'linear-gradient(135deg, #ff4444 0%, #ff6666 100%)';
+                
+                // Update camera info with error
+                document.getElementById('ar-support').textContent = 'Error';
+                document.getElementById('ar-support').style.color = '#ff4444';
+            }
+        }
+
+        // Initialize the Camera AR experience
+        const cameraAR = new CameraARExperience();
+    </script>
+</body>
+</html>
