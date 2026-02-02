@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Studio - Export & Customize</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;600&display=swap');
+
+        :root {
+            --bg-dark: #121212;
+            --bg-panel: #1e1e1e;
+            --bg-light: #2c2c2c;
+            --accent: #00e5ff;
+            --accent-dim: #0099aa;
+            --record: #ff3b30;
+            --text-main: #e0e0e0;
+            --text-dim: #888;
+            --border: #3a3a3a;
+        }
+
+        * { box-sizing: border-box; user-select: none; }
+        
+        body {
+            margin: 0; background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex; flex-direction: column; height: 100vh;
+            overflow: hidden;
+        }
+
+        /* HEADER */
+        header {
+            height: 60px; background: var(--bg-panel); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 20px; gap: 20px; flex-shrink: 0;
+        }
+        .logo { font-family: 'Roboto Mono', monospace; font-weight: 700; color: var(--text-dim); letter-spacing: -1px; }
+        .logo span { color: var(--accent); }
+        
+        .btn {
+            background: var(--bg-light); border: 1px solid var(--border);
+            color: white; padding: 6px 16px; border-radius: 4px;
+            cursor: pointer; font-size: 0.8rem; font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
+            transition: 0.2s;
+        }
+        .btn:hover { border-color: var(--accent); color: var(--accent); }
+        .btn.primary { background: var(--accent); color: #000; border: none; }
+        .btn.export { background: var(--record); color: white; border: none; box-shadow: 0 0 10px rgba(255,59,48,0.4); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .transport {
+            display: flex; gap: 5px; background: #000; padding: 4px; border-radius: 4px;
+        }
+        .t-btn { background: transparent; border: none; color: #666; font-size: 1.2rem; cursor: pointer; padding: 0 10px; }
+        .t-btn:hover { color: white; }
+        .t-btn.active { color: var(--accent); }
+
+        .param-box { background: var(--bg-light); padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border); font-family: 'Roboto Mono'; font-size: 0.8rem; display: flex; align-items: center; gap: 8px;}
+        input[type="number"] { background: transparent; border: none; color: white; width: 40px; text-align: right; }
+        input:focus { outline: none; }
+
+        /* MAIN LAYOUT */
+        .workspace { display: flex; flex: 1; overflow: hidden; }
+
+        /* MIXER (LEFT) */
+        .mixer {
+            width: 200px; background: var(--bg-panel); border-right: 1px solid var(--border);
+            padding: 10px; display: flex; flex-direction: column; gap: 5px;
+            overflow-y: auto; flex-shrink: 0;
+        }
+        .track-strip {
+            background: var(--bg-light); border: 1px solid var(--border);
+            border-radius: 4px; padding: 8px; cursor: pointer;
+            transition: 0.2s;
+        }
+        .track-strip:hover { background: #333; }
+        .track-strip.selected { border-color: var(--accent); background: #252525; }
+        .strip-head { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.75rem; font-weight: bold; color: var(--text-dim); }
+        .strip-controls { display: flex; justify-content: space-between; }
+        .mini-fader { width: 100%; height: 60px; -webkit-appearance: slider-vertical; background: transparent; }
+        .led { width: 6px; height: 6px; background: #333; border-radius: 50%; margin-top: 5px; }
+        .led.active { background: var(--accent); box-shadow: 0 0 5px var(--accent); }
+
+        /* CENTER AREA */
+        .center { flex: 1; display: flex; flex-direction: column; background: var(--bg-dark); position: relative; }
+        
+        .tabs { height: 35px; background: var(--bg-panel); border-bottom: 1px solid var(--border); display: flex; }
+        .tab { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: var(--text-dim); cursor: pointer; border-right: 1px solid var(--border); }
+        .tab:hover { color: white; background: #252525; }
+        .tab.active { background: var(--bg-dark); color: var(--accent); border-top: 2px solid var(--accent); }
+
+        .grid-scroll { flex: 1; overflow: auto; padding: 20px; position: relative; }
+        
+        /* TRACK INSPECTOR (BOTTOM) */
+        .inspector {
+            height: 180px; background: var(--bg-panel); border-top: 1px solid var(--border);
+            padding: 15px; display: flex; gap: 20px; flex-shrink: 0;
+        }
+        .insp-section { flex: 1; }
+        .insp-title { font-size: 0.75rem; color: var(--accent); margin-bottom: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .control-row { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.8rem; }
+        .control-row label { width: 80px; color: var(--text-dim); }
+        .control-row select, .control-row input[type="range"] { flex: 1; background: #111; border: 1px solid var(--border); color: white; padding: 2px; }
+        .control-row span.val { width: 35px; text-align: right; color: var(--accent); font-family: 'Roboto Mono'; }
+
+        /* GRID */
+        .grid { display: grid; gap: 4px; }
+        .grid-cell { width: 30px; height: 40px; background: #1a1a1a; border: 1px solid #333; cursor: pointer; }
+        .grid-cell:hover { background: #2a2a2a; border-color: #555; }
+        .grid-cell.active { background: var(--accent); box-shadow: 0 0 5px var(--accent-dim); border-color: white; }
+        .grid-cell.playing { filter: brightness(1.5); }
+        
+        .label-cell { display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; font-size: 0.7rem; color: var(--text-dim); background: var(--bg-light); border-right: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">STUDIO<span>ONE</span></div>
+        
+        <div class="transport">
+            <button class="t-btn" onclick="stopAll()">■</button>
+            <button class="t-btn active" id="playBtn" onclick="togglePlay()">▶</button>
+        </div>
+
+        <div class="param-box">
+            <span>BPM</span>
+            <input type="number" id="bpmInput" value="128" onchange="updateBPM()">
+        </div>
+        
+        <div style="flex:1"></div>
+
+        <button id="exportBtn" class="btn export" onclick="startExport()">
+            ● Export Audio
+        </button>
+        <button class="btn" onclick="toggleSettings()">Settings</button>
+    </header>
+
+    <div class="workspace">
+        <!-- MIXER -->
+        <aside class="mixer" id="mixer">
+            <!-- Tracks generated by JS -->
+        </aside>
+
+        <!-- CENTER -->
+        <div class="center">
+            <div class="tabs">
+                <div class="tab active" id="tabDrums" onclick="switchTab('drums')">DRUM MACHINE</div>
+                <div class="tab" id="tabSynth" onclick="switchTab('synth')">SYNTHESIZER</div>
+            </div>
+            
+            <div class="grid-scroll">
+                <div id="grid" class="grid"></div>
+            </div>
+
+            <!-- INSPECTOR -->
+            <div class="inspector" id="inspector">
+                <div style="flex:1; display:flex; align-items:center; justify-content:center; color:var(--text-dim);">
+                    Select a track to customize
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+/**
+ * AUDIO ENGINE - MODULAR & CUSTOMIZABLE
+ */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+const ctx = new AudioCtx();
+const MasterGain = ctx.createGain();
+MasterGain.connect(ctx.destination);
+MasterGain.gain.value = 0.8;
+
+// Recorder Setup
+const dest = ctx.createMediaStreamDestination();
+MasterGain.connect(dest); // Connect master to recorder destination
+
+// Track Configuration (The "Customizable" part)
+// Each track has its own synth parameters
+const TrackConfig = {
+    kick: { type: 'drum', wave: 'sine', pitch: 60, decay: 0.5, vol: 0.8, name: 'KICK' },
+    snare: { type: 'drum', wave: 'triangle', pitch: 200, decay: 0.2, vol: 0.7, filter: 1000, name: 'SNARE' },
+    hihat: { type: 'drum', wave: 'square', pitch: 8000, decay: 0.05, vol: 0.5, filter: 5000, name: 'HI-HAT' },
+    clap:  { type: 'drum', wave: 'sawtooth', pitch: 1500, decay: 0.1, vol: 0.6, name: 'CLAP' },
+    synth1:{ type: 'synth', wave: 'sawtooth', cutoff: 800, res: 5, attack: 0.05, release: 0.4, detune: 0, vol: 0.6, name: 'LEAD' },
+    synth2:{ type: 'synth', wave: 'square', cutoff: 400, res: 10, attack: 0.01, release: 0.2, detune: 10, vol: 0.4, name: 'BASS' }
+};
+
+// Pattern Data
+const Patterns = {};
+Object.keys(TrackConfig).forEach(k => Patterns[k] = Array(16).fill(false));
+
+// Scale Data for Synth
+const Scales = {
+    'Chromatic': ['C3','C#3','D3','D#3','E3','F3','F#3','G3','G#3','A3','A#3','B3','C4','C#4','D4'],
+    'Major': ['C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5'],
+    'Minor': ['C3','D3','D#3','F3','G3','G#3','A#3','C4','D4','D#4','F4','G4','G#4','A#4','C5'],
+    'Pentatonic': ['C3','D#3','F3','G3','A#3','C4','D#4','F4','G4','A#4','C5','D#5','F5','G5','A#5']
+};
+const FreqMap = {
+    'C3':130.8,'C#3':138.6,'D3':146.8,'D#3':155.6,'E3':164.8,'F3':174.6,'F#3':185.0,'G3':196.0,'G#3':207.7,'A3':220.0,'A#3':233.1,'B3':246.9,
+    'C4':261.6,'C#4':277.2,'D4':293.7,'D#4':311.1,'E4':329.6,'F4':349.2,'F#4':370.0,'G4':392.0,'G#4':415.3,'A4':440.0,'A#4':466.2,'B4':493.9,
+    'C5':523.3,'D#5':622.3,'F5':698.5,'G5':784.0,'A#5':932.3
+};
+let CurrentScale = 'Major';
+let SynthPattern = {}; // Will map Note Names to bool arrays
+initSynthPattern();
+
+/**
+ * SOUND GENERATION LOGIC
+ */
+function playTrack(id, time) {
+    const cfg = TrackConfig[id];
+    if(cfg.type === 'drum') playDrum(cfg, time);
+    else playSynthNote(cfg, time, 261.6); // Default C4 if pitch not handled by grid
+}
+
+function playDrum(cfg, time) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = cfg.wave;
+    osc.frequency.setValueAtTime(cfg.pitch, time);
+    
+    // Kick Pitch Drop Logic
+    if(id === 'kick') {
+        osc.frequency.exponentialRampToValueAtTime(0.01, time + cfg.decay);
+    }
+
+    gain.gain.setValueAtTime(cfg.vol, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + cfg.decay);
+
+    // Filter for Snare/Hats
+    if(cfg.filter) {
+        const filter = ctx.createBiquadFilter();
+        filter.type = id === 'hihat' || id === 'clap' ? 'highpass' : 'lowpass';
+        filter.frequency.value = cfg.filter;
+        osc.connect(filter); filter.connect(gain);
+    } else {
+        osc.connect(gain);
+    }
+
+    gain.connect(MasterGain);
+    osc.start(time); osc.stop(time + cfg.decay);
+}
+
+function playSynthNote(cfg, time, freq) {
+    const osc = ctx.createOscillator();
+    const filter = ctx.createBiquadFilter();
+    const gain = ctx.createGain();
+
+    osc.type = cfg.wave;
+    osc.frequency.value = freq;
+    osc.detune.value = cfg.detune;
+
+    filter.type = 'lowpass';
+    filter.frequency.value = cfg.cutoff;
+    filter.Q.value = cfg.res;
+
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(cfg.vol, time + cfg.attack);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + cfg.release);
+
+    osc.connect(filter); filter.connect(gain); gain.connect(MasterGain);
+    osc.start(time); osc.stop(time + cfg.release);
+}
+
+/**
+ * STATE & UI
+ */
+let App = {
+    playing: false,
+    bpm: 128,
+    step: 0,
+    nextTime: 0,
+    mode: 'drums', // 'drums' or 'synth'
+    selectedTrack: 'kick', // For Inspector
+    isExporting: false
+};
+
+function initSynthPattern() {
+    // Rebuild pattern object based on scale
+    const notes = Scales[CurrentScale];
+    SynthPattern = {};
+    notes.forEach(n => SynthPattern[n] = Array(16).fill(false));
+}
+
+function renderMixer() {
+    const mix = document.getElementById('mixer');
+    mix.innerHTML = '';
+    Object.keys(TrackConfig).forEach(id => {
+        const t = TrackConfig[id];
+        const div = document.createElement('div');
+        div.className = `track-strip ${App.selectedTrack === id ? 'selected' : ''}`;
+        div.onclick = () => { App.selectedTrack = id; renderMixer(); renderInspector(); };
+        
+        div.innerHTML = `
+            <div class="strip-head">
+                <span>${t.name}</span>
+                <span class="led"></span>
+            </div>
+            <div class="strip-controls">
+                <input type="range" class="mini-fader" min="0" max="1" step="0.01" value="${t.vol}" 
+                oninput="updateVol('${id}', this.value)" onclick="event.stopPropagation()">
+            </div>
+        `;
+        mix.appendChild(div);
+    });
+}
+
+function renderInspector() {
+    const insp = document.getElementById('inspector');
+    const id = App.selectedTrack;
+    const cfg = TrackConfig[id];
+    
+    let html = `<div class="insp-section"><div class="insp-title">${cfg.name} PARAMETERS</div>`;
+    
+    // Common Params
+    html += `<div class="control-row"><label>Wave</label><select onchange="updateParam('${id}', 'wave', this.value)"><option ${cfg.wave==='sine'?'selected':''}>sine</option><option ${cfg.wave==='square'?'selected':''}>square</option><option ${cfg.wave==='sawtooth'?'selected':''}>sawtooth</option><option ${cfg.wave==='triangle'?'selected':''}>triangle</option></select></div>`;
+    html += `<div class="control-row"><label>Vol</label><input type="range" min="0" max="1" step="0.05" value="${cfg.vol}" oninput="updateParam('${id}', 'vol', this.value)"><span class="val">${Math.round(cfg.vol*100)}%</span></div>`;
+    
+    if(cfg.type === 'drum') {
+        html += `<div class="control-row"><label>Pitch</label><input type="range" min="20" max="5000" value="${cfg.pitch}" oninput="updateParam('${id}', 'pitch', this.value)"><span class="val">${cfg.pitch}Hz</span></div>`;
+        html += `<div class="control-row"><label>Decay</label><input type="range" min="0.01" max="1.0" step="0.01" value="${cfg.decay}" oninput="updateParam('${id}', 'decay', this.value)"><span class="val">${cfg.decay}s</span></div>`;
+        if(cfg.filter !== undefined) {
+            html += `<div class="control-row"><label>Filter</label><input type="range" min="100" max="10000" value="${cfg.filter}" oninput="updateParam('${id}', 'filter', this.value)"><span class="val">${cfg.filter}Hz</span></div>`;
+        }
+    } else {
+        // Synth Params
+        html += `<div class="control-row"><label>Cutoff</label><input type="range" min="100" max="5000" value="${cfg.cutoff}" oninput="updateParam('${id}', 'cutoff', this.value)"><span class="val">${cfg.cutoff}Hz</span></div>`;
+        html += `<div class="control-row"><label>Resonance</label><input type="range" min="0" max="20" value="${cfg.res}" oninput="updateParam('${id}', 'res', this.value)"><span class="val">${cfg.res}</span></div>`;
+        html += `<div class="control-row"><label>Attack</label><input type="range" min="0.01" max="0.5" step="0.01" value="${cfg.attack}" oninput="updateParam('${id}', 'attack', this.value)"><span class="val">${cfg.attack}s</span></div>`;
+        html += `<div class="control-row"><label>Release</label><input type="range" min="0.1" max="2.0" step="0.1" value="${cfg.release}" oninput="updateParam('${id}', 'release', this.value)"><span class="val">${cfg.release}s</span></div>`;
+        html += `<div class="control-row"><label>Detune</label><input type="range" min="-50" max="50" value="${cfg.detune}" oninput="updateParam('${id}', 'detune', this.value)"><span class="val">${cfg.detune}</span></div>`;
+    }
+    
+    html += `</div>`;
+    
+    // Synth Global Settings
+    if(App.mode === 'synth') {
+        html += `<div class="insp-section" style="border-left:1px solid #333; padding-left:20px;">
+        <div class="insp-title">KEYBOARD</div>
+        <div class="control-row"><label>Scale</label>
+        <select onchange="changeScale(this.value)">
+            <option value="Chromatic">Chromatic</option>
+            <option value="Major" selected>Major</option>
+            <option value="Minor">Minor</option>
+            <option value="Pentatonic">Pentatonic</option>
+        </select></div></div>`;
+    }
+
+    insp.innerHTML = html;
+}
+
+function updateParam(id, key, val) {
+    if(key === 'vol' || key === 'pitch' || key === 'cutoff' || key === 'res' || key === 'detune' || key === 'filter') val = parseFloat(val);
+    if(key === 'decay' || key === 'attack' || key === 'release') val = parseFloat(val);
+    TrackConfig[id][key] = val;
+    renderInspector(); // Re-render to show value text
+}
+
+function updateVol(id, val) {
+    TrackConfig[id].vol = parseFloat(val);
+}
+
+function changeScale(scale) {
+    // Backup current active notes? For simplicity, we clear and reset to keep data structure consistent
+    CurrentScale = scale;
+    initSynthPattern();
+    renderGrid();
+}
+
+function renderGrid() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    
+    if(App.mode === 'drums') {
+        grid.style.gridTemplateColumns = `80px repeat(16, 1fr)`;
+        Object.keys(TrackConfig).forEach(id => {
+            const h = document.createElement('div'); h.className = 'label-cell'; h.textContent = TrackConfig[id].name; grid.appendChild(h);
+            for(let i=0; i<16; i++) {
+                const c = document.createElement('div'); c.className = 'grid-cell';
+                if(Patterns[id][i]) c.classList.add('active');
+                c.onclick = () => { Patterns[id][i] = !Patterns[id][i]; renderGrid(); if(!App.playing && Patterns[id][i]) playTrack(id,0); };
+                grid.appendChild(c);
+            }
+        });
+    } else {
+        grid.style.gridTemplateColumns = `60px repeat(16, 1fr)`;
+        const notes = Scales[CurrentScale];
+        notes.forEach(note => {
+            const h = document.createElement('div'); h.className = 'label-cell'; h.textContent = note; grid.appendChild(h);
+            for(let i=0; i<16; i++) {
+                const c = document.createElement('div'); c.className = 'grid-cell';
+                if(SynthPattern[note][i]) c.classList.add('active');
+                c.onclick = () => { 
+                    SynthPattern[note][i] = !SynthPattern[note][i]; 
+                    renderGrid(); 
+                    if(!App.playing && SynthPattern[note][i]) playSynthNote(TrackConfig['synth1'], 0, FreqMap[note]);
+                };
+                grid.appendChild(c);
+            }
+        });
+    }
+}
+
+/**
+ * SCHEDULING
+ */
+function nextNote() {
+    const sec = 60/App.bpm;
+    App.nextTime += (sec/4);
+    App.step++;
+    if(App.step===16) App.step = 0;
+}
+
+function scheduler() {
+    while(App.nextTime < ctx.currentTime + 0.1) {
+        playStep(App.step, App.nextTime);
+        nextNote();
+    }
+    if(App.playing) setTimeout(scheduler, 25);
+}
+
+function playStep(step, time) {
+    // Visuals
+    const offset = (time - ctx.currentTime) * 1000;
+    setTimeout(() => {
+        document.querySelectorAll('.grid-cell.playing').forEach(e => e.classList.remove('playing'));
+        // Select all cells in this column
+        // Indices: For drum, col starts at (trackIndex * 17) + 1 + step
+        // For synth, col starts at (noteIndex * 17) + 1 + step
+        const allCells = document.querySelectorAll('.grid-cell');
+        const items = App.mode === 'drums' ? Object.keys(TrackConfig).length : Scales[CurrentScale].length;
+        
+        for(let r=0; r<items; r++) {
+            const idx = (r * 17) + 1 + step;
+            if(allCells[idx]) allCells[idx].classList.add('playing');
+        }
+    }, Math.max(0, offset));
+
+    // Audio: Drums
+    Object.keys(TrackConfig).forEach(id => {
+        if(Patterns[id][step]) playTrack(id, time);
+    });
+
+    // Audio: Synth
+    if(App.mode === 'synth') {
+        const notes = Scales[CurrentScale];
+        notes.forEach(note => {
+            if(SynthPattern[note][step]) {
+                playSynthNote(TrackConfig['synth1'], time, FreqMap[note]);
+            }
+        });
+    }
+}
+
+function togglePlay() {
+    if(ctx.state==='suspended') ctx.resume();
+    App.playing = !App.playing;
+    document.getElementById('playBtn').classList.toggle('active');
+    if(App.playing) { App.nextTime = ctx.currentTime + 0.05; scheduler(); }
+}
+
+function stopAll() {
+    App.playing = false;
+    App.step = 0;
+    document.getElementById('playBtn').classList.remove('active');
+    document.querySelectorAll('.grid-cell.playing').forEach(e => e.classList.remove('playing'));
+}
+
+function switchTab(m) {
+    App.mode = m;
+    document.getElementById('tabDrums').classList.toggle('active', m==='drums');
+    document.getElementById('tabSynth').classList.toggle('active', m==='synth');
+    renderGrid();
+    renderInspector();
+}
+
+function updateBPM() { App.bpm = parseInt(document.getElementById('bpmInput').value); }
+
+/**
+ * EXPORT FUNCTIONALITY
+ */
+function startExport() {
+    if(App.playing) stopAll();
+    
+    const btn = document.getElementById('exportBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "Recording...";
+    btn.disabled = true;
+    App.isExporting = true;
+
+    // Setup Recorder
+    const stream = dest.stream;
+    const chunks = [];
+    const recorder = new MediaRecorder(stream);
+    
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.onstop = () => {
+        const blob = new Blob(chunks, { 'type' : 'audio/webm; codecs=opus' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'my-beat.webm';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+        // Cleanup
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        App.isExporting = false;
+        stopAll();
+    };
+
+    // Play once to record
+    App.step = 0;
+    App.nextTime = ctx.currentTime + 0.5; // Delay to ensure recorder is ready
+    recorder.start();
+    
+    // We need to manually drive the scheduler for exactly one loop
+    const loopDuration = (60 / App.bpm) * 4; // 1 bar (4 beats)
+    
+    // Use a specialized scheduler loop for export to ensure it stops correctly
+    function exportScheduler() {
+        while(App.nextTime < ctx.currentTime + 0.1) {
+            if(App.step === 0 && ctx.currentTime > (ctx.currentTime + 0.5 + 0.1)) {
+                // We wrapped around, stop recording
+                recorder.stop();
+                return; 
+            }
+            playStep(App.step, App.nextTime);
+            nextNote();
+        }
+        if(App.isExporting) setTimeout(exportScheduler, 25);
+    }
+    
+    setTimeout(exportScheduler, 100); // Start loop after delay
+}
+
+function toggleSettings() {
+    alert("Settings: Adjust your browser audio output to ensure 'Stereo Mix' or similar is selected if you want to record system audio with other apps. For this tool, the internal export button handles the recording.");
+}
+
+// Init
+renderMixer();
+renderGrid();
+// Default Beat
+Patterns['kick'][0]=true; Patterns['kick'][4]=true; Patterns['kick'][8]=true; Patterns['kick'][12]=true;
+Patterns['snare'][4]=true; Patterns['snare'][12]=true;
+Patterns['hihat'][2]=true; Patterns['hihat'][6]=true; Patterns['hihat'][10]=true; Patterns['hihat'][14]=true;
+// Bassline
+SynthPattern['C3'][0]=true; SynthPattern['C3'][3]=true; SynthPattern['D3'][6]=true; SynthPattern['E3'][10]=true;
+renderGrid();
+
+</script>
+</body>
+</html>
