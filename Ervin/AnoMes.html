@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AnonMap Messages</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- CSS VARIABLES & THEME --- */
+        :root {
+            --bg-dark: #0f172a;
+            --glass-bg: rgba(15, 23, 42, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #8b5cf6; /* Violet */
+            --accent-glow: rgba(139, 92, 246, 0.5);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            
+            /* Pin Colors */
+            --pin-neutral: #3b82f6;
+            --pin-happy: #eab308;
+            --pin-fire: #f97316;
+            --pin-sad: #64748b;
+            --pin-love: #ec4899;
+        }
+
+        /* Light Mode Overrides */
+        [data-theme="light"] {
+            --bg-dark: #f1f5f9;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --pin-neutral: #2563eb;
+            --pin-sad: #94a3b8;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        /* --- MAP CONTAINER --- */
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            cursor: grab;
+        }
+        #map:active { cursor: grabbing; }
+
+        /* --- UI OVERLAY --- */
+        .ui-layer {
+            position: absolute;
+            z-index: 1000;
+            pointer-events: none; 
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .pointer-events-auto { pointer-events: auto; }
+
+        /* Header */
+        header {
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to bottom, var(--bg-dark), transparent);
+        }
+
+        .brand {
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-main);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .ghost-badge {
+            font-size: 0.7rem;
+            background: var(--accent);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: white;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn-icon:active { transform: scale(0.9); }
+        .btn-icon:hover { background: rgba(255,255,255,0.1); }
+
+        /* FAB (Compose Button) */
+        .fab {
+            position: absolute;
+            bottom: 2rem;
+            right: 1.5rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+        }
+
+        .fab:hover { transform: scale(1.1) rotate(90deg); }
+
+        /* Filter Slider Area */
+        .filter-area {
+            position: absolute;
+            left: 1rem;
+            bottom: 2rem;
+            background: var(--glass-bg);
+            padding: 1rem;
+            border-radius: 12px;
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            width: 200px;
+        }
+        
+        .filter-area label { font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem; }
+        .slider { width: 100%; accent-color: var(--accent); cursor: pointer; }
+
+        /* --- MODALS --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .modal-card {
+            background: var(--bg-dark);
+            width: 90%;
+            max-width: 400px;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-card { transform: translateY(0); }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            background: none; border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        /* Message Form */
+        .mood-selector { display: flex; gap: 10px; margin-bottom: 1rem; justify-content: center; }
+        .mood-opt {
+            font-size: 1.5rem; cursor: pointer; opacity: 0.5; transition: 0.2s;
+        }
+        .mood-opt:hover, .mood-opt.selected { opacity: 1; transform: scale(1.2); }
+
+        textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 0.8rem;
+            font-family: inherit;
+            resize: none;
+            height: 100px;
+            margin-bottom: 1rem;
+        }
+        textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+        .location-tag {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--accent);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* --- MESSAGE DETAIL BOTTOM SHEET --- */
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            background: var(--bg-dark);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 1.5rem;
+            z-index: 1500;
+            transform: translateY(110%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.3);
+        }
+
+        .bottom-sheet.active { transform: translateY(0); }
+
+        .sheet-handle {
+            width: 40px; height: 4px; background: var(--text-muted);
+            border-radius: 2px; margin: 0 auto 1rem auto; opacity: 0.5;
+        }
+
+        .message-header {
+            display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;
+        }
+        
+        .msg-meta { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-muted); }
+        .msg-text { font-size: 1.2rem; line-height: 1.4; margin: 0.5rem 0 1rem 0; }
+
+        .actions-bar {
+            display: flex; gap: 1rem; border-top: 1px solid var(--glass-border); padding-top: 1rem; margin-bottom: 1rem;
+        }
+
+        .action-btn {
+            background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem;
+        }
+        .action-btn:hover { color: var(--accent); }
+
+        /* Replies */
+        .replies-section {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        .reply-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--glass-border);
+            font-size: 0.9rem;
+        }
+        .reply-item:last-child { border-bottom: none; }
+
+        /* --- TOAST NOTIFICATIONS --- */
+        #toast-container {
+            position: fixed;
+            top: 1rem; left: 50%; transform: translateX(-50%);
+            z-index: 3000;
+            width: 90%;
+            max-width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--accent);
+            color: var(--text-main);
+            padding: 0.8rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* --- MAP MARKER ANIMATIONS --- */
+        .pin-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .pin {
+            width: 24px; height: 36px;
+            background: var(--pin-neutral);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            position: relative;
+            animation: dropIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .pin-inner {
+            transform: rotate(45deg);
+            font-size: 14px;
+        }
+
+        .pin::after {
+            content: ''; position: absolute; width: 14px; height: 14px;
+            background: rgba(255,255,255,0.3); bottom: 6px; left: 5px;
+            border-radius: 50%;
+        }
+
+        .pulse {
+            width: 20px; height: 20px;
+            background: var(--pin-neutral);
+            border-radius: 50%;
+            position: absolute;
+            opacity: 0;
+            animation: pulseAnim 2s infinite;
+        }
+        
+        @keyframes pulseAnim {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
+        @keyframes dropIn {
+            from { transform: translateY(-500%) rotate(-45deg); opacity: 0; }
+            to { transform: translateY(0) rotate(-45deg); opacity: 1; }
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 5000;
+        }
+
+    </style>
+</head>
+<body data-theme="dark">
+
+    <!-- Canvas for FX -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Map Layer -->
+    <div id="map"></div>
+
+    <!-- UI Overlay -->
+    <div class="ui-layer">
+        <header class="pointer-events-auto">
+            <div class="brand">
+                <i class="fa-solid fa-earth-americas"></i>
+                AnonMap <span class="ghost-badge" id="my-ghost-id">Ghost#0000</span>
+            </div>
+            <div class="controls">
+                <!-- New Fly to Me Button -->
+                <button class="btn-icon" id="fly-to-me" title="Find Me">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </button>
+                <button class="btn-icon" id="theme-toggle" title="Toggle Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <button class="btn-icon" id="ghost-mode" title="Ghost Mode (Spectate)">
+                    <i class="fa-solid fa-eye-slash"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Filter Area -->
+        <div class="filter-area pointer-events-auto" id="filter-panel">
+            <label>Nearby Radius: <span id="radius-val">10</span>km</label>
+            <input type="range" min="1" max="100" value="10" class="slider" id="radius-slider">
+        </div>
+
+        <!-- FAB -->
+        <button class="fab pointer-events-auto" id="compose-btn">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- Toasts -->
+    <div id="toast-container"></div>
+
+    <!-- Compose Modal -->
+    <div class="modal-overlay" id="compose-modal">
+        <div class="modal-card">
+            <button class="close-btn" id="close-compose"><i class="fa-solid fa-times"></i></button>
+            <h3>Drop a Message</h3>
+            
+            <div class="mood-selector" id="mood-selector">
+                <div class="mood-opt selected" data-mood="neutral" data-color="#3b82f6">💬</div>
+                <div class="mood-opt" data-mood="happy" data-color="#eab308">😄</div>
+                <div class="mood-opt" data-mood="fire" data-color="#f97316">🔥</div>
+                <div class="mood-opt" data-mood="love" data-color="#ec4899">❤️</div>
+                <div class="mood-opt" data-mood="sad" data-color="#64748b">😢</div>
+            </div>
+
+            <div class="location-tag" id="location-preview">
+                <i class="fa-solid fa-location-dot"></i> Locating...
+            </div>
+
+            <textarea id="msg-input" maxlength="280" placeholder="Say something anonymously..."></textarea>
+            <div style="text-align: right; font-size: 0.8rem; margin-bottom: 1rem; color: var(--text-muted);">
+                <span id="char-count">0</span>/280
+            </div>
+
+            <button class="btn-primary" id="send-btn">Drop Pin</button>
+        </div>
+    </div>
+
+    <!-- Message Detail Bottom Sheet -->
+    <div class="bottom-sheet" id="message-sheet">
+        <div class="sheet-handle" id="sheet-close"></div>
+        <div id="sheet-content">
+            <!-- Dynamic Content -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        /**
+         * AnonMap Messages - Location Accurate Version
+         */
+
+        // --- UTILS ---
+        const Utils = {
+            generateId: () => 'msg_' + Math.random().toString(36).substr(2, 9),
+            generateGhostId: () => 'Ghost#' + Math.floor(1000 + Math.random() * 9000),
+            formatTime: (ts) => {
+                const diff = (Date.now() - ts) / 1000;
+                if (diff < 60) return 'Just now';
+                if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+                return new Date(ts).toLocaleDateString();
+            },
+            randomCoordsGlobal: () => {
+                const lat = (Math.random() * 160) - 80; 
+                const lng = (Math.random() * 360) - 180; 
+                return { lat, lng };
+            },
+            randomCoordsNear: (lat, lng, radiusKm) => {
+                const r = radiusKm / 111.300; 
+                const u = Math.random();
+                const v = Math.random();
+                const w = r * Math.sqrt(u);
+                const t = 2 * Math.PI * v;
+                const x = w * Math.cos(t);
+                const y = w * Math.sin(t);
+                return { lat: lat + y, lng: lng + x };
+            }
+        };
+
+        // --- CONFETTI ENGINE ---
+        class ConfettiEngine {
+            constructor() {
+                this.canvas = document.getElementById('confetti-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                this.loop();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            burst(x, y) {
+                const colors = ['#8b5cf6', '#3b82f6', '#eab308', '#ec4899'];
+                for (let i = 0; i < 30; i++) {
+                    this.particles.push({
+                        x, y,
+                        vx: (Math.random() - 0.5) * 10,
+                        vy: (Math.random() - 0.5) * 10 - 5,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        life: 1.0,
+                        size: Math.random() * 4 + 2
+                    });
+                }
+            }
+
+            loop() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    let p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.2; 
+                    p.life -= 0.02;
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.globalAlpha = p.life;
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                    if (p.life <= 0) this.particles.splice(i, 1);
+                }
+                requestAnimationFrame(() => this.loop());
+            }
+        }
+
+        // --- MOCK BACKEND ---
+        class MockBackend {
+            constructor() {
+                this.messages = JSON.parse(localStorage.getItem('anonmap_msgs')) || [];
+                this.listeners = [];
+                
+                if (this.messages.length === 0) this.seedData();
+            }
+
+            seedData() {
+                // Seed GLOBAL data initially
+                for(let i=0; i<30; i++) {
+                    const pos = Utils.randomCoordsGlobal();
+                    this.addMessage({
+                        lat: pos.lat,
+                        lng: pos.lng,
+                        text: ["Hello World!", "Greetings.", "Is anyone here?", "Sending vibes.", "Connection established."][Math.floor(Math.random()*5)],
+                        mood: ['neutral', 'happy', 'fire', 'love', 'sad'][Math.floor(Math.random()*5)],
+                        ghostId: Utils.generateGhostId(),
+                        timestamp: Date.now() - Math.floor(Math.random() * 3600000)
+                    }, false); 
+                }
+            }
+
+            save() {
+                const oneDayAgo = Date.now() - 86400000;
+                this.messages = this.messages.filter(m => m.timestamp > oneDayAgo);
+                localStorage.setItem('anonmap_msgs', JSON.stringify(this.messages));
+            }
+
+            addMessage(msgData, broadcast = true) {
+                const msg = {
+                    id: Utils.generateId(),
+                    likes: 0,
+                    replies: [],
+                    ...msgData,
+                    timestamp: Date.now()
+                };
+                this.messages.push(msg);
+                this.save();
+                if (broadcast) this.emit('new_message', msg);
+                return msg;
+            }
+
+            likeMessage(msgId) {
+                const msg = this.messages.find(m => m.id === msgId);
+                if (msg) {
+                    msg.likes++;
+                    this.save();
+                    this.emit('update_message', msg);
+                }
+            }
+
+            addReply(msgId, text) {
+                const msg = this.messages.find(m => m.id === msgId);
+                if (msg) {
+                    msg.replies.push({
+                        id: Utils.generateId(),
+                        text,
+                        ghostId: Utils.generateGhostId(),
+                        timestamp: Date.now()
+                    });
+                    this.save();
+                    this.emit('update_message', msg);
+                }
+            }
+
+            on(event, callback) {
+                this.listeners.push({ event, callback });
+            }
+
+            emit(event, data) {
+                this.listeners.forEach(l => {
+                    if (l.event === event) l.callback(data);
+                });
+            }
+        }
+
+        // --- MAP MANAGER ---
+        class MapManager {
+            constructor() {
+                const tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+                
+                // Start at World View
+                this.map = L.map('map', {
+                    zoomControl: false, 
+                    attributionControl: false,
+                    minZoom: 2,
+                    maxZoom: 18
+                }).setView([20, 0], 2);
+
+                L.tileLayer(tileUrl, {
+                    maxZoom: 19
+                }).addTo(this.map);
+
+                this.markers = {}; 
+
+                this.createIcon = (mood) => {
+                    const colorVar = `var(--pin-${mood})`;
+                    return L.divIcon({
+                        className: 'pin-wrapper',
+                        html: `
+                            <div class="pin" style="background:${colorVar}; box-shadow: 0 0 15px ${colorVar}">
+                                <div class="pin-inner">📍</div>
+                            </div>
+                            <div class="pulse" style="background:${colorVar}"></div>
+                        `,
+                        iconSize: [30, 42],
+                        iconAnchor: [15, 42]
+                    });
+                };
+            }
+
+            addOrUpdateMessage(msg) {
+                if (this.markers[msg.id]) return;
+
+                const marker = L.marker([msg.lat, msg.lng], {
+                    icon: this.createIcon(msg.mood)
+                }).addTo(this.map);
+
+                marker.on('click', () => {
+                    App.ui.openMessageSheet(msg);
+                });
+
+                this.markers[msg.id] = marker;
+
+                if (msg.isNew) {
+                    if(this.map.getZoom() > 5) {
+                        this.map.flyTo([msg.lat, msg.lng], 10, { duration: 1.5 });
+                    }
+                }
+            }
+
+            setTheme(theme) {
+                document.body.setAttribute('data-theme', theme);
+                const tileUrl = theme === 'light' 
+                    ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+                    : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+                
+                this.map.eachLayer((layer) => {
+                    if (layer instanceof L.TileLayer) {
+                        layer.setUrl(tileUrl);
+                    }
+                });
+            }
+
+            flyToUser() {
+                if (App.ui.userCoords) {
+                    this.map.flyTo([App.ui.userCoords.lat, App.ui.userCoords.lng], 15, { duration: 2 });
+                    App.ui.showToast("Flying to your location", "info");
+                } else {
+                    App.ui.initLocation(); // Try to get location again
+                }
+            }
+        }
+
+        // --- UI MANAGER ---
+        class UIManager {
+            constructor(backend, mapManager) {
+                this.backend = backend;
+                this.map = mapManager;
+                this.ghostId = localStorage.getItem('ghost_id') || Utils.generateGhostId();
+                localStorage.setItem('ghost_id', this.ghostId);
+                
+                // Accurate Location Storage
+                this.userCoords = null; 
+                this.selectedMood = 'neutral';
+                
+                this.initElements();
+                this.bindEvents();
+                this.updateGhostDisplay();
+                
+                // Init Location immediately on load
+                this.initLocation();
+            }
+
+            initElements() {
+                this.composeModal = document.getElementById('compose-modal');
+                this.bottomSheet = document.getElementById('message-sheet');
+                this.sheetContent = document.getElementById('sheet-content');
+                this.toastContainer = document.getElementById('toast-container');
+                this.msgInput = document.getElementById('msg-input');
+                this.charCount = document.getElementById('char-count');
+                this.locPreview = document.getElementById('location-preview');
+            }
+
+            initLocation() {
+                if (navigator.geolocation) {
+                    this.showToast("Finding your location...", "info");
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            this.userCoords = { 
+                                lat: pos.coords.latitude, 
+                                lng: pos.coords.longitude 
+                            };
+                            // Update location preview immediately
+                            this.locPreview.innerHTML = `<i class="fa-solid fa-location-dot"></i> GPS: ${this.userCoords.lat.toFixed(4)}, ${this.userCoords.lng.toFixed(4)}`;
+                            
+                            // Fly to user
+                            this.map.map.flyTo([this.userCoords.lat, this.userCoords.lng], 14, { duration: 2.5 });
+                            this.showToast("Location found!", "success");
+                        },
+                        (err) => {
+                            this.showToast("Location access denied. Using Map Center.", "error");
+                            this.locPreview.innerHTML = `<i class="fa-solid fa-map-pin"></i> Using Map Center`;
+                        },
+                        { enableHighAccuracy: true, timeout: 10000 }
+                    );
+                } else {
+                    this.showToast("Geolocation not supported.", "error");
+                }
+            }
+
+            bindEvents() {
+                document.getElementById('compose-btn').onclick = () => this.openCompose();
+                document.getElementById('close-compose').onclick = () => this.closeCompose();
+                this.sheetClose = document.getElementById('sheet-close').onclick = () => this.closeSheet();
+                
+                // Fly to me button
+                document.getElementById('fly-to-me').onclick = () => {
+                    this.map.flyToUser();
+                };
+
+                document.querySelectorAll('.mood-opt').forEach(el => {
+                    el.onclick = () => {
+                        document.querySelectorAll('.mood-opt').forEach(m => m.classList.remove('selected'));
+                        el.classList.add('selected');
+                        this.selectedMood = el.dataset.mood;
+                    };
+                });
+
+                this.msgInput.oninput = (e) => {
+                    this.charCount.textContent = e.target.value.length;
+                };
+
+                document.getElementById('send-btn').onclick = () => this.sendMessage();
+
+                document.getElementById('theme-toggle').onclick = () => {
+                    const current = document.body.getAttribute('data-theme');
+                    this.map.setTheme(current === 'dark' ? 'light' : 'dark');
+                    const icon = document.querySelector('#theme-toggle i');
+                    icon.className = current === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+                };
+            }
+
+            updateGhostDisplay() {
+                document.getElementById('my-ghost-id').textContent = this.ghostId;
+            }
+
+            openCompose() {
+                this.composeModal.classList.add('active');
+                
+                // Determine what coordinates to show/preview
+                let coords;
+                let label;
+
+                if (this.userCoords) {
+                    coords = this.userCoords;
+                    label = "GPS Location";
+                } else {
+                    // Fallback to map center if GPS denied
+                    const center = this.map.map.getCenter();
+                    coords = { lat: center.lat, lng: center.lng };
+                    label = "Map Center (No GPS)";
+                }
+
+                this.previewCoords = coords; // Store for sending
+                this.locPreview.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${label}: ${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}`;
+            }
+
+            closeCompose() {
+                this.composeModal.classList.remove('active');
+            }
+
+            sendMessage() {
+                const text = this.msgInput.value.trim();
+                if (!text) return;
+
+                const msg = {
+                    text: text,
+                    mood: this.selectedMood,
+                    ghostId: this.ghostId,
+                    lat: this.previewCoords.lat,
+                    lng: this.previewCoords.lng
+                };
+
+                this.backend.addMessage(msg);
+                
+                this.msgInput.value = '';
+                this.closeCompose();
+                
+                App.confetti.burst(window.innerWidth/2, window.innerHeight/2);
+                this.showToast("Message dropped!", "success");
+            }
+
+            openMessageSheet(msg) {
+                this.currentMsgId = msg.id;
+                
+                const html = `
+                    <div class="message-header">
+                        <div>
+                            <div class="msg-meta">
+                                <span>${msg.ghostId}</span> • <span>${Utils.formatTime(msg.timestamp)}</span>
+                            </div>
+                            <div class="msg-text">${msg.text}</div>
+                        </div>
+                        <div style="font-size: 2rem;">
+                            ${this.getMoodEmoji(msg.mood)}
+                        </div>
+                    </div>
+
+                    <div class="actions-bar">
+                        <button class="action-btn" onclick="App.ui.handleLike('${msg.id}')">
+                            <i class="fa-solid fa-arrow-up"></i> ${msg.likes} Upvotes
+                        </button>
+                        <button class="action-btn">
+                            <i class="fa-solid fa-share-nodes"></i> Share
+                        </button>
+                    </div>
+
+                    <div class="replies-section">
+                        <h4>Replies (${msg.replies.length})</h4>
+                        ${msg.replies.map(r => `
+                            <div class="reply-item">
+                                <div class="msg-meta"><span>${r.ghostId}</span></div>
+                                <div>${r.text}</div>
+                            </div>
+                        `).join('')}
+                        
+                        <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+                            <input type="text" id="reply-input" placeholder="Reply anonymously..." style="flex:1; padding:0.5rem; border-radius:4px; border:none; background:rgba(255,255,255,0.1); color:white;">
+                            <button onclick="App.ui.sendReply()" style="background:var(--accent); border:none; padding:0 1rem; border-radius:4px; color:white;">Send</button>
+                        </div>
+                    </div>
+                `;
+
+                this.sheetContent.innerHTML = html;
+                this.bottomSheet.classList.add('active');
+            }
+
+            closeSheet() {
+                this.bottomSheet.classList.remove('active');
+            }
+
+            handleLike(id) {
+                this.backend.likeMessage(id);
+            }
+
+            sendReply() {
+                const input = document.getElementById('reply-input');
+                const text = input.value.trim();
+                if(text) {
+                    this.backend.addReply(this.currentMsgId, text);
+                    input.value = '';
+                }
+            }
+
+            getMoodEmoji(mood) {
+                const map = {
+                    'neutral': '💬', 'happy': '😄', 'fire': '🔥', 'love': '❤️', 'sad': '😢'
+                };
+                return map[mood] || '💬';
+            }
+
+            showToast(msg, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                const icon = type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
+                toast.innerHTML = `<i class="fa-solid ${icon}" style="color:var(--accent)"></i> ${msg}`;
+                this.toastContainer.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
+        }
+
+        // --- MAIN APP ---
+        const App = {
+            backend: new MockBackend(),
+            confetti: new ConfettiEngine(),
+            init: function() {
+                this.mapManager = new MapManager();
+                this.ui = new UIManager(this.backend, this.mapManager);
+
+                this.backend.on('new_message', (msg) => {
+                    const center = this.mapManager.map.getCenter();
+                    const dist = this.mapManager.map.distance([center.lat, center.lng], [msg.lat, msg.lng]);
+                    const radiusKm = parseInt(document.getElementById('radius-slider').value) * 1000;
+
+                    // Logic: Show message if within user radius OR if it is from the user themselves
+                    if (dist <= radiusKm || this.ui.userCoords && this.mapManager.map.distance([this.ui.userCoords.lat, this.ui.userCoords.lng], [msg.lat, msg.lng]) < radiusKm) {
+                        this.mapManager.addOrUpdateMessage(msg);
+                        if (msg.ghostId !== this.ui.ghostId) {
+                            this.ui.showToast(`New message nearby!`);
+                        }
+                    } else {
+                        // Even if out of radius, just add the marker so they see it on zoom out, 
+                        // but don't notify loudly.
+                        this.mapManager.addOrUpdateMessage(msg);
+                    }
+                });
+
+                this.backend.on('update_message', (msg) => {
+                    if (this.ui.currentMsgId === msg.id) {
+                        this.ui.openMessageSheet(msg); 
+                    }
+                });
+
+                this.backend.messages.forEach(m => this.mapManager.addOrUpdateMessage(m));
+
+                // Simulate Global Activity
+                setInterval(() => {
+                    if (Math.random() > 0.8) this.simulateIncoming();
+                }, 5000);
+            },
+
+            simulateIncoming: function() {
+                const pos = Utils.randomCoordsGlobal();
+                const moods = ['neutral', 'happy', 'fire', 'love', 'sad'];
+                const texts = ["Hello from here!", "Global wave!", "Can you see me?", "The world is big.", "Ping."];
+                
+                const msg = {
+                    lat: pos.lat,
+                    lng: pos.lng,
+                    text: texts[Math.floor(Math.random() * texts.length)],
+                    mood: moods[Math.floor(Math.random() * moods.length)],
+                    ghostId: Utils.generateGhostId(),
+                    isNew: true
+                };
+                
+                this.backend.addMessage(msg);
+            }
+        };
+
+        window.onload = () => App.init();
+
+    </script>
+</body>
+</html>
