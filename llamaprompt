@@ -1,0 +1,104 @@
+"Create a complete web application using HTML, CSS, JavaScript (frontend) and PHP/MySQL (backend) that integrates Meta's FREE Llama LLM models to answer questions by scraping and analyzing data from your database. Include full implementation details:
+
+Tech Stack:
+
+Frontend: HTML5, CSS3, vanilla JavaScript
+
+Backend: PHP 8+, MySQL 8+
+
+LLM: Meta Llama 3.1 (free inference via Hugging Face Inference API or Ollama local)
+
+Core Architecture:
+
+1. Database Setup (MySQL):
+
+sql
+CREATE database llm_chatbot;
+-- Tables: documents (content to scrape), conversations, learned_responses
+Provide complete schema with sample data
+
+Documents table stores text content for RAG (Retrieval-Augmented Generation)
+
+2. Backend PHP API:
+
+/api/search-db.php - Full-text search MySQL data matching user query
+
+/api/llama-infer.php - Send retrieved data + query to Llama API
+
+/api/conversations.php - Chat history CRUD
+
+Use prepared statements, error handling, CORS
+
+3. Free Llama Integration (2 Options):
+Option A: Hugging Face Inference API (easiest, free tier)
+
+php
+// Complete cURL implementation with meta-llama/Llama-3.1-8B-Instruct
+Option B: Ollama (local, unlimited free)
+
+php
+// Docker setup + PHP API calls to localhost:11434
+4. RAG Pipeline (Retrieval-Augmented Generation):
+
+text
+User Query → MySQL Full-Text Search → Top 5 relevant docs → 
+Llama Prompt: 'Using ONLY this context: {scraped_data} Answer: {query}' → Response
+Frontend Chat Interface:
+
+Modern messenger UI with message bubbles
+
+Real-time typing indicators
+
+Search status: 'Searching database...', 'Analyzing with Llama...'
+
+Source citations linking back to original DB records
+
+Responsive design, dark mode
+
+Key Features:
+
+Add/edit documents via admin panel (PHP form → MySQL)
+
+Conversation history with export
+
+Llama response confidence scoring
+
+Fallback when no DB matches found
+
+Rate limiting and caching
+
+Complete Deliverables:
+
+Full database schema with sample data
+
+All PHP files with LLM integration code
+
+Complete HTML/JS/CSS single-page app
+
+Step-by-step setup guide:
+
+MySQL setup
+
+Hugging Face API key (free)
+
+OR Ollama Docker installation
+
+PHP server config (.htaccess)
+
+Llama prompt templates optimized for RAG
+
+Security: Input sanitization, API key protection
+
+Production Ready:
+
+Error handling for API downtime
+
+MySQL connection pooling
+
+Responsive images/icons via CSS
+
+PWA capabilities
+
+Comments explaining RAG flow
+
+Provide ALL code files separately with folder structure. Include config files and .env template for API keys. Make it deployable to any standard PHP/MySQL hosting (cPanel, etc.). Add admin dashboard to manage database content!"
