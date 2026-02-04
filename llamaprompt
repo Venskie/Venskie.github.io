@@ -1,104 +1,114 @@
-"Create a complete web application using HTML, CSS, JavaScript (frontend) and PHP/MySQL (backend) that integrates Meta's FREE Llama LLM models to answer questions by scraping and analyzing data from your database. Include full implementation details:
+"Create a complete web application using HTML, CSS, JavaScript (frontend) and PHP + MySQL (backend) that integrates Meta's FREE Llama LLM API to intelligently query, analyze, and predict from a MySQL database. The system should understand natural language questions about database data and generate insights, summaries, and predictions.
 
-Tech Stack:
-
-Frontend: HTML5, CSS3, vanilla JavaScript
-
-Backend: PHP 8+, MySQL 8+
-
-LLM: Meta Llama 3.1 (free inference via Hugging Face Inference API or Ollama local)
-
-Core Architecture:
-
-1. Database Setup (MySQL):
-
-sql
-CREATE database llm_chatbot;
--- Tables: documents (content to scrape), conversations, learned_responses
-Provide complete schema with sample data
-
-Documents table stores text content for RAG (Retrieval-Augmented Generation)
-
-2. Backend PHP API:
-
-/api/search-db.php - Full-text search MySQL data matching user query
-
-/api/llama-infer.php - Send retrieved data + query to Llama API
-
-/api/conversations.php - Chat history CRUD
-
-Use prepared statements, error handling, CORS
-
-3. Free Llama Integration (2 Options):
-Option A: Hugging Face Inference API (easiest, free tier)
-
-php
-// Complete cURL implementation with meta-llama/Llama-3.1-8B-Instruct
-Option B: Ollama (local, unlimited free)
-
-php
-// Docker setup + PHP API calls to localhost:11434
-4. RAG Pipeline (Retrieval-Augmented Generation):
+Tech Stack Requirements:
 
 text
-User Query → MySQL Full-Text Search → Top 5 relevant docs → 
-Llama Prompt: 'Using ONLY this context: {scraped_data} Answer: {query}' → Response
-Frontend Chat Interface:
+Frontend: HTML5, CSS3, Vanilla JS (no frameworks)
+Backend: PHP 8+, MySQL 8+
+LLM: Meta Llama 3.1 (free tier via Hugging Face/Replicate/any free endpoint)
+Database: Sample healthcare/iot dataset with abnormalities, timestamps, metrics
+Core Functionality:
 
-Modern messenger UI with message bubbles
+Natural Language → SQL Generation:
 
-Real-time typing indicators
+User asks: 'Create summary of abnormalities in May 2025'
 
-Search status: 'Searching database...', 'Analyzing with Llama...'
+LLM converts to SQL: SELECT * FROM abnormalities WHERE date LIKE '2025-05%'
 
-Source citations linking back to original DB records
+Execute query, return results to LLM for summarization
 
-Responsive design, dark mode
+Intelligent Data Analysis:
+
+Summaries, trends, comparisons, anomaly detection
+
+Example: 'What's the abnormality pattern last quarter?' → SQL + LLM narrative
+
+Handle aggregations (SUM, AVG, COUNT, GROUP BY)
+
+Predictive Analytics:
+
+'Predict abnormality trend for next month' → LLM analyzes historical patterns
+
+Simple forecasting using trends/rates from data
+
+Database Setup (include sample data):
+
+text
+- Table: abnormalities (id, date, severity, location, description, resolved)
+- Table: metrics (id, timestamp, value, sensor_id, status) 
+- 500+ sample records covering 2024-2025 with realistic healthcare/IoT data
+System Architecture:
+
+Frontend (chat interface):
+
+Modern dashboard-style UI with chat panel
+
+Question input + response area with SQL preview
+
+Data visualizations (charts for summaries)
+
+Responsive design, dark theme option
+
+Backend PHP API endpoints:
+
+text
+POST /api/query → {question: string} → LLM → SQL → Execute → LLM Summary → JSON
+POST /api/chat → conversation history + context
+GET /api/schema → database structure for LLM context
+Meta Llama Integration:
+
+Use FREE Llama 3.1 8B via Hugging Face Inference API (free tier)
+
+System prompt teaches LLM your database schema + analysis patterns
+
+Include exact API setup instructions and PHP cURL integration
+
+Context injection: database schema + recent chat history
 
 Key Features:
 
-Add/edit documents via admin panel (PHP form → MySQL)
+SQL query preview + safety validation before execution
 
-Conversation history with export
+LLM-generated charts/tables from query results
 
-Llama response confidence scoring
+Conversation memory (last 10 exchanges)
 
-Fallback when no DB matches found
+Export reports as PDF/CSV
+
+Error handling for bad SQL/LLM failures
 
 Rate limiting and caching
 
-Complete Deliverables:
+Sample Queries to Handle:
 
-Full database schema with sample data
+text
+"Summary of high-severity abnormalities May 2025"
+"Compare abnormality rates Q1 vs Q2 2025"
+"Predict if sensor #23 will fail next week"
+"Top 5 locations with most unresolved issues"
+"Create monthly trend chart for severity levels"
+Deliverables:
 
-All PHP files with LLM integration code
+Complete project folder structure
 
-Complete HTML/JS/CSS single-page app
+Database SQL dump with sample data
 
-Step-by-step setup guide:
+PHP config file with LLM API setup instructions
 
-MySQL setup
+Frontend HTML/JS/CSS single-page app
 
-Hugging Face API key (free)
+Full API documentation
 
-OR Ollama Docker installation
+Llama system prompt optimization guide
 
-PHP server config (.htaccess)
+Security:
 
-Llama prompt templates optimized for RAG
+SQL injection prevention
 
-Security: Input sanitization, API key protection
+API key protection
 
-Production Ready:
+Input sanitization
 
-Error handling for API downtime
+Read-only query execution
 
-MySQL connection pooling
-
-Responsive images/icons via CSS
-
-PWA capabilities
-
-Comments explaining RAG flow
-
-Provide ALL code files separately with folder structure. Include config files and .env template for API keys. Make it deployable to any standard PHP/MySQL hosting (cPanel, etc.). Add admin dashboard to manage database content!"
+Provide ALL code ready-to-deploy with step-by-step setup instructions. Include a demo video script showing 5 complex database queries working end-to-end. Make the LLM feel like a expert data analyst!"
