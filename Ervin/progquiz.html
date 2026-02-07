@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevQuiz - Pro Coding Assessment Platform</title>
+    <title>DevQuiz AI - Ultimate Edition</title>
     
-    <!-- Fonts and Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -14,6 +13,8 @@
             --bg-header: #333333;
             --accent: #007acc;
             --accent-hover: #005f9e;
+            --ai-color: #9b59b6; 
+            --ai-bg: rgba(155, 89, 182, 0.1);
             --text-main: #d4d4d4;
             --text-muted: #858585;
             --border: #3e3e42;
@@ -27,7 +28,6 @@
         * { box-sizing: border-box; outline: none; }
         body { margin: 0; background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-sans); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* --- Components --- */
         button {
             background-color: var(--bg-header); color: var(--text-main); border: 1px solid var(--border);
             padding: 8px 16px; cursor: pointer; font-size: 14px; transition: 0.2s; border-radius: 4px;
@@ -35,7 +35,10 @@
         button:hover { background-color: var(--border); }
         button.primary { background-color: var(--accent); border-color: var(--accent); color: white; }
         button.primary:hover { background-color: var(--accent-hover); }
+        button.ai-btn { background-color: var(--ai-bg); color: var(--ai-color); border-color: var(--ai-color); }
+        button.ai-btn:hover { background-color: var(--ai-color); color: white; }
         button.danger { background-color: var(--danger); border-color: var(--danger); color: white; }
+        button.text-btn { background: none; border: none; color: var(--text-muted); font-size: 12px; text-decoration: underline; }
         
         input, select, textarea {
             background-color: var(--bg-dark); border: 1px solid var(--border); color: var(--text-main);
@@ -43,12 +46,15 @@
         }
         input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 
-        /* --- Layout --- */
         header {
             height: 50px; background-color: var(--bg-header); display: flex; align-items: center; padding: 0 20px;
             justify-content: space-between; border-bottom: 1px solid var(--border); flex-shrink: 0;
         }
         .brand { font-weight: bold; font-size: 18px; color: var(--success); display: flex; align-items: center; gap: 10px; }
+        .brand i.ai-icon { color: var(--ai-color); animation: pulse 2s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
         nav { display: flex; gap: 10px; }
         nav button { background: none; border: none; color: var(--text-muted); font-weight: 500; padding: 5px 10px; }
         nav button.active { color: white; border-bottom: 2px solid var(--accent); border-radius: 0; }
@@ -56,96 +62,90 @@
 
         main { flex: 1; overflow-y: auto; padding: 20px; position: relative; }
 
-        /* --- Views --- */
         .view { display: none; max-width: 1200px; margin: 0 auto; height: 100%; flex-direction: column; }
         .view.active { display: flex; }
 
         /* --- Dashboard --- */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .card { background-color: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 10px; position: relative; }
+        .card { background-color: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 10px; position: relative; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-3px); border-color: var(--accent); }
         .card h3 { margin: 0; color: var(--accent); }
         .card-meta { font-size: 12px; color: var(--text-muted); display: flex; gap: 15px; }
         .card-actions { margin-top: auto; padding-top: 15px; display: flex; gap: 10px; justify-content: flex-end; }
+        
         .stats-row { display: flex; gap: 20px; margin-bottom: 20px; }
         .stat-box { background: var(--bg-panel); padding: 15px; border-radius: 6px; border: 1px solid var(--border); flex: 1; text-align: center; }
         .stat-val { font-size: 24px; font-weight: bold; color: var(--success); }
 
-        /* --- Quiz Creator --- */
+        /* --- Creator --- */
         .creator-container { display: flex; gap: 20px; height: 100%; }
-        .creator-sidebar { width: 300px; background: var(--bg-panel); padding: 15px; border-radius: 6px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px; }
+        .creator-sidebar { width: 300px; background: var(--bg-panel); padding: 15px; border-radius: 6px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .creator-main { flex: 1; background: var(--bg-panel); padding: 20px; border-radius: 6px; border: 1px solid var(--border); overflow-y: auto; }
         
-        .question-list-item { 
-            background: var(--bg-dark); padding: 10px; border: 1px solid var(--border); margin-bottom: 8px; 
-            cursor: grab; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;
-        }
-        .question-list-item.dragging { opacity: 0.5; border-color: var(--accent); }
-        .q-badge { font-size: 10px; padding: 2px 5px; border-radius: 3px; text-transform: uppercase; margin-right: 5px; }
-        .badge-mcq { background: #4a90e2; }
-        .badge-code { background: #dcdcaa; color: black; }
-        .badge-debug { background: #f44336; }
+        .ai-panel { background: linear-gradient(145deg, #2a2a2d, #1e1e1e); border: 1px solid var(--ai-color); padding: 15px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; }
+        .ai-header { color: var(--ai-color); font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .ai-suggestion { background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px; margin-bottom: 8px; border-left: 3px solid var(--ai-color); cursor: pointer; transition: 0.2s; }
+        .ai-suggestion:hover { background: rgba(155, 89, 182, 0.2); }
 
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--text-muted); }
+        .question-list-item { background: var(--bg-dark); padding: 10px; border: 1px solid var(--border); margin-bottom: 8px; cursor: grab; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .q-badge { font-size: 10px; padding: 2px 5px; border-radius: 3px; text-transform: uppercase; margin-right: 5px; color: #000; font-weight: bold; }
         
-        #editor-container-question { height: 200px; border: 1px solid var(--border); margin-bottom: 10px; }
-        #editor-template { height: 150px; border: 1px solid var(--border); margin-bottom: 10px; }
-        #editor-solution { height: 150px; border: 1px solid var(--border); margin-bottom: 10px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 12px; color: var(--text-muted); }
+        
+        #editor-template { height: 120px; border: 1px solid var(--border); margin-bottom: 10px; }
+        #editor-solution { height: 120px; border: 1px solid var(--border); margin-bottom: 10px; }
 
-        /* --- Quiz Runner --- */
+        /* --- Runner --- */
         .runner-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
         .timer { font-family: var(--font-mono); font-size: 18px; color: var(--warning); font-weight: bold; }
         .progress-bar { height: 4px; background: var(--bg-header); width: 100%; margin-bottom: 20px; border-radius: 2px; }
         .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.3s; }
         
-        .question-display { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        .question-display { flex: 1; display: flex; flex-direction: column; gap: 15px; }
         .q-text { font-size: 18px; line-height: 1.5; }
         .mcq-options { display: flex; flex-direction: column; gap: 10px; }
-        .mcq-option { 
-            background: var(--bg-dark); padding: 12px; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; 
-            display: flex; align-items: center; gap: 10px; transition: 0.2s;
-        }
+        .mcq-option { background: var(--bg-dark); padding: 12px; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
         .mcq-option:hover { border-color: var(--text-muted); }
         .mcq-option.selected { border-color: var(--accent); background: rgba(0, 122, 204, 0.1); }
         
-        #editor-take { height: 300px; border: 1px solid var(--border); border-radius: 4px; }
+        #editor-take { height: 350px; border: 1px solid var(--border); border-radius: 4px; }
         
         .runner-footer { margin-top: 20px; display: flex; justify-content: space-between; }
-        .feedback-box { background: rgba(78, 201, 176, 0.1); border: 1px solid var(--success); color: var(--success); padding: 15px; border-radius: 4px; display: none; }
+        .feedback-box { padding: 15px; border-radius: 4px; display: none; font-size: 14px; line-height: 1.4; }
+        .feedback-box.success { background: rgba(78, 201, 176, 0.1); border: 1px solid var(--success); color: var(--success); }
+        .feedback-box.error { background: rgba(244, 67, 54, 0.1); border: 1px solid var(--danger); color: var(--danger); }
 
-        /* --- Toast Notification --- */
-        #toast {
-            visibility: hidden; min-width: 250px; background-color: var(--accent); color: white; text-align: center;
-            border-radius: 4px; padding: 16px; position: fixed; z-index: 100; right: 30px; bottom: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-size: 14px;
-        }
+        /* --- Review View --- */
+        .review-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .review-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 20px; margin-bottom: 20px; }
+        .review-header { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .review-status { font-weight: bold; }
+        .review-status.correct { color: var(--success); }
+        .review-status.wrong { color: var(--danger); }
+        .code-block { background: #000; padding: 10px; border-radius: 4px; font-family: var(--font-mono); font-size: 13px; overflow-x: auto; margin-top: 5px; color: #d4d4d4; border-left: 3px solid var(--accent); }
+        .label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: bold; margin-top: 10px; display: block; }
+
+        /* --- Toast --- */
+        #toast { visibility: hidden; min-width: 250px; background-color: var(--accent); color: white; text-align: center; border-radius: 4px; padding: 16px; position: fixed; z-index: 100; right: 30px; bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-size: 14px; }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-        
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
         @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .creator-container { flex-direction: column; }
-            .creator-sidebar { width: 100%; max-height: 200px; overflow-y: auto; }
-            .brand span { display: none; }
-        }
     </style>
 </head>
 <body>
 
-<!-- Header -->
 <header>
     <div class="brand">
-        <i class="fas fa-code"></i>
-        <span>DevQuiz Platform</span>
+        <i class="fas fa-brain ai-icon"></i>
+        <span>DevQuiz AI</span>
     </div>
     <nav>
         <button onclick="router.navigate('dashboard')" id="nav-dashboard" class="active">Dashboard</button>
         <button onclick="router.navigate('create')" id="nav-create">Create Quiz</button>
     </nav>
     <div class="user-profile">
-        <i class="fas fa-user-circle"></i> Instructor
+        <i class="fas fa-robot" style="color:var(--ai-color)"></i> AI Assistant
     </div>
 </header>
 
@@ -163,13 +163,14 @@
             </div>
             <div class="stat-box">
                 <div class="stat-val" id="stat-avg-score">0%</div>
-                <div>Average Score</div>
+                <div>Avg Performance</div>
             </div>
         </div>
 
-        <h2><i class="fas fa-layer-group"></i> Available Quizzes</h2>
-        <div class="dashboard-grid" id="quiz-list-container">
-            <!-- Quizzes injected here -->
+        <h2><i class="fas fa-layer-group"></i> Quiz Library</h2>
+        <div class="dashboard-grid" id="quiz-list-container"></div>
+        <div style="text-align:center; margin-top:40px;">
+            <button class="text-btn" onclick="Store.clearData()">Reset All Data</button>
         </div>
     </section>
 
@@ -177,24 +178,44 @@
     <section id="view-create" class="view">
         <div class="creator-container">
             <div class="creator-sidebar">
-                <h3>Settings</h3>
+                <h3>Quiz Settings</h3>
+                <div class="form-group"><label>Quiz Title</label><input type="text" id="new-quiz-title" placeholder="e.g. Advanced JS"></div>
+                
                 <div class="form-group">
-                    <label>Quiz Title</label>
-                    <input type="text" id="new-quiz-title" placeholder="e.g. JavaScript Basics">
+                    <label>Default Language</label>
+                    <select id="default-quiz-lang">
+                        <option value="javascript">JavaScript</option>
+                        <option value="typescript">TypeScript</option>
+                        <option value="python">Python</option>
+                        <option value="java">Java</option>
+                        <option value="cpp">C++</option>
+                        <option value="c">C</option>
+                        <option value="csharp">C#</option>
+                        <option value="go">Go</option>
+                        <option value="rust">Rust</option>
+                        <option value="ruby">Ruby</option>
+                        <option value="swift">Swift</option>
+                        <option value="kotlin">Kotlin</option>
+                        <option value="php">PHP</option>
+                        <option value="sql">SQL</option>
+                        <option value="html">HTML</option>
+                        <option value="css">CSS</option>
+                    </select>
                 </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="new-quiz-desc" rows="3" placeholder="Brief description..."></textarea>
+
+                <div class="form-group"><label>Description</label><textarea id="new-quiz-desc" rows="2"></textarea></div>
+                <div class="form-group"><label>Time (Mins)</label><input type="number" id="new-quiz-time" value="15"></div>
+                <div class="form-group"><label>Passing %</label><input type="number" id="new-quiz-pass" value="75"></div>
+                <button class="primary" onclick="quizBuilder.saveQuiz()" style="width:100%">Publish Quiz</button>
+                
+                <hr style="border-color:var(--border); width:100%; margin: 10px 0;">
+                
+                <div class="ai-panel">
+                    <div class="ai-header"><i class="fas fa-sparkles"></i> AI Insights</div>
+                    <div id="ai-sidebar-content">
+                        <div style="color:var(--text-muted); font-style:italic;">Start adding questions...</div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Time Limit (Minutes)</label>
-                    <input type="number" id="new-quiz-time" value="10">
-                </div>
-                <div class="form-group">
-                    <label>Passing Score (%)</label>
-                    <input type="number" id="new-quiz-pass" value="70">
-                </div>
-                <button class="primary" onclick="quizBuilder.saveQuiz()" style="width:100%">Save / Publish</button>
             </div>
             
             <div class="creator-main">
@@ -206,13 +227,10 @@
                             <option value="code">Code Writing</option>
                             <option value="debug">Debugging</option>
                         </select>
-                        <button onclick="quizBuilder.openQuestionModal()">+ Add Question</button>
+                        <button class="ai-btn" onclick="quizBuilder.openQuestionModal()"><i class="fas fa-plus"></i> Add Question</button>
                     </div>
                 </div>
-
-                <div id="questions-drag-list">
-                    <!-- Question list items go here -->
-                </div>
+                <div id="questions-drag-list"></div>
             </div>
         </div>
     </section>
@@ -226,227 +244,313 @@
         <div class="progress-bar"><div class="progress-fill" id="take-progress"></div></div>
 
         <div class="question-display">
-            <div class="q-text" id="take-q-text">Question text goes here?</div>
-            
-            <!-- MCQ Container -->
+            <div class="q-text" id="take-q-text"></div>
             <div id="take-mcq-container" class="mcq-options"></div>
-            
-            <!-- Code Editor Container -->
-            <div id="take-code-container">
-                <div id="editor-take"></div>
-                <div style="margin-top:5px; font-size:12px; color:var(--text-muted);">
-                    <i class="fas fa-terminal"></i> Write your solution above.
-                </div>
-            </div>
-
+            <div id="take-code-container"><div id="editor-take"></div></div>
             <div id="feedback-box" class="feedback-box"></div>
         </div>
 
         <div class="runner-footer">
             <button onclick="quizRunner.prevQuestion()" id="btn-prev">Previous</button>
             <button onclick="quizRunner.submitAnswer()" id="btn-submit" class="primary">Submit Answer</button>
-            <button onclick="quizRunner.nextQuestion()" id="btn-next">Next</button>
+            <button onclick="quizRunner.nextQuestion()" id="btn-next" style="display:none">Next</button>
         </div>
     </section>
 
-    <!-- Results View -->
-    <section id="view-result" class="view" style="text-align:center; align-items:center; justify-content:center;">
-        <i class="fas fa-trophy" style="font-size: 64px; color: var(--warning); margin-bottom:20px;"></i>
-        <h1>Quiz Completed!</h1>
-        <h2 id="result-score">Score: 0/0</h2>
-        <p id="result-message">Great job!</p>
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button onclick="router.navigate('dashboard')">Back to Dashboard</button>
-            <button class="primary" onclick="router.navigate('create')">Create Another</button>
+    <!-- Quiz Review View (NEW) -->
+    <section id="view-review" class="view">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2><i class="fas fa-clipboard-check"></i> Quiz Review</h2>
+            <div>
+                <span style="font-size:18px; margin-right:15px;">Score: <span id="review-final-score" style="color:var(--success); font-weight:bold;"></span></span>
+                <button onclick="router.navigate('dashboard')">Back to Dashboard</button>
+            </div>
         </div>
+        <div id="review-content" class="review-container"></div>
     </section>
 </main>
 
-<!-- Question Modal (Hidden by default) -->
+<!-- Question Modal -->
 <div id="question-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:50; align-items:center; justify-content:center;">
-    <div style="background:var(--bg-panel); width:800px; max-width:90%; max-height:90%; overflow-y:auto; padding:20px; border-radius:6px; border:1px solid var(--border);">
+    <div style="background:var(--bg-panel); width:850px; max-width:95%; max-height:90vh; overflow-y:auto; padding:25px; border-radius:6px; border:1px solid var(--border);">
         <h3 id="modal-title">Add Question</h3>
         
         <div class="form-group">
             <label>Question Text</label>
-            <textarea id="modal-q-text" rows="3"></textarea>
+            <textarea id="modal-q-text" rows="2" onkeyup="AIBot.analyzeText()"></textarea>
+            <small id="ai-text-hint" style="color:var(--ai-color); display:none;"><i class="fas fa-magic"></i> AI detected keywords!</small>
         </div>
 
-        <div class="form-group">
-            <label>Programming Language</label>
-            <select id="modal-lang">
+        <div class="form-group" style="background: var(--bg-dark); padding: 10px; border-radius: 4px; border: 1px solid var(--accent);">
+            <label style="color: var(--accent); font-weight: bold;">Programming Language</label>
+            <select id="modal-lang" onchange="AIBot.suggestTemplate()">
                 <option value="javascript">JavaScript</option>
+                <option value="typescript">TypeScript</option>
                 <option value="python">Python</option>
                 <option value="java">Java</option>
                 <option value="cpp">C++</option>
+                <option value="c">C</option>
+                <option value="csharp">C#</option>
+                <option value="go">Go</option>
+                <option value="rust">Rust</option>
+                <option value="ruby">Ruby</option>
+                <option value="swift">Swift</option>
+                <option value="kotlin">Kotlin</option>
+                <option value="php">PHP</option>
+                <option value="sql">SQL</option>
+                <option value="html">HTML</option>
+                <option value="css">CSS</option>
             </select>
         </div>
 
-        <!-- Code Specific Fields -->
         <div id="modal-code-fields" style="display:none;">
-            <div class="form-group">
-                <label>Starter Code / Template (Optional)</label>
-                <div id="editor-template"></div>
+            <div class="form-group"><label>Starter Code</label><div id="editor-template"></div></div>
+
+            <div style="background:var(--bg-dark); padding:15px; border:1px solid var(--border); border-radius:4px; margin-bottom:15px;">
+                <h4 style="margin-top:0; color:var(--accent);">Auto-Grading Strategy</h4>
+                <div class="radio-group" style="display:flex; gap:15px; margin-bottom:10px;">
+                    <label><input type="radio" name="gradingType" value="output" checked onchange="quizBuilder.toggleGradingFields()"> Run Code (JS Only)</label>
+                    <label><input type="radio" name="gradingType" value="structure" onchange="quizBuilder.toggleGradingFields()"> Structure/Keywords</label>
+                </div>
+
+                <div id="grading-field-output" class="form-group">
+                    <label>Expected Output</label>
+                    <input type="text" id="modal-expected-output" placeholder="e.g. 15, 'Hello'">
+                </div>
+
+                <div id="grading-field-structure" class="form-group" style="display:none;">
+                    <label>Required Keywords (AI Auto-fill)</label>
+                    <input type="text" id="modal-keywords" placeholder="e.g. for, while, function">
+                    <small style="color:var(--ai-color)">AI auto-filled this based on your question text.</small>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Correct Solution / Expected Output (for Auto-grading)</label>
-                <div id="editor-solution"></div>
-                <small style="color:var(--text-muted)">For Code Writing: Write the code that solves it. For Debugging: This is the fixed version.</small>
-            </div>
+            
+            <div class="form-group"><label>Correct Solution (Shown after quiz)</label><div id="editor-solution"></div></div>
         </div>
 
-        <!-- MCQ Specific Fields -->
         <div id="modal-mcq-fields">
-            <div class="form-group">
-                <label>Option A (Correct)</label>
-                <input type="text" class="mcq-opt" data-correct="true">
-            </div>
-            <div class="form-group">
-                <label>Option B</label>
-                <input type="text" class="mcq-opt">
-            </div>
-            <div class="form-group">
-                <label>Option C</label>
-                <input type="text" class="mcq-opt">
-            </div>
-            <div class="form-group">
-                <label>Option D</label>
-                <input type="text" class="mcq-opt">
-            </div>
+            <div class="form-group"><label>Option A (Correct)</label><input type="text" class="mcq-opt" data-correct="true"></div>
+            <div class="form-group"><label>Option B</label><input type="text" class="mcq-opt"></div>
+            <div class="form-group"><label>Option C</label><input type="text" class="mcq-opt"></div>
+            <div class="form-group"><label>Option D</label><input type="text" class="mcq-opt"></div>
         </div>
 
         <div style="text-align:right; margin-top:20px;">
             <button onclick="document.getElementById('question-modal').style.display='none'">Cancel</button>
-            <button class="primary" onclick="quizBuilder.addQuestion()">Add to Quiz</button>
+            <button class="primary" onclick="quizBuilder.addQuestion()">Add Question</button>
         </div>
     </div>
 </div>
 
 <!-- Toast -->
-<div id="toast">Notification Message</div>
+<div id="toast">Notification</div>
 
 <!-- Scripts -->
-<!-- Monaco Editor Loader -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
-
 <script>
-    // --- 1. State Management & Data ---
+    // --- 1. State Management ---
     const Store = {
-        getQuizzes: () => JSON.parse(localStorage.getItem('devquiz_quizzes')) || [],
-        saveQuizzes: (quizzes) => localStorage.setItem('devquiz_quizzes', JSON.stringify(quizzes)),
-        getResults: () => JSON.parse(localStorage.getItem('devquiz_results')) || [],
+        getQuizzes: () => {
+            try {
+                const q = localStorage.getItem('devquiz_ai_quizzes_v2');
+                return q ? JSON.parse(q) : [];
+            } catch(e) { console.error("Error reading quizzes", e); return []; }
+        },
+        saveQuizzes: (quizzes) => {
+            try {
+                localStorage.setItem('devquiz_ai_quizzes_v2', JSON.stringify(quizzes));
+            } catch(e) { console.error("Error saving quizzes", e); }
+        },
+        getResults: () => {
+            try {
+                const r = localStorage.getItem('devquiz_ai_results_v2');
+                return r ? JSON.parse(r) : [];
+            } catch(e) { return []; }
+        },
         saveResult: (res) => {
             const results = Store.getResults();
             results.push(res);
-            localStorage.setItem('devquiz_results', JSON.stringify(results));
+            localStorage.setItem('devquiz_ai_results_v2', JSON.stringify(results));
+        },
+        clearData: () => {
+            if(confirm("Are you sure? This will delete all quizzes and results.")) {
+                localStorage.removeItem('devquiz_ai_quizzes_v2');
+                localStorage.removeItem('devquiz_ai_results_v2');
+                location.reload();
+            }
         },
         seedData: () => {
-            if (Store.getQuizzes().length === 0) {
+            const quizzes = Store.getQuizzes();
+            if (quizzes.length === 0) {
                 const demoQuizzes = [
                     {
-                        id: 1715001,
-                        title: "JavaScript Fundamentals",
-                        desc: "Test your knowledge on ES6+ features, closures, and scope.",
-                        time: 10,
-                        pass: 70,
-                        questions: [
-                            { id: 1, type: 'mcq', text: 'What does the "const" keyword do?', lang: 'javascript', options: ['Declares a block-scoped variable that cannot be reassigned', 'Declares a global variable', 'Creates a constant function', 'None of the above'], answer: 0 },
-                            { id: 2, type: 'code', text: 'Write a function named `add` that takes two numbers and returns their sum.', lang: 'javascript', template: 'function add(a, b) {\n  // Your code here\n}', solution: 'function add(a, b) {\n  return a + b;\n}' },
-                            { id: 3, type: 'debug', text: 'Fix the syntax error in this loop.', lang: 'javascript', template: 'for (i = 0; i < 5; i++) {\n  console.log(i;\n}', solution: 'for (i = 0; i < 5; i++) {\n  console.log(i);\n}' }
-                        ]
-                    },
-                    {
-                        id: 1715002,
-                        title: "Python Data Structures",
-                        desc: "Lists, Dictionaries, and Sets.",
-                        time: 15,
-                        pass: 60,
-                        questions: [
-                            { id: 1, type: 'mcq', text: 'Which data type is immutable?', lang: 'python', options: ['List', 'Dictionary', 'Tuple', 'Set'], answer: 2 },
-                            { id: 2, type: 'code', text: 'Define a class `Dog` with a method `bark` that returns "Woof".', lang: 'python', template: 'class Dog:\n    def bark(self):\n        pass', solution: 'class Dog:\n    def bark(self):\n        return "Woof"' }
+                        id: 1, title: "JS Fundamentals", desc: "Loops and Arrays", time: 5, pass: 70, questions: [
+                            { id: 1, type: 'mcq', text: 'Which creates a block scoped variable?', lang: 'javascript', options: ['var', 'let', 'global', 'scope'], answer: 1 },
+                            { id: 2, type: 'code', text: 'Write a function `sum` that adds two numbers.', lang: 'javascript', template: 'function sum(a,b){}', gradingType: 'output', expectedOutput: '5', solution: 'function sum(a,b){return a+b;}' },
+                            { id: 3, type: 'code', text: 'Use a for loop to print 0 to 4.', lang: 'javascript', template: '', gradingType: 'structure', keywords: 'for, console.log', solution: 'for(let i=0;i<5;i++){console.log(i);}' }
                         ]
                     }
                 ];
                 Store.saveQuizzes(demoQuizzes);
+                console.log("Seeded demo data");
             }
         }
     };
 
-    // --- 2. Monaco Editor Manager ---
+    // --- 2. AI Assistant ---
+    const AIBot = {
+        techKeywords: ['function', 'var', 'let', 'const', 'for', 'while', 'if', 'else', 'class', 'import', 'return', 'async', 'await', 'promise', 'array', 'object', 'string', 'map', 'filter', 'reduce', 'sql', 'select', 'from', 'where'],
+        stopWords: ['the', 'is', 'a', 'an', 'and', 'or', 'to', 'in', 'of', 'for', 'with', 'on', 'at', 'by', 'from'],
+
+        analyzeText: () => {
+            const text = document.getElementById('modal-q-text').value.toLowerCase();
+            const gradingType = document.querySelector('input[name="gradingType"]:checked').value;
+            
+            if(gradingType === 'structure' && text.length > 10) {
+                const words = text.split(/[\s,?.]+/);
+                const foundKeywords = words.filter(w => AIBot.techKeywords.includes(w) && !AIBot.stopWords.includes(w));
+                const uniqueKeywords = [...new Set(foundKeywords)];
+                
+                if(uniqueKeywords.length > 0) {
+                    document.getElementById('modal-keywords').value = uniqueKeywords.join(', ');
+                    document.getElementById('ai-text-hint').style.display = 'block';
+                }
+            }
+        },
+
+        suggestTemplate: () => {
+            const lang = document.getElementById('modal-lang').value;
+            const editor = EditorManager.instances['editor-template'];
+            if(!editor) return;
+
+            let template = '';
+            if(lang === 'javascript' || lang === 'typescript') {
+                template = '// Write your solution here\nfunction solve() {\n    \n}';
+            } else if (lang === 'python') {
+                template = '# Write your solution here\ndef solve():\n    pass';
+            } else if (lang === 'sql') {
+                template = '-- Write your query here\nSELECT * FROM table_name';
+            } else if (lang === 'java') {
+                template = 'public class Solution {\n    public static void main(String[] args) {\n        \n    }\n}';
+            } else if (lang === 'csharp') {
+                template = 'public class Program {\n    public static void Main() {\n        \n    }\n}';
+            } else if (lang === 'go') {
+                template = 'package main\n\nfunc main() {\n    // Write code here\n}';
+            } else if (lang === 'rust') {
+                template = 'fn main() {\n    // Write code here\n}';
+            } else if (lang === 'ruby') {
+                template = '# Write code here';
+            }
+            editor.setValue(template);
+        },
+
+        analyzeQuizBalance: (questions) => {
+            const container = document.getElementById('ai-sidebar-content');
+            if(!questions || questions.length === 0) {
+                container.innerHTML = '<div style="color:var(--text-muted); font-style:italic;">Start adding questions...</div>';
+                return;
+            }
+            const types = questions.reduce((acc, q) => { acc[q.type] = (acc[q.type] || 0) + 1; return acc; }, {});
+            const langs = [...new Set(questions.map(q => q.lang))];
+            
+            let suggestions = [];
+            if(types['mcq'] > 3 && !types['code']) suggestions.push({ icon: 'fa-code', text: 'Consider adding a coding challenge.' });
+            if(langs.length > 2) suggestions.push({ icon: 'fa-language', text: 'Multilingual quiz detected!' });
+            if(!types['debug']) suggestions.push({ icon: 'fa-bug', text: 'Add a debugging question.' });
+            if(suggestions.length === 0) suggestions.push({ icon: 'fa-check-circle', text: 'Quiz balance looks great!' });
+
+            container.innerHTML = suggestions.map(s => `
+                <div class="ai-suggestion"><i class="fas ${s.icon}"></i> ${s.text}</div>
+            `).join('');
+
+            AIBot.updateKnowledgeGraph(questions);
+        },
+
+        updateKnowledgeGraph: (questions) => {
+            const topics = new Set();
+            questions.forEach(q => {
+                q.text.toLowerCase().split(/\s+/).forEach(w => {
+                    if(AIBot.techKeywords.includes(w)) topics.add(w);
+                });
+            });
+            document.getElementById('stat-topics').innerText = topics.size + "+"; 
+        }
+    };
+
+    // --- 3. Monaco Editor ---
     const EditorManager = {
         instances: {},
         init: (callback) => {
             require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs' }});
             require(['vs/editor/editor.main'], callback);
         },
-        create: (containerId, code = '', lang = 'javascript', readOnly = false) => {
+        create: (containerId, code = '', lang = 'javascript') => {
             if (EditorManager.instances[containerId]) EditorManager.instances[containerId].dispose();
             const container = document.getElementById(containerId);
             if(!container) return;
             
+            let mLang = lang;
+            if(lang === 'csharp') mLang = 'csharp';
+            if(lang === 'cpp') mLang = 'cpp';
+            if(lang === 'html') mLang = 'html';
+
             EditorManager.instances[containerId] = monaco.editor.create(container, {
-                value: code,
-                language: lang,
-                theme: 'vs-dark',
-                readOnly: readOnly,
-                automaticLayout: true,
-                minimap: { enabled: false },
-                fontSize: 14
+                value: code, language: mLang, theme: 'vs-dark', automaticLayout: true, minimap: { enabled: false }, fontSize: 14
             });
-            return EditorManager.instances[containerId];
         },
-        getValue: (containerId) => EditorManager.instances[containerId] ? EditorManager.instances[containerId].getValue() : '',
-        dispose: (containerId) => {
-            if (EditorManager.instances[containerId]) EditorManager.instances[containerId].dispose();
-        }
+        getValue: (id) => EditorManager.instances[id] ? EditorManager.instances[id].getValue() : ''
     };
 
-    // --- 3. Router & Navigation ---
+    // --- 4. Router ---
     const router = {
         navigate: (viewId) => {
             document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
             document.getElementById(`view-${viewId}`).classList.add('active');
-            
             document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
-            const navBtn = document.getElementById(`nav-${viewId}`);
-            if(navBtn) navBtn.classList.add('active');
-
-            if (viewId === 'dashboard') dashboard.render();
+            const btn = document.getElementById(`nav-${viewId}`);
+            if(btn) btn.classList.add('active');
+            if(viewId === 'dashboard') dashboard.render();
         }
     };
 
-    // --- 4. Dashboard Logic ---
+    // --- 5. Dashboard Logic ---
     const dashboard = {
         render: () => {
+            console.log("Rendering Dashboard...");
             const quizzes = Store.getQuizzes();
             const results = Store.getResults();
+            console.log(`Found ${quizzes.length} quizzes.`);
             
-            // Stats
-            document.getElementById('stat-total-quizzes').innerText = quizzes.length;
-            document.getElementById('stat-total-attempts').innerText = results.length;
-            const avg = results.length ? Math.round(results.reduce((a,b) => a + b.percentage, 0) / results.length) : 0;
-            document.getElementById('stat-avg-score').innerText = avg + "%";
+            const elQuizzes = document.getElementById('stat-total-quizzes');
+            const elAttempts = document.getElementById('stat-total-attempts');
+            const elScore = document.getElementById('stat-avg-score');
+            
+            if(elQuizzes) elQuizzes.innerText = quizzes.length;
+            if(elAttempts) elAttempts.innerText = results.length; 
+            if(elScore) {
+                const avg = results.length ? Math.round(results.reduce((a,b) => a + b.percentage, 0) / results.length) : 0;
+                elScore.innerText = avg + "%";
+            }
 
-            // List
             const container = document.getElementById('quiz-list-container');
             container.innerHTML = '';
             
+            if(quizzes.length === 0) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-muted)">No quizzes found. Create one!</div>';
+                return;
+            }
+
             quizzes.forEach(q => {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:start">
+                    <div style="display:flex; justify-content:space-between;">
                         <h3>${q.title}</h3>
-                        <i class="fas fa-code" style="color:${getLangColor(q.questions[0]?.lang)}"></i>
+                        <span style="font-size:12px; background:#333; padding:2px 6px; border-radius:4px;">${q.questions.length} Qs</span>
                     </div>
-                    <p style="color:var(--text-muted); font-size:14px; flex:1;">${q.desc}</p>
-                    <div class="card-meta">
-                        <span><i class="fas fa-question-circle"></i> ${q.questions.length} Questions</span>
-                        <span><i class="fas fa-clock"></i> ${q.time} Mins</span>
-                        <span><i class="fas fa-check-circle"></i> ${q.pass}% Pass</span>
-                    </div>
+                    <p style="color:var(--text-muted); font-size:13px; flex:1;">${q.desc}</p>
                     <div class="card-actions">
-                        <button onclick="quizRunner.start(${q.id})" class="primary"><i class="fas fa-play"></i> Take Quiz</button>
+                        <button onclick="quizRunner.start(${q.id})" class="primary">Take Quiz</button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -454,94 +558,110 @@
         }
     };
 
-    function getLangColor(lang) {
-        const colors = { javascript: '#f7df1e', python: '#3776ab', java: '#007396', cpp: '#00599C' };
-        return colors[lang] || '#ccc';
-    }
-
-    // --- 5. Quiz Builder Logic ---
+    // --- 6. Quiz Builder ---
     const quizBuilder = {
         currentQuestions: [],
-        dragSrcEl: null,
 
         init: () => {
-            // Initialize Modal Listeners
             document.getElementById('q-type-selector').addEventListener('change', (e) => {
                 const type = e.target.value;
                 document.getElementById('modal-code-fields').style.display = (type === 'mcq') ? 'none' : 'block';
                 document.getElementById('modal-mcq-fields').style.display = (type === 'mcq') ? 'block' : 'none';
             });
-
-            // Initialize Drag and Drop for Question List
+            
             const list = document.getElementById('questions-drag-list');
-            list.addEventListener('dragstart', quizBuilder.handleDragStart, false);
-            list.addEventListener('dragover', quizBuilder.handleDragOver, false);
-            list.addEventListener('drop', quizBuilder.handleDrop, false);
+            list.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', e.target.dataset.index); e.target.classList.add('dragging'); });
+            list.addEventListener('dragover', e => { e.preventDefault(); });
+            list.addEventListener('drop', e => {
+                e.preventDefault();
+                const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
+                const toEl = e.target.closest('.question-list-item');
+                if(!toEl) return;
+                const toIdx = parseInt(toEl.dataset.index);
+                const moved = quizBuilder.currentQuestions.splice(fromIdx, 1)[0];
+                quizBuilder.currentQuestions.splice(toIdx, 0, moved);
+                quizBuilder.renderList();
+            });
         },
 
         openQuestionModal: () => {
+            console.log("Opening Question Modal");
             document.getElementById('question-modal').style.display = 'flex';
+            
+            // Reset fields
             document.getElementById('modal-q-text').value = '';
             document.querySelectorAll('.mcq-opt').forEach(i => i.value = '');
-            
-            // Initialize Editors inside modal
+            document.getElementById('modal-expected-output').value = '';
+            document.getElementById('modal-keywords').value = '';
+            document.getElementById('ai-text-hint').style.display = 'none';
+
+            // Set Language from Sidebar
+            const defaultLang = document.getElementById('default-quiz-lang').value;
+            const langSelect = document.getElementById('modal-lang');
+            if(langSelect) langSelect.value = defaultLang;
+
+            // Delay editor creation slightly to ensure container is visible
             setTimeout(() => {
-                EditorManager.create('editor-template', '', document.getElementById('modal-lang').value);
-                EditorManager.create('editor-solution', '', document.getElementById('modal-lang').value);
+                const lang = document.getElementById('modal-lang').value;
+                EditorManager.create('editor-template', '', lang);
+                EditorManager.create('editor-solution', '', lang);
+                AIBot.suggestTemplate();
             }, 100);
         },
 
+        toggleGradingFields: () => {
+            const type = document.querySelector('input[name="gradingType"]:checked').value;
+            document.getElementById('grading-field-output').style.display = type === 'output' ? 'block' : 'none';
+            document.getElementById('grading-field-structure').style.display = type === 'structure' ? 'block' : 'none';
+            if(type === 'structure') AIBot.analyzeText();
+        },
+
         addQuestion: () => {
-            const type = document.getElementById('q-type-selector').value;
-            const text = document.getElementById('modal-q-text').value;
-            const lang = document.getElementById('modal-lang').value;
-            
-            if(!text) return alert("Question text is required");
+            console.log("Attempting to add question...");
+            try {
+                const type = document.getElementById('q-type-selector').value;
+                const text = document.getElementById('modal-q-text').value;
+                const lang = document.getElementById('modal-lang').value;
+                
+                if(!text) return showToast("Please enter question text");
 
-            const q = { id: Date.now(), type, text, lang };
+                const q = { id: Date.now(), type, text, lang };
 
-            if(type === 'mcq') {
-                const opts = Array.from(document.querySelectorAll('.mcq-opt')).map(i => i.value);
-                const correctIdx = opts.findIndex((_, i) => document.querySelectorAll('.mcq-opt')[i].dataset.correct === "true");
-                q.options = opts;
-                q.answer = correctIdx; // Simplification: In real app, allow selecting correct one dynamically
-            } else {
-                q.template = EditorManager.getValue('editor-template');
-                q.solution = EditorManager.getValue('editor-solution');
+                if(type === 'mcq') {
+                    q.options = Array.from(document.querySelectorAll('.mcq-opt')).map(i => i.value);
+                    q.answer = q.options.findIndex((_, i) => document.querySelectorAll('.mcq-opt')[i].dataset.correct === "true");
+                } else {
+                    // Safe check for editor values
+                    q.template = EditorManager.getValue('editor-template');
+                    q.solution = EditorManager.getValue('editor-solution');
+                    q.gradingType = document.querySelector('input[name="gradingType"]:checked').value;
+                    q.expectedOutput = document.getElementById('modal-expected-output').value;
+                    q.keywords = document.getElementById('modal-keywords').value;
+                }
+
+                quizBuilder.currentQuestions.push(q);
+                quizBuilder.renderList();
+                document.getElementById('question-modal').style.display = 'none';
+                showToast("Question Added");
+            } catch(e) {
+                console.error("Error adding question", e);
+                alert("Error adding question. Check console.");
             }
-
-            quizBuilder.currentQuestions.push(q);
-            quizBuilder.renderList();
-            document.getElementById('question-modal').style.display = 'none';
         },
 
         renderList: () => {
             const list = document.getElementById('questions-drag-list');
-            list.innerHTML = '';
-            quizBuilder.currentQuestions.forEach((q, idx) => {
-                const el = document.createElement('div');
-                el.className = 'question-list-item';
-                el.draggable = true;
-                el.dataset.index = idx;
-                el.innerHTML = `
+            list.innerHTML = quizBuilder.currentQuestions.map((q, idx) => `
+                <div class="question-list-item" draggable="true" data-index="${idx}">
                     <div>
-                        <span class="q-badge badge-${q.type}">${q.type}</span>
-                        <span>${q.text.substring(0, 40)}...</span>
+                        <span class="q-badge" style="background:${q.type==='mcq'?'#4a90e2':(q.type==='code'?'#dcdcaa':'#f44336')}">${q.type}</span> 
+                        <small style="color:var(--text-muted)">[${q.lang}]</small> 
+                        ${q.text.substring(0, 40)}...
                     </div>
-                    <div>
-                        <button onclick="quizBuilder.removeQuestion(${idx})" style="padding:4px 8px; color:var(--danger); border:none; background:none;"><i class="fas fa-trash"></i></button>
-                    </div>
-                `;
-                // Add drag events dynamically
-                el.addEventListener('dragstart', quizBuilder.handleDragStart, false);
-                el.addEventListener('dragenter', quizBuilder.handleDragEnter, false);
-                el.addEventListener('dragover', quizBuilder.handleDragOver, false);
-                el.addEventListener('dragleave', quizBuilder.handleDragLeave, false);
-                el.addEventListener('drop', quizBuilder.handleDrop, false);
-                el.addEventListener('dragend', quizBuilder.handleDragEnd, false);
-                
-                list.appendChild(el);
-            });
+                    <button onclick="quizBuilder.removeQuestion(${idx})" style="color:var(--danger); background:none; border:none;"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+            AIBot.analyzeQuizBalance(quizBuilder.currentQuestions);
         },
 
         removeQuestion: (idx) => {
@@ -551,13 +671,11 @@
 
         saveQuiz: () => {
             const title = document.getElementById('new-quiz-title').value;
-            if(!title || quizBuilder.currentQuestions.length === 0) {
-                showToast("Please add a title and at least one question.");
-                return;
-            }
+            if(!title || !quizBuilder.currentQuestions.length) return showToast("Missing title or questions");
+            
             const newQuiz = {
-                id: Date.now(),
-                title,
+                id: Date.now(), 
+                title, 
                 desc: document.getElementById('new-quiz-desc').value,
                 time: parseInt(document.getElementById('new-quiz-time').value),
                 pass: parseInt(document.getElementById('new-quiz-pass').value),
@@ -567,53 +685,27 @@
             const quizzes = Store.getQuizzes();
             quizzes.push(newQuiz);
             Store.saveQuizzes(quizzes);
+            
             showToast("Quiz Saved Successfully!");
             
-            // Reset
             document.getElementById('new-quiz-title').value = '';
+            document.getElementById('new-quiz-desc').value = '';
             quizBuilder.currentQuestions = [];
             quizBuilder.renderList();
-        },
-
-        // Drag and Drop Handlers
-        handleDragStart: function(e) {
-            quizBuilder.dragSrcEl = this;
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', this.innerHTML);
-            this.classList.add('dragging');
-        },
-        handleDragOver: function(e) { if (e.preventDefault) e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; },
-        handleDragEnter: function() { this.classList.add('over'); },
-        handleDragLeave: function() { this.classList.remove('over'); },
-        handleDrop: function(e) {
-            if (e.stopPropagation) e.stopPropagation();
-            if (quizBuilder.dragSrcEl !== this) {
-                const srcIdx = parseInt(quizBuilder.dragSrcEl.dataset.index);
-                const targetIdx = parseInt(this.dataset.index);
-                // Swap
-                const temp = quizBuilder.currentQuestions[srcIdx];
-                quizBuilder.currentQuestions[srcIdx] = quizBuilder.currentQuestions[targetIdx];
-                quizBuilder.currentQuestions[targetIdx] = temp;
-                quizBuilder.renderList();
-            }
-            return false;
-        },
-        handleDragEnd: function() { this.classList.remove('dragging'); }
+            router.navigate('dashboard'); 
+        }
     };
 
-    // --- 6. Quiz Runner & Auto-Grading ---
+    // --- 7. Quiz Runner ---
     const quizRunner = {
-        activeQuiz: null,
-        currentIndex: 0,
-        userAnswers: [],
-        timerInterval: null,
-        timeLeft: 0,
+        activeQuiz: null, currentIndex: 0, userAnswers: [], timerInterval: null, timeLeft: 0, results: [],
 
         start: (quizId) => {
             const quizzes = Store.getQuizzes();
             quizRunner.activeQuiz = quizzes.find(q => q.id === quizId);
             quizRunner.currentIndex = 0;
             quizRunner.userAnswers = new Array(quizRunner.activeQuiz.questions.length).fill(null);
+            quizRunner.results = []; // Store detailed results for review
             quizRunner.timeLeft = quizRunner.activeQuiz.time * 60;
             
             document.getElementById('take-quiz-title').innerText = quizRunner.activeQuiz.title;
@@ -636,15 +728,20 @@
         loadQuestion: () => {
             const q = quizRunner.activeQuiz.questions[quizRunner.currentIndex];
             document.getElementById('take-q-text').innerText = `${quizRunner.currentIndex + 1}. ${q.text}`;
-            document.getElementById('feedback-box').style.display = 'none';
-            document.getElementById('btn-submit').style.display = 'block';
-            document.getElementById('btn-next').style.display = 'none';
+            
+            const fb = document.getElementById('feedback-box');
+            fb.style.display = 'none';
+            fb.className = 'feedback-box';
+            
+            const btnSubmit = document.getElementById('btn-submit');
+            const btnNext = document.getElementById('btn-next');
+            
+            btnSubmit.style.display = 'block';
+            btnNext.style.display = 'none';
 
-            // Progress Bar
             const pct = ((quizRunner.currentIndex) / quizRunner.activeQuiz.questions.length) * 100;
             document.getElementById('take-progress').style.width = `${pct}%`;
 
-            // Hide/Show containers
             document.getElementById('take-mcq-container').innerHTML = '';
             document.getElementById('take-code-container').style.display = 'none';
 
@@ -655,19 +752,17 @@
                     div.className = 'mcq-option';
                     if(quizRunner.userAnswers[quizRunner.currentIndex] === idx) div.classList.add('selected');
                     div.innerHTML = `<span>${String.fromCharCode(65+idx)}.</span> ${opt}`;
-                    div.onclick = () => quizRunner.selectMcq(idx, div);
+                    div.onclick = () => {
+                        document.querySelectorAll('.mcq-option').forEach(d => d.classList.remove('selected'));
+                        div.classList.add('selected');
+                        quizRunner.userAnswers[quizRunner.currentIndex] = idx;
+                    };
                     document.getElementById('take-mcq-container').appendChild(div);
                 });
             } else {
                 document.getElementById('take-code-container').style.display = 'block';
                 EditorManager.create('editor-take', q.template || '', q.lang);
             }
-        },
-
-        selectMcq: (idx, el) => {
-            document.querySelectorAll('.mcq-option').forEach(d => d.classList.remove('selected'));
-            el.classList.add('selected');
-            quizRunner.userAnswers[quizRunner.currentIndex] = idx;
         },
 
         submitAnswer: () => {
@@ -677,33 +772,32 @@
                 quizRunner.userAnswers[quizRunner.currentIndex] = EditorManager.getValue('editor-take');
             }
             
-            // Instant Feedback Logic
-            const isCorrect = quizRunner.gradeSingle(q, quizRunner.userAnswers[quizRunner.currentIndex]);
+            const result = quizRunner.gradeSingle(q, quizRunner.userAnswers[quizRunner.currentIndex]);
+            
+            // Store for review
+            quizRunner.results[quizRunner.currentIndex] = {
+                q: q,
+                userAnswer: quizRunner.userAnswers[quizRunner.currentIndex],
+                result: result
+            };
+
             const fb = document.getElementById('feedback-box');
             fb.style.display = 'block';
-            
-            if(isCorrect) {
-                fb.style.borderColor = 'var(--success)';
-                fb.style.color = 'var(--success)';
-                fb.style.backgroundColor = 'rgba(78, 201, 176, 0.1)';
-                fb.innerHTML = '<i class="fas fa-check-circle"></i> Correct!';
-            } else {
-                fb.style.borderColor = 'var(--danger)';
-                fb.style.color = 'var(--danger)';
-                fb.style.backgroundColor = 'rgba(244, 67, 54, 0.1)';
-                fb.innerHTML = `<i class="fas fa-times-circle"></i> Incorrect. ${q.type !== 'mcq' ? 'Check your syntax or logic.' : ''}`;
-            }
+            fb.innerHTML = result.isCorrect 
+                ? `<i class="fas fa-check"></i> Correct! ${result.msg||''}` 
+                : `<i class="fas fa-times"></i> Incorrect. ${result.msg||''}`;
+            fb.className = 'feedback-box ' + (result.isCorrect ? 'success' : 'error');
 
             document.getElementById('btn-submit').style.display = 'none';
-            document.getElementById('btn-next').style.display = 'block';
+            const btnNext = document.getElementById('btn-next');
+            btnNext.style.display = 'block';
             
-            // If last question, change Next to Finish
             if(quizRunner.currentIndex === quizRunner.activeQuiz.questions.length - 1) {
-                document.getElementById('btn-next').innerText = 'Finish Quiz';
-                document.getElementById('btn-next').onclick = quizRunner.finish;
+                btnNext.innerText = 'Finish Quiz';
+                btnNext.onclick = quizRunner.finish;
             } else {
-                document.getElementById('btn-next').innerText = 'Next';
-                document.getElementById('btn-next').onclick = quizRunner.nextQuestion;
+                btnNext.innerText = 'Next Question';
+                btnNext.onclick = quizRunner.nextQuestion;
             }
         },
 
@@ -711,97 +805,109 @@
             quizRunner.currentIndex++;
             quizRunner.loadQuestion();
         },
-
+        
         prevQuestion: () => {
-            if(quizRunner.currentIndex > 0) {
+             if(quizRunner.currentIndex > 0) {
                 quizRunner.currentIndex--;
                 quizRunner.loadQuestion();
             }
         },
 
-        // Auto-Grading Engine (Simulation)
-        gradeSingle: (question, userAnswer) => {
-            if(userAnswer === null) return false;
-
-            if(question.type === 'mcq') {
-                return parseInt(userAnswer) === question.answer;
-            } 
+        gradeSingle: (q, ans) => {
+            if(!ans) return { isCorrect: false, msg: "No answer provided." };
+            if(q.type === 'mcq') return { isCorrect: parseInt(ans) === q.answer };
             
-            // For Code/Debug: 
-            // 1. Try to normalize strings (remove extra spaces)
-            // 2. Very basic execution simulation for specific patterns
-            // Note: Real execution requires backend sandbox.
-            
-            const clean = (str) => str.replace(/\s+/g, '').trim();
-            const userClean = clean(userAnswer);
-            const solClean = clean(question.solution);
-
-            // Strategy 1: Exact Match (after whitespace removal)
-            if(userClean === solClean) return true;
-
-            // Strategy 2: Output Simulation (Very Basic Safe Eval for JS)
-            // This is for demonstration of "Auto-grading" capability in a client-side only app
-            if(question.lang === 'javascript' && question.type === 'code') {
-                try {
-                    // Extract expected output from solution execution
-                    // DANGER: eval is used here purely for the prototype functionality. 
-                    // In production, this must be a backend sandbox.
-                    const expectedRun = new Function(question.solution)();
-                    const userRun = new Function(userAnswer)();
-                    return JSON.stringify(expectedRun) === JSON.stringify(userRun);
-                } catch(e) {
-                    return false; 
-                }
+            if(q.gradingType === 'structure') {
+                const req = q.keywords.toLowerCase().split(',').map(k=>k.trim());
+                const miss = req.filter(k => !ans.toLowerCase().includes(k));
+                return miss.length ? { isCorrect: false, msg: `Missing: ${miss.join(', ')}` } : { isCorrect: true };
             }
-
-            return false;
+            
+            if(q.gradingType === 'output' && q.lang === 'javascript') {
+                try {
+                    const res = new Function(`"use strict"; return (${ans})`)();
+                    return { isCorrect: String(res) === q.expectedOutput, msg: `Output: ${res}` };
+                } catch(e) { return { isCorrect: false, msg: `Error: ${e.message}` }; }
+            }
+            return { isCorrect: false, msg: "Grading failed." };
         },
 
         finish: () => {
             clearInterval(quizRunner.timerInterval);
-            let correctCount = 0;
-            quizRunner.activeQuiz.questions.forEach((q, idx) => {
-                if(quizRunner.gradeSingle(q, quizRunner.userAnswers[idx])) correctCount++;
-            });
-
-            const percentage = Math.round((correctCount / quizRunner.activeQuiz.questions.length) * 100);
-            const passed = percentage >= quizRunner.activeQuiz.pass;
-
-            // Save Result
-            Store.saveResult({
-                quizId: quizRunner.activeQuiz.id,
-                score: correctCount,
-                total: quizRunner.activeQuiz.questions.length,
-                percentage: percentage,
-                date: new Date().toISOString()
-            });
-
-            // Show Result View
-            document.getElementById('result-score').innerText = `${correctCount} / ${quizRunner.activeQuiz.questions.length} (${percentage}%)`;
-            document.getElementById('result-message').innerText = passed ? "You Passed!" : "You did not pass the threshold.";
-            document.getElementById('result-message').style.color = passed ? "var(--success)" : "var(--danger)";
             
-            router.navigate('result');
+            // Calculate final score
+            let correct = 0;
+            quizRunner.results.forEach(r => {
+                if(r.result.isCorrect) correct++;
+            });
+            const pct = Math.round((correct / quizRunner.activeQuiz.questions.length) * 100);
+            
+            // Save to history
+            Store.saveResult({ quizId: quizRunner.activeQuiz.id, score: correct, total: quizRunner.activeQuiz.questions.length, percentage: pct, date: new Date().toISOString() });
+            
+            // Render Review
+            quizRunner.renderReview(correct, quizRunner.activeQuiz.questions.length);
+            
+            router.navigate('review');
+        },
+
+        renderReview: (score, total) => {
+            document.getElementById('review-final-score').innerText = `${score}/${total}`;
+            const container = document.getElementById('review-content');
+            container.innerHTML = '';
+
+            quizRunner.results.forEach((item, idx) => {
+                const q = item.q;
+                const isCorrect = item.result.isCorrect;
+                
+                let userHtml = '';
+                let correctHtml = '';
+
+                if(q.type === 'mcq') {
+                    userHtml = `<div class="code-block">${q.options[item.userAnswer] || 'No Answer'}</div>`;
+                    correctHtml = `<div class="code-block">${q.options[q.answer]}</div>`;
+                } else {
+                    userHtml = `<div class="code-block">${item.userAnswer || 'No Answer'}</div>`;
+                    correctHtml = `<div class="code-block">${q.solution || 'No solution provided by creator.'}</div>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'review-card';
+                card.innerHTML = `
+                    <div class="review-header">
+                        <h4>Question ${idx + 1}</h4>
+                        <span class="review-status ${isCorrect ? 'correct' : 'wrong'}">
+                            ${isCorrect ? '<i class="fas fa-check"></i> Correct' : '<i class="fas fa-times"></i> Incorrect'}
+                        </span>
+                    </div>
+                    <p style="margin-bottom:10px;">${q.text}</p>
+                    
+                    <span class="label">Your Answer</span>
+                    ${userHtml}
+
+                    <span class="label" style="color:var(--success)">Correct Answer / Solution</span>
+                    ${correctHtml}
+                `;
+                container.appendChild(card);
+            });
         }
     };
 
-    // --- 7. Utilities ---
     function showToast(msg) {
-        const x = document.getElementById("toast");
-        x.innerText = msg;
-        x.className = "show";
-        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+        const t = document.getElementById("toast");
+        t.innerText = msg; t.className = "show";
+        setTimeout(() => t.className = t.className.replace("show", ""), 3000);
     }
 
-    // --- Initialization ---
     window.onload = () => {
+        console.log("App Loading...");
         Store.seedData();
         EditorManager.init(() => {
+            console.log("Monaco Loaded");
             quizBuilder.init();
             dashboard.render();
         });
     };
-
 </script>
 </body>
 </html>
