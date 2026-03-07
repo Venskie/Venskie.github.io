@@ -1,0 +1,96 @@
+"Create a complete immersive multiplayer first-person anime fighting game (40 players max) using Node.js server.js, Socket.io for real-time networking, Express.js, and Three.js for 3D rendering. Deliver all files: server.js, index.html, style.css, game.js, package.json with anime-inspired assets.
+
+Core Gameplay (Box-Type Movement):
+
+Grid-based 'box' movement system: 8-directional movement (WASD + QE strafe), no free camera rotation
+
+Fixed facing direction per 'box', smooth anime-style dash/teleport between grid positions
+
+3D anime character models with exaggerated proportions, dynamic hair/clothes physics
+
+Anime Fighting Mechanics:
+
+Combo-based combat: Light/Heavy punches, kicks, uppercuts, spinning attacks (Q/E/R/F keys)
+
+Visible limb animations: detailed hand/foot IK for every punch, kick, grab
+
+Special moves: charged energy blasts, flying kicks, ground pounds (hold + direction)
+
+Block/parry system with slow-motion feedback
+
+Ragdoll physics on knockout blows
+
+Power-Up System:
+
+12 floating anime orbs spawn every 30s: Super Speed, Energy Shield, Mega Punch, Homing Missiles, Heal Burst, Rage Mode
+
+Visual aura effects, screen shake, particle explosions on activation
+
+Combo meter fills for ultimate attacks (screen-wide energy beam, meteor strike)
+
+Arena & Environment:
+
+5 anime-themed arenas: Neo-Tokyo Rooftops, Floating Sky Islands, Demon Realm, Cyber Dojo, Volcanic Wasteland
+
+Destructible pillars/crates, environmental hazards (lava pits, wind gusts)
+
+Dynamic lighting: neon signs, energy beams, moonlit nights
+
+Multiplayer Features (40 players):
+
+Free-for-all battle royale shrinking zone
+
+Team deathmatch (4 teams of 10)
+
+1v1 ranked duels with spectator stands
+
+Player profiles: anime avatar creator (hair, outfits, weapons), emotes, victory poses
+
+Technical Precision:
+
+text
+Movement: 1m grid boxes, 0.2s dash time, momentum preservation
+Combat: 60ms input delay, server-authoritative hit detection
+Animation: 24 FPS skeletal animation blending, limb collision boxes
+Networking: Delta state compression, client prediction + reconciliation
+Performance: LOD switching, occlusion culling for 40 players
+Visual/Audio Polish:
+
+Cel-shaded anime rendering pipeline
+
+Dynamic camera shake/dolly zoom on big hits
+
+Japanese voice acting samples (attack grunts, ultimate calls)
+
+Screen distortion, speed lines, impact frames
+
+Bloodless rating: energy sparks, dramatic slow-mo KOs
+
+Server Requirements:
+
+SQLite for player stats, cosmetics unlocks, match history
+
+Anti-cheat: movement validation, combo timing checks
+
+Room system: 5 arenas x 8 players = 40 max
+
+Matchmaking + spectator mode
+
+Leaderboards: KOs, combos, power-up steals
+
+Deliverables:
+
+Full project with 50+ anime assets (models, textures, sounds)
+
+One-click setup: npm install && npm start
+
+Mobile touch controls (virtual joystick + buttons)
+
+Performance benchmarks (40 players @ 60 FPS)
+
+Arena/weapon editor template
+
+Steam Workshop integration guide
+
+Code must be modular, documented, with realistic anime combat feel. Focus on satisfying punch/kick feedback, fluid combos, and spectacular power-up moments!"
+
