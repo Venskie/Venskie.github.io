@@ -1,0 +1,126 @@
+ "Create a complete immersive multiplayer badminton game (16 players max) using Node.js server.js, Socket.io, Express.js, Three.js for 3D rendering, HTML/CSS/JS. NO DATABASE - use in-memory JSON objects only. Include all files: server.js, index.html, style.css, game.js, package.json.
+
+Core Badminton Mechanics:
+
+text
+Realistic Physics:
+- Shuttlecock: parabolic arc, spin, air resistance, bounce physics
+- Rackets: swing momentum, string tension, swing speed affects power/angle
+- Court: 13.4m x 6.1m doubles court, net collision, out-of-bounds
+- Player Physics: momentum, fatigue, positioning
+Multiplayer Features (4 Doubles Courts = 16 Players):
+
+Real-time 2v2 doubles matches (join random/create private)
+
+Tournament bracket system (8 teams → winner)
+
+Spectator mode with camera follow
+
+Match replay system (last 5 matches stored in memory)
+
+Global leaderboard (wins, rally length, smash speed)
+
+Character Stats Building System (No Database):
+
+text
+Core Stats (start at 10, max 100):
+- Power: smash/drive strength (affects shuttle speed)
+- Control: shot accuracy/placement 
+- Speed: movement/positioning
+- Stamina: reduces fatigue over rallies
+- Jump: net clearance/smash height
+
+Progression:
+- Earn XP per rally won, ace serves, long rallies (>10 hits)
+- In-match stat upgrades: spend XP during breaks (30s between games)
+- Visual feedback: muscle definition, aura glow, speed trails
+- Persistent per session (resets on server restart)
+Three.js Visual Features:
+
+text
+Court: Indoor stadium with dynamic lighting, crowd cheering
+Players: Customizable avatars (height, build, racket color, outfit)
+Shuttlecock: Feather trail, glow on smashes, spin visualization
+Animations: 60+ mocap badminton swings (forehand/backhand/smash/drop)
+Camera: Dynamic spectator cams (player follow, overhead, net cam)
+Effects: sweat particles, impact sparks, slow-mo replays
+Game Modes:
+
+Quick Match - Random opponents, best of 3 (21 points)
+
+Ranked Ladder - ELO system, promotion/relegation
+
+Tournament - 8-team single elimination
+
+Practice - vs AI + stat testing
+
+Custom - private rooms, handicaps
+
+Server Architecture (Memory Only):
+
+text
+Memory Structure:
+{
+  players: { socketId: { stats, matchesWon, currentGame } },
+  games: { gameId: { players, score, shuttleState, stats } },
+  leaderboards: { daily: [], weekly: [], allTime: [] },
+  tournaments: { bracketState, participants }
+}
+Auto-save leaderboards to JSON file every 5min
+
+Graceful player reconnect (30s window)
+
+Matchmaking queue with skill-based pairing
+
+UI/Controls:
+
+text
+Desktop: WASD move, Mouse aim/swing, Space jump, 1-4 shots
+Mobile: Virtual joystick + swipe gestures for shots
+HUD: Score, stamina bar, XP/stats panel, minimap
+Character Creator: 20 outfits, 5 rackets, stat allocation preview
+Match Rules (IBA Standards):
+
+21 points, win by 2 or first to 30
+
+Service rules, faults, lets
+
+90s breaks between games for stat upgrades
+
+Realistic rally timing (2-15 hits typical)
+
+Technical Requirements:
+
+text
+Performance: 16 players + 50 spectators @ 60FPS
+Networking: Shuttlecock interpolation, player prediction
+Physics: Custom Verlet integration (no Ammo/PhysX)
+Mobile: Touch-optimized, 30FPS minimum
+Deployment: PM2 + nginx reverse proxy ready
+Polish Features:
+
+Dynamic crowd reactions (cheers, boos, chants)
+
+Professional commentator voice lines
+
+Achievement system (50+ steam-like achievements)
+
+Daily challenges (use specific stat builds)
+
+Photo mode for stat showcase screenshots
+
+Deliverables:
+
+Complete project with pro badminton mocaps + stadium assets
+
+npm i && npm start (localhost:3000)
+
+Mobile PWA install instructions
+
+Stat build tier list + pro player templates
+
+Tournament streaming overlay export
+
+16-player stress test results
+
+Make it feel like a polished esports badminton title with deep stat progression and competitive multiplayer!"
