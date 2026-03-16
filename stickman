@@ -1,0 +1,83 @@
+"Build a fully functional, scalable web application for a stickman MMORPG game using Node.js (server.js), WebSockets for real-time multiplayer, vanilla HTML/CSS/JS for the frontend, and minimal external libraries. Include the following features:
+
+Core Requirements:
+
+Real-time multiplayer with 100+ concurrent players visible on screen
+
+2D top-down tile-based map (20x20 tiles initially, designed to scale to larger worlds)
+
+Stickman characters with smooth movement (WASD/arrow keys), animations (idle, walk, attack)
+
+Player authentication (simple username system, persistent across sessions)
+
+Game World:
+
+Small starter map with grass tiles, paths, trees, and 3 distinct areas (town, forest, dungeon entrance)
+
+NPCs (3-5) with basic quest dialogue and markers above heads
+
+2 simple quests: 'Talk to Village Elder' and 'Collect 5 sticks from forest'
+
+Basic collision detection (walls, trees, other players)
+
+Multiplayer Features:
+
+Real-time player positions and animations synced via WebSockets
+
+Player name tags and health bars
+
+Proximity chat (players within 5 tiles can see messages)
+
+Player list sidebar showing online players
+
+Technical Architecture:
+
+text
+server.js (Node.js + Express + Socket.io)
+├── Handles WebSocket connections
+├── Player state management (positions, inventory, quests)
+├── Basic zone instancing for scalability
+├── Rate limiting and anti-cheat basics
+└── REST API endpoints for static assets
+
+public/
+├── index.html (game canvas + UI)
+├── game.js (main game loop, rendering, input)
+├── player.js (stickman logic, animations)
+├── map.js (tile rendering, collision)
+├── websocket.js (real-time sync)
+└── ui.js (HUD, inventory, chat)
+Scalability Design:
+
+Zone-based sharding system (players auto-move to adjacent zones)
+
+Efficient delta-state updates (only send changes, not full state)
+
+LOD (level of detail) for distant players
+
+Configurable tile size and world chunk loading
+
+Visual Style:
+
+Clean stickman pixel art (simple lines, 32x32px sprites)
+
+16x16px isometric tiles
+
+Smooth 60fps gameplay
+
+Minimalist UI with dark theme
+
+Provide complete, production-ready code with:
+
+Detailed comments explaining multiplayer sync logic
+
+Error handling and reconnection logic
+
+Responsive design (works on desktop/mobile)
+
+Clear instructions for running locally
+
+README with scalability roadmap (adding combat, items, larger maps)
+
+Make it immediately playable with 2-3 sample accounts for testing multiplayer. Structure code modularly for easy expansion (combat system, inventory, more quests)."
+
