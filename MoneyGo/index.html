@@ -752,6 +752,36 @@
   .touch-feedback:active::after {
     opacity: 0.1;
   }
+
+
+   /* --- MOBILE TOP BAR (NEW) --- */
+  .mobile-topbar {
+    display: none; /* Hidden on desktop */
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    padding-top: calc(12px + var(--safe-top));
+    align-items: center;
+    justify-content: space-between;
+    margin: -24px -24px 20px -24px; /* Negate main-content padding */
+  }
+  .mobile-topbar-btn {
+    width: 40px; height: 40px; border-radius: 10px; background: var(--bg-card);
+    border: 1px solid var(--border); color: var(--fg); display: flex;
+    align-items: center; justify-content: center; cursor: pointer;
+  }
+@media (max-width: 1023px) {
+  .mobile-topbar {
+    display: flex;
+  }
+  /* Optional: Adjust main-content padding if needed */
+  .main-content {
+    padding: 20px;
+  }
+}
 </style>
 </head>
 <body>
@@ -767,7 +797,7 @@
         <i class="fas fa-vault" style="color:#0f0f0f;font-size:16px;"></i>
       </div>
       <div>
-        <h1 style="font-size:18px;font-weight:700;letter-spacing:-0.5px;">Vault</h1>
+        <h1 style="font-size:18px;font-weight:700;letter-spacing:-0.5px;">MoneyGo</h1>
         <p style="font-size:11px;color:var(--fg-muted);margin-top:1px;">Money Tracker</p>
       </div>
     </div>
@@ -795,9 +825,20 @@
   </div>
 </aside>
 
-<button class="mobile-toggle" id="mobileToggle" onclick="toggleSidebar()">
+<!-- <button class="mobile-toggle" id="mobileToggle" onclick="toggleSidebar()">
   <i class="fas fa-bars" id="menuIcon"></i>
-</button>
+</button> -->
+
+<!-- MOBILE TOP BAR (FIXED POSITION REPLACED WITH STICKY HEADER) -->
+<header class="mobile-topbar" id="mobileTopbar">
+  <button class="mobile-topbar-btn" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+  <h1 style="font-size:16px;font-weight:700;font-family:'Space Grotesk',sans-serif;">MoneyGo</h1>
+  <div class="currency-chip" style="padding:6px 12px;min-height:auto;font-size:12px;" onclick="openCurrencyPicker()">
+    <span id="topbarCurrSymbol">$</span>
+  </div>
+</header>
 
 <!-- Bottom Navigation for Mobile -->
 <nav class="bottom-nav" id="bottomNav">
@@ -1665,6 +1706,9 @@ function updateCurrencyDisplays() {
   document.getElementById('previewIncome').textContent=fmtSigned(5250.75);
   document.getElementById('previewExpense').textContent='-'+fmt(1342.50);
   document.getElementById('previewLarge').textContent=fmt(1234567.89);
+  
+  const topbarSymbol = document.getElementById('topbarCurrSymbol');
+  if (topbarSymbol) topbarSymbol.textContent = curr.symbol;
 }
 
 /* ========== NAVIGATION ========== */
