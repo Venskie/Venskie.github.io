@@ -1,4 +1,4 @@
-const CACHE_NAME = 'MoneyGo-v1';
+const CACHE_NAME = 'MoneyGo-v1.1';
 const ASSETS = [
   './',
   './index.html',
