@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Foundations — Classroom Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+body { background: #f8f9fa; color: #1a1a1a; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f8f9fa; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn .4s cubic-bezier(.16,1,.3,1) forwards; opacity: 0; }
+.fd1 { animation-delay: .05s; } .fd2 { animation-delay: .1s; } .fd3 { animation-delay: .15s; } .fd4 { animation-delay: .2s; } .fd5 { animation-delay: .25s; } .fd6 { animation-delay: .3s; }
+.lesson-content { max-height: 0; overflow: hidden; transition: max-height .6s cubic-bezier(.16,1,.3,1); }
+.lesson-content.open { max-height: 50000px; }
+.code-block { background: #1e1e1e; border: 1px solid rgba(0,0,0,.1); border-radius: 12px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.7; overflow-x: auto; }
+.code-block .tag { color: #f472b6; } .code-block .attr { color: #60a5fa; } .code-block .val { color: #4ade80; } .code-block .cmt { color: #525252; } .code-block .txt { color: #e5e5e5; }
+.sim-frame { background: #fff; border-radius: 12px; overflow: hidden; }
+.sim-frame iframe { width: 100%; border: none; display: block; }
+.progress-ring { transition: stroke-dashoffset .6s cubic-bezier(.16,1,.3,1); }
+.glow-line { background: linear-gradient(to right, transparent, rgba(59,130,246,.2), transparent); height: 1px; }
+.lesson-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; transition: all .3s ease; }
+.lesson-card:hover { border-color: #d1d5db; }
+.lesson-card.active { border-color: rgba(59,130,246,.4); box-shadow: 0 0 30px -10px rgba(59,130,246,.1); }
+.tag-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; border-width: 1px; }
+.check-btn { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #d1d5db; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .3s ease; flex-shrink: 0; }
+.check-btn.checked { background: #2563eb; border-color: #2563eb; }
+.nav-dot { width: 8px; height: 8px; border-radius: 50%; background: #d1d5db; cursor: pointer; transition: all .3s ease; }
+.nav-dot.active { background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,.5); }
+.nav-dot.done { background: #22c55e; }
+.toast { position: fixed; bottom: 24px; right: 24px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px 20px; display: flex; align-items: center; gap: 10px; transform: translateY(100px); opacity: 0; transition: all .4s cubic-bezier(.16,1,.3,1); z-index: 100; box-shadow: 0 25px 50px -12px rgba(0,0,0,.15); }
+.toast.show { transform: translateY(0); opacity: 1; }
+.sim-tab { padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all .2s ease; color: #6b7280; }
+.sim-tab.active { background: rgba(59,130,246,.1); color: #2563eb; }
+.sim-tab:hover:not(.active) { color: #111827; }
+.copy-btn { position: absolute; top: 12px; right: 12px; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); color: #a3a3a3; cursor: pointer; transition: all .2s ease; z-index: 2; }
+.copy-btn:hover { background: rgba(255,255,255,.15); color: #e5e5e5; }
+.teacher-box { background: linear-gradient(135deg, rgba(59,130,246,.04), rgba(99,102,241,.03)); border: 1px solid rgba(59,130,246,.1); border-radius: 16px; padding: 24px; position: relative; }
+.teacher-box::before { content: ''; position: absolute; top: 16px; left: 16px; width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,.5); }
+.ref-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ref-table th { text-align: left; padding: 10px 14px; border-bottom: 1px solid #d1d5db; color: #6b7280; font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+.ref-table td { padding: 10px 14px; border-bottom: 1px solid #f3f4f6; color: #374151; font-weight: 300; }
+.ref-table tr:hover td { background: #f9fafb; }
+.ref-table code { background: rgba(59,130,246,.08); padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #2563eb; font-family: 'Courier New', monospace; }
+.quiz-opt { display: block; width: 100%; text-align: left; padding: 12px 16px; border-radius: 10px; border: 1px solid #e5e7eb; background: #ffffff; color: #374151; font-size: 13px; cursor: pointer; transition: all .2s ease; margin-bottom: 8px; }
+.quiz-opt:hover { border-color: #d1d5db; background: #f9fafb; }
+.quiz-opt.correct { border-color: #22c55e; background: rgba(34,197,94,.08); color: #16a34a; }
+.quiz-opt.wrong { border-color: #ef4444; background: rgba(239,68,68,.08); color: #dc2626; }
+.quiz-opt.disabled { pointer-events: none; opacity: .5; }
+.quiz-opt.disabled.correct { opacity: 1; }
+.section-title { font-size: 14px; font-weight: 600; color: #111827; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.section-title i { width: 16px; height: 16px; }
+.chrome-bar { background: #f1f3f4; padding: 8px 16px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #e0e0e0; }
+.chrome-dot { width: 10px; height: 10px; border-radius: 50%; }
+.bg-blue-500\/10.text-blue-400 { background: rgba(59,130,246,.08); color: #2563eb; border-color: rgba(59,130,246,.15); }
+.bg-pink-500\/10.text-pink-400 { background: rgba(236,72,153,.08); color: #db2777; border-color: rgba(236,72,153,.15); }
+.bg-purple-500\/10.text-purple-400 { background: rgba(168,85,247,.08); color: #7c3aed; border-color: rgba(168,85,247,.15); }
+.bg-amber-500\/10.text-amber-400 { background: rgba(245,158,11,.08); color: #d97706; border-color: rgba(245,158,11,.15); }
+.bg-green-500\/10.text-green-400 { background: rgba(34,197,94,.08); color: #16a34a; border-color: rgba(34,197,94,.15); }
+.bg-white\/\[0\.02\] { background: #f9fafb; border-color: #e5e7eb; }
+.bg-blue-500\/\[0\.05\] { background: rgba(59,130,246,.04); border-color: rgba(59,130,246,.12); }
+.bg-pink-500\/\[0\.05\] { background: rgba(236,72,153,.04); border-color: rgba(236,72,153,.12); }
+.bg-purple-500\/\[0\.05\] { background: rgba(168,85,247,.04); border-color: rgba(168,85,247,.12); }
+.bg-amber-500\/\[0\.05\] { background: rgba(245,158,11,.04); border-color: rgba(245,158,11,.12); }
+.bg-green-500\/\[0\.05\] { background: rgba(34,197,94,.04); border-color: rgba(34,197,94,.12); }
+.bg-red-500\/\[0\.05\] { background: rgba(239,68,68,.04); border-color: rgba(239,68,68,.12); }
+.bg-gradient-to-br { background: linear-gradient(to bottom right, rgba(59,130,246,.06), rgba(99,102,241,.04)); border-color: rgba(59,130,246,.12); }
+.bg-black\/20 { background: rgba(0,0,0,.03); }
+.text-neutral-500 { color: #6b7280 !important; }
+.text-neutral-400 { color: #6b7280 !important; }
+.text-neutral-300 { color: #374151 !important; }
+.text-neutral-200 { color: #111827 !important; }
+.text-blue-300 { color: #2563eb !important; }
+.text-purple-300 { color: #7c3aed !important; }
+.text-amber-300 { color: #d97706 !important; }
+.text-green-300 { color: #16a34a !important; }
+.text-pink-300 { color: #db2777 !important; }
+.text-green-400 { color: #16a34a !important; }
+#preloader { background: #f8f9fa; }
+.border-green-500\/20 { border-color: rgba(34,197,94,.2); }
+.bg-green-500\/10 { background: rgba(34,197,94,.08); }
+.border-green-500\/15 { border-color: rgba(34,197,94,.15); }
+.bg-blue-500\/10 { background: rgba(59,130,246,.08); }
+.border-blue-500\/20 { border-color: rgba(59,130,246,.2); }
+.border-blue-500\/15 { border-color: rgba(59,130,246,.15); }
+.bg-blue-500\/5 { background: rgba(59,130,246,.04); }
+.bg-purple-500\/5 { background: rgba(168,85,247,.04); }
+.border-purple-500\/15 { border-color: rgba(168,85,247,.15); }
+.bg-amber-500\/10 { background: rgba(245,158,11,.08); }
+.border-amber-500\/20 { border-color: rgba(245,158,11,.2); }
+.border-dashed { border-style: dashed; }
+.border-white\/5 { border-color: #e5e7eb; }
+.bg-white\/5 { background: rgba(0,0,0,.03); border-color: #e5e7eb; }
+.code-view { background: #1e1e1e; border-radius: 0 0 12px 12px; overflow: auto; max-height: 520px; }
+.code-view pre { padding: 20px; margin: 0; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.7; color: #e5e5e5; white-space: pre; }
+.code-view .t { color: #f472b6; } .code-view .a { color: #60a5fa; } .code-view .v { color: #4ade80; } .code-view .c { color: #525252; } .code-view .d { color: #e5e5e5; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+<div id="preloader" class="fixed inset-0 z-[200] bg-[#f8f9fa] flex items-center justify-center">
+    <div class="flex flex-col items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center"><i data-lucide="graduation-cap" class="w-5 h-5 text-white"></i></div>
+        <div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-bounce" style="animation-delay:0s"></div><div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-bounce" style="animation-delay:.15s"></div><div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-bounce" style="animation-delay:.3s"></div></div>
+    </div>
+</div>
+
+<div id="toast" class="toast"><i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i><span id="toast-msg" class="text-sm text-neutral-300"></span></div>
+
+<nav class="fixed right-6 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col gap-3">
+    <div class="nav-dot" data-target="hero"></div>
+    <div class="nav-dot" data-target="lesson-3-1"></div>
+    <div class="nav-dot" data-target="lesson-3-2"></div>
+    <div class="nav-dot" data-target="lesson-3-3"></div>
+    <div class="nav-dot" data-target="lesson-3-4"></div>
+    <div class="nav-dot" data-target="hands-on-1"></div>
+    <div class="nav-dot" data-target="hands-on-2"></div>
+</nav>
+
+<div class="max-w-6xl mx-auto px-4 md:px-6">
+
+<section id="hero" class="min-h-screen flex flex-col justify-center pt-32 pb-20 relative">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none"><div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/[0.03] rounded-full blur-[120px]"></div></div>
+    <div class="relative z-10">
+        <div class="fade-in fd1 flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center"><i data-lucide="graduation-cap" class="w-5 h-5 text-white"></i></div>
+            <!-- <span class="tag-pill bg-blue-500/10 text-blue-400 border border-blue-500/20">Module 3</span> -->
+            <span class="tag-pill bg-amber-500/10 text-amber-400 border border-amber-500/20">Classroom</span>
+        </div>
+        <h1 class="fade-in fd2 text-5xl md:text-7xl font-medium tracking-tight leading-[0.9] mb-6">HTML<br><span class="text-neutral-500">Foundations</span></h1>
+        <p class="fade-in fd3 text-neutral-400 text-base md:text-lg font-light leading-relaxed max-w-lg mb-10">A complete classroom lesson covering text formatting, media, tables, forms, every input type, and semantic HTML.</p>
+        <!-- <div class="fade-in fd4 flex flex-wrap items-center gap-6 mb-10">
+            <div class="flex items-center gap-3">
+                <svg width="48" height="48" viewBox="0 0 48 48" class="transform -rotate-90"><circle cx="24" cy="24" r="20" stroke="#e5e7eb" stroke-width="3" fill="none"/><circle id="progress-ring" cx="24" cy="24" r="20" stroke="#3b82f6" stroke-width="3" fill="none" stroke-dasharray="125.66" stroke-dashoffset="125.66" stroke-linecap="round" class="progress-ring"/></svg>
+                <div><div class="text-2xl font-medium" id="progress-pct">0%</div><div class="text-xs text-neutral-500">Complete</div></div>
+            </div>
+            <div class="h-10 w-px bg-gray-200"></div>
+            <div><div class="text-lg font-medium"><span id="done-count">0</span> / 6</div><div class="text-xs text-neutral-500">Lessons</div></div>
+            <div class="h-10 w-px bg-gray-200"></div>
+            <div><div class="text-lg font-medium">~5 hrs</div><div class="text-xs text-neutral-500">Class Time</div></div>
+        </div> -->
+        <div class="fade-in fd5 flex gap-3">
+            <a href="#lesson-3-1" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-3 rounded-lg transition-colors"><i data-lucide="arrow-down" class="w-4 h-4"></i>Start Class</a>
+            <!-- <button onclick="resetProgress()" class="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-6 py-3 rounded-lg transition-colors border border-gray-200"><i data-lucide="rotate-ccw" class="w-4 h-4"></i>Reset</button> -->
+        </div>
+    </div>
+</section>
+
+<div class="glow-line mb-16"></div>
+
+<!-- ==================== LESSON 3.1 ==================== -->
+<section id="lesson-3-1" class="mb-8 scroll-mt-24">
+<div class="lesson-card fade-in" data-lesson="3-1">
+<button onclick="toggleLesson('3-1')" class="w-full flex items-center justify-between p-6 md:p-8 text-left">
+    <div class="flex items-center gap-4">
+        <div class="check-btn" data-check="3-1" onclick="event.stopPropagation();toggleCheck('3-1')"><i data-lucide="check" class="w-3 h-3 text-white opacity-0 transition-opacity" data-check-icon="3-1"></i></div>
+        <div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-bold text-neutral-500 tracking-widest uppercase">Lesson 3.1</span><span class="tag-pill bg-pink-500/10 text-pink-400 border border-pink-500/20">Formatting</span></div><h2 class="text-xl md:text-2xl font-medium tracking-tight">Text Formatting, Links & Lists</h2></div>
+    </div>
+    <div class="flex items-center gap-3"><i data-lucide="chevron-down" class="w-5 h-5 text-neutral-500 transition-transform duration-300" data-chevron="3-1"></i></div>
+</button>
+<div class="lesson-content" data-content="3-1">
+<div class="px-6 md:px-8 pb-8 space-y-8">
+
+    <div class="teacher-box">
+        <p class="text-sm text-neutral-300 font-light leading-relaxed pl-5">Today we begin with the basics of making text look good on web pages. Think of HTML text tags like the tools in a word processor — bold, italic, underline, highlight. But unlike a word processor, HTML also has <em>semantic</em> tags that tell the browser <strong class="text-blue-300">what the text means</strong>, not just how it looks. This matters for screen readers and Google.</p>
+    </div>
+
+    <div>
+        <div class="section-title"><i data-lucide="type" class="text-pink-400"></i>Complete Text Formatting Reference</div>
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+            <table class="ref-table">
+                <thead><tr><th>Tag</th><th>Visual</th><th>Purpose</th><th>Semantic?</th></tr></thead>
+                <tbody>
+                    <tr><td><code>&lt;b&gt;</code></td><td><strong class="font-bold">Bold text</strong></td><td>Draw attention — no extra importance</td><td>No</td></tr>
+                    <tr><td><code>&lt;strong&gt;</code></td><td><strong>Bold text</strong></td><td>Important text (screen readers announce it)</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;i&gt;</code></td><td><em class="font-serif italic">Italic text</em></td><td>Alternate voice, mood</td><td>No</td></tr>
+                    <tr><td><code>&lt;em&gt;</code></td><td><em>Emphasized text</em></td><td>Stressed emphasis</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;u&gt;</code></td><td><u>Underlined</u></td><td>Unarticulated annotation</td><td>No</td></tr>
+                    <tr><td><code>&lt;ins&gt;</code></td><td><ins>Inserted</ins></td><td>Text added to the document</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;del&gt;</code></td><td><del>Deleted</del></td><td>Text removed from the document</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;s&gt;</code></td><td><s>Strikethrough</s></td><td>No longer correct or relevant</td><td>No</td></tr>
+                    <tr><td><code>&lt;mark&gt;</code></td><td><mark class="bg-yellow-200/60 px-1 rounded text-yellow-900">Highlighted</mark></td><td>Highlighted/relevant text</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;small&gt;</code></td><td><small class="text-xs">Small text</small></td><td>Side comments, copyright</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;sub&gt;</code></td><td>H<sub>2</sub>O</td><td>Subscript</td><td>No</td></tr>
+                    <tr><td><code>&lt;sup&gt;</code></td><td>x<sup>2</sup></td><td>Superscript</td><td>No</td></tr>
+                    <tr><td><code>&lt;abbr&gt;</code></td><td><abbr title="HyperText Markup Language" class="underline decoration-dotted cursor-help">HTML</abbr></td><td>Abbreviation</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;code&gt;</code></td><td><code class="bg-blue-50 px-1.5 py-0.5 rounded text-xs text-blue-600 font-mono">x = 5;</code></td><td>Inline code snippet</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;kbd&gt;</code></td><td><kbd class="bg-gray-100 px-1.5 py-0.5 rounded text-xs border border-gray-200 font-mono">Ctrl+C</kbd></td><td>Keyboard input</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;samp&gt;</code></td><td><samp class="text-xs font-mono text-gray-500">Error: file not found</samp></td><td>Sample output</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;var&gt;</code></td><td><var class="italic text-purple-600">x</var></td><td>Variable in math/programming</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;blockquote&gt;</code></td><td class="text-gray-500 text-xs italic">Block quotation</td><td>Long quotation from source</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;q&gt;</code></td><td class="text-gray-500 text-xs italic">"Inline quote"</td><td>Short inline quotation</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;cite&gt;</code></td><td class="text-gray-500 text-xs italic">Source Title</td><td>Title of creative work</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;dfn&gt;</code></td><td class="text-gray-500 text-xs italic">Term defined</td><td>Definition of a term</td><td class="text-green-400">Yes</td></tr>
+                    <tr><td><code>&lt;pre&gt;</code></td><td class="text-gray-500 text-xs">Preformatted</td><td>Preserves spaces/line breaks</td><td>No</td></tr>
+                    <tr><td><code>&lt;address&gt;</code></td><td class="text-gray-500 text-xs italic">Contact info</td><td>Contact information</td><td class="text-green-400">Yes</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- LIVE DEMO: Text Formatting with Code tab -->
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Live Demo — All Text Formatting Tags</span>
+            <div class="flex gap-1">
+                <div class="sim-tab active" onclick="switchTab(this,'pv-3-1a','cv-3-1a')">Preview</div>
+                <div class="sim-tab" onclick="switchTab(this,'cv-3-1a','pv-3-1a')">Code</div>
+            </div>
+        </div>
+        <div id="pv-3-1a" class="sim-frame">
+            <div class="chrome-bar"><div class="chrome-dot bg-red-400"></div><div class="chrome-dot bg-yellow-400"></div><div class="chrome-dot bg-green-400"></div><span class="text-[10px] text-gray-400 ml-3 font-medium">text-formatting.html</span></div>
+            <iframe id="frame-3-1a" height="520"></iframe>
+        </div>
+        <div id="cv-3-1a" class="hidden code-view" style="max-height:560px">
+<div class="relative"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="c">&lt;!-- Basic Styling --&gt;</span>
+<span class="t">&lt;b&gt;</span><span class="d">Bold text</span><span class="t">&lt;/b&gt;</span>
+<span class="t">&lt;strong&gt;</span><span class="d">Strong (important) text</span><span class="t">&lt;/strong&gt;</span>
+<span class="t">&lt;i&gt;</span><span class="d">Italic text</span><span class="t">&lt;/i&gt;</span>
+<span class="t">&lt;em&gt;</span><span class="d">Emphasized text</span><span class="t">&lt;/em&gt;</span>
+<span class="t">&lt;u&gt;</span><span class="d">Underlined text</span><span class="t">&lt;/u&gt;</span>
+
+<span class="c">&lt;!-- Edits &amp; Marks --&gt;</span>
+<span class="t">&lt;ins&gt;</span><span class="d">Inserted text</span><span class="t">&lt;/ins&gt;</span>
+<span class="t">&lt;del&gt;</span><span class="d">Deleted text</span><span class="t">&lt;/del&gt;</span>
+<span class="t">&lt;s&gt;</span><span class="d">No longer correct</span><span class="t">&lt;/s&gt;</span>
+<span class="t">&lt;mark&gt;</span><span class="d">Highlighted text</span><span class="t">&lt;/mark&gt;</span>
+
+<span class="c">&lt;!-- Size &amp; Position --&gt;</span>
+<span class="t">&lt;small&gt;</span><span class="d">Small text (fine print)</span><span class="t">&lt;/small&gt;</span>
+H<span class="t">&lt;sub&gt;</span>2<span class="t">&lt;/sub&gt;</span>O    x<span class="t">&lt;sup&gt;</span>2<span class="t">&lt;/sup&gt;</span>
+
+<span class="c">&lt;!-- Technical --&gt;</span>
+<span class="t">&lt;code&gt;</span><span class="d">x = Math.sqrt(y)</span><span class="t">&lt;/code&gt;</span>
+<span class="t">&lt;kbd&gt;</span>Ctrl<span class="t">&lt;/kbd&gt;</span> + <span class="t">&lt;kbd&gt;</span>C<span class="t">&lt;/kbd&gt;</span>
+<span class="t">&lt;samp&gt;</span><span class="d">Error: file not found</span><span class="t">&lt;/samp&gt;</span>
+<span class="t">&lt;var&gt;</span>x<span class="t">&lt;/var&gt;</span> + <span class="t">&lt;var&gt;</span>y<span class="t">&lt;/var&gt;</span>
+
+<span class="t">&lt;pre&gt;</span>
+function hello() {
+  console.log("World");
+}
+<span class="t">&lt;/pre&gt;</span>
+
+<span class="c">&lt;!-- Quotations --&gt;</span>
+<span class="t">&lt;blockquote&gt;</span>
+  The only way to do great work is to love what you do.
+  <span class="t">&lt;small&gt;</span><span class="t">&lt;cite&gt;</span>Steve Jobs<span class="t">&lt;/cite&gt;</span><span class="t">&lt;/small&gt;</span>
+<span class="t">&lt;/blockquote&gt;</span>
+<span class="t">&lt;q&gt;</span><span class="d">Short inline quote</span><span class="t">&lt;/q&gt;</span>
+<span class="t">&lt;dfn&gt;</span><span class="d">HTML</span><span class="t">&lt;/dfn&gt;</span> stands for HyperText Markup Language
+<span class="t">&lt;abbr</span> <span class="a">title=</span><span class="v">"World Health Organization"</span><span class="t">&gt;</span>WHO<span class="t">&lt;/abbr&gt;</span>
+<span class="t">&lt;address&gt;</span>Contact: teacher@school.edu<span class="t">&lt;/address&gt;</span></pre>
+</div>
+        </div>
+    </div>
+
+    <!-- LINKS & LISTS with Code tab -->
+    <!-- LINKS REFERENCE -->
+    <div>
+        <div class="section-title"><i data-lucide="link" class="text-pink-400"></i>All Link Types</div>
+        <div class="overflow-x-auto rounded-xl border border-white/5">
+            <table class="ref-table">
+                <thead><tr><th>Type</th><th>Example</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td><code>External</code></td><td class="text-xs"><code>&lt;a href="https://..."&gt;</code></td><td>Add <code>target="_blank"</code> + <code>rel="noopener noreferrer"</code></td></tr>
+                    <tr><td><code>Relative</code></td><td class="text-xs"><code>&lt;a href="about.html"&gt;</code></td><td>Same website, relative path</td></tr>
+                    <tr><td><code>Anchor</code></td><td class="text-xs"><code>&lt;a href="#section-id"&gt;</code></td><td>Jump to element with that id on the same page</td></tr>
+                    <tr><td><code>Email</code></td><td class="text-xs"><code>&lt;a href="mailto:me@site.com"&gt;</code></td><td>Opens email client</td></tr>
+                    <tr><td><code>Phone</code></td><td class="text-xs"><code>&lt;a href="tel:+1234567890"&gt;</code></td><td>Dials number on mobile</td></tr>
+                    <tr><td><code>Download</code></td><td class="text-xs"><code>&lt;a href="file.pdf" download&gt;</code></td><td>Forces download instead of navigation</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- LISTS REFERENCE -->
+    <div>
+        <div class="section-title"><i data-lucide="list" class="text-pink-400"></i>All List Types & Attributes</div>
+        <div class="overflow-x-auto rounded-xl border border-white/5">
+            <table class="ref-table">
+                <thead><tr><th>Element</th><th>Key Attributes</th><th>Use Case</th></tr></thead>
+                <tbody>
+                    <tr><td><code>&lt;ul&gt;</code></td><td>Unordered, bullet points by default</td><td>Items with no specific order</td></tr>
+                    <tr><td><code>&lt;ol&gt;</code></td><td><code>type="1|a|A|i|I"</code> <code>start="3"</code> <code>reversed</code></td><td>Step-by-step, ranked items</td></tr>
+                    <tr><td><code>&lt;li&gt;</code></td><td><code>value="5"</code> (in ol, changes number)</td><td>Individual list item</td></tr>
+                    <tr><td><code>&lt;dl&gt;</code></td><td>Description list wrapper</td><td>Term-definition pairs (glossary, metadata)</td></tr>
+                    <tr><td><code>&lt;dt&gt;</code></td><td>Term being defined</td><td>Goes inside dl</td></tr>
+                    <tr><td><code>&lt;dd&gt;</code></td><td>Definition/description</td><td>Goes after dt, can have multiple per dt</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div>
+        <div class="section-title"><i data-lucide="link" class="text-pink-400"></i>All Link Types & List Elements</div>
+        <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Live Demo — Links & Lists</span>
+            <div class="flex gap-1">
+                <div class="sim-tab active" onclick="switchTab(this,'pv-3-1b','cv-3-1b')">Preview</div>
+                <div class="sim-tab" onclick="switchTab(this,'cv-3-1b','pv-3-1b')">Code</div>
+            </div>
+        </div>
+        <div id="pv-3-1b" class="sim-frame">
+            <div class="chrome-bar"><div class="chrome-dot bg-red-400"></div><div class="chrome-dot bg-yellow-400"></div><div class="chrome-dot bg-green-400"></div><span class="text-[10px] text-gray-400 ml-3 font-medium">links-lists.html</span></div>
+            <iframe id="frame-3-1b" height="500"></iframe>
+        </div>
+        <div id="cv-3-1b" class="hidden code-view" style="max-height:540px">
+<div class="relative"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="c">&lt;!-- External Link --&gt;</span>
+<span class="t">&lt;a</span> <span class="a">href=</span><span class="v">"https://example.com"</span> <span class="a">target=</span><span class="v">"_blank"</span> <span class="a">rel=</span><span class="v">"noopener noreferrer"</span><span class="t">&gt;</span>
+  External Link
+<span class="t">&lt;/a&gt;</span>
+
+<span class="c">&lt;!-- Relative Link --&gt;</span>
+<span class="t">&lt;a</span> <span class="a">href=</span><span class="v">"about.html"</span><span class="t">&gt;</span>About Page<span class="t">&lt;/a&gt;</span>
+
+<span class="c">&lt;!-- Anchor Link --&gt;</span>
+<span class="t">&lt;a</span> <span class="a">href=</span><span class="v">"#section-id"</span><span class="t">&gt;</span>Jump to section<span class="t">&lt;/a&gt;</span>
+
+<span class="c">&lt;!-- Email Link --&gt;</span>
+<span class="t">&lt;a</span> <span class="a">href=</span><span class="v">"mailto:teacher@school.edu"</span><span class="t">&gt;</span>Send email<span class="t">&lt;/a&gt;</span>
+
+<span class="c">&lt;!-- Phone Link --&gt;</span>
+<span class="t">&lt;a</span> <span class="a">href=</span><span class="v">"tel:+1234567890"</span><span class="t">&gt;</span>Call office<span class="t">&lt;/a&gt;</span>
+
+<span class="c">&lt;!-- Download Link --&gt;</span>
+<span class="t">&lt;a</span> <span class="a">href=</span><span class="v">"syllabus.pdf"</span> <span class="a">download&gt;</span>Download PDF<span class="t">&lt;/a&gt;</span>
+
+<span class="c">&lt;!-- Unordered List --&gt;</span>
+<span class="t">&lt;ul&gt;</span>
+  <span class="t">&lt;li&gt;</span><span class="d">HTML</span><span class="t">&lt;/li&gt;</span>
+  <span class="t">&lt;li&gt;</span><span class="d">CSS
+    </span><span class="t">&lt;ul&gt;</span>
+      <span class="t">&lt;li&gt;</span><span class="d">Flexbox</span><span class="t">&lt;/li&gt;</span>
+      <span class="t">&lt;li&gt;</span><span class="d">Grid</span><span class="t">&lt;/li&gt;</span>
+    <span class="t">&lt;/ul&gt;</span>
+  <span class="t">&lt;/li&gt;</span>
+<span class="t">&lt;/ul&gt;</span>
+
+<span class="c">&lt;!-- Ordered List (type="A", start="3") --&gt;</span>
+<span class="t">&lt;ol</span> <span class="a">type=</span><span class="v">"A"</span> <span class="a">start=</span><span class="v">"3"</span><span class="t">&gt;</span>
+  <span class="t">&lt;li&gt;</span><span class="d">Shows as C</span><span class="t">&lt;/li&gt;</span>
+  <span class="t">&lt;li&gt;</span><span class="d">Shows as D</span><span class="t">&lt;/li&gt;</span>
+<span class="t">&lt;/ol&gt;</span>
+
+<span class="c">&lt;!-- Ordered List (reversed) --&gt;</span>
+<span class="t">&lt;ol</span> <span class="a">type=</span><span class="v">"i"</span> <span class="a">reversed&gt;</span>
+  <span class="t">&lt;li&gt;</span><span class="d">Countdown step 1</span><span class="t">&lt;/li&gt;</span>
+  <span class="t">&lt;li&gt;</span><span class="d">Countdown step 2</span><span class="t">&lt;/li&gt;</span>
+<span class="t">&lt;/ol&gt;</span>
+
+<span class="c">&lt;!-- Description List --&gt;</span>
+<span class="t">&lt;dl&gt;</span>
+  <span class="t">&lt;dt&gt;</span><span class="d">HTML</span><span class="t">&lt;/dt&gt;</span>
+  <span class="t">&lt;dd&gt;</span><span class="d">HyperText Markup Language</span><span class="t">&lt;/dd&gt;</span>
+  <span class="t">&lt;dt&gt;</span><span class="d">CSS</span><span class="t">&lt;/dt&gt;</span>
+  <span class="t">&lt;dd&gt;</span><span class="d">Cascading Style Sheets</span><span class="t">&lt;/dd&gt;</span>
+  <span class="c">&lt;!-- Multiple dd per dt --&gt;</span>
+  <span class="t">&lt;dt&gt;</span><span class="d">API</span><span class="t">&lt;/dt&gt;</span>
+  <span class="t">&lt;dd&gt;</span><span class="d">Application Programming Interface</span><span class="t">&lt;/dd&gt;</span>
+  <span class="t">&lt;dd&gt;</span><span class="d">A way for programs to talk</span><span class="t">&lt;/dd&gt;</span>
+<span class="t">&lt;/dl&gt;</span></pre>
+</div>
+        </div>
+    </div>
+
+    <!-- QUIZ -->
+    <!-- <div class="bg-white/[0.02] rounded-xl p-6 border border-white/5">
+        <div class="section-title"><i data-lucide="help-circle" class="text-pink-400"></i>Quick Check — Lesson 3.1</div>
+        <div class="space-y-4" data-quiz="3-1">
+            <div><p class="text-sm text-neutral-300 mb-3 font-medium">1. Which tag should you use for text that is important and should be announced by screen readers?</p>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-1')">&lt;b&gt;</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,true,'3-1')">&lt;strong&gt;</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-1')">&lt;mark&gt;</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-1')">&lt;span&gt;</button>
+            </div>
+            <div><p class="text-sm text-neutral-300 mb-3 font-medium">2. What does &lt;dl&gt; stand for?</p>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-1')">Data List</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,true,'3-1')">Description List</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-1')">Document List</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-1')">Definition Line</button>
+            </div>
+            <div><p class="text-sm text-neutral-300 mb-3 font-medium">3. Which attribute forces a link to open in a new tab?</p>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-1')">href="_new"</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,true,'3-1')">target="_blank"</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-1')">open="new"</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-1')">new="tab"</button>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="bg-pink-500/[0.05] rounded-xl p-5 border border-pink-500/10"><div class="flex items-start gap-3"><i data-lucide="pencil" class="w-4 h-4 text-pink-400 mt-0.5 flex-shrink-0"></i><div><div class="text-sm font-medium text-pink-300 mb-1">Homework</div><div class="text-sm text-neutral-400 font-light">Create an HTML page with: every text formatting tag from the table above, 3 different link types, an ordered list (type="A", start="3"), a nested unordered list, and a description list with 3 term-definition pairs.</div></div></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ==================== LESSON 3.2 ==================== -->
+<section id="lesson-3-2" class="mb-8 scroll-mt-24">
+<div class="lesson-card fade-in" data-lesson="3-2">
+<button onclick="toggleLesson('3-2')" class="w-full flex items-center justify-between p-6 md:p-8 text-left">
+    <div class="flex items-center gap-4">
+        <div class="check-btn" data-check="3-2" onclick="event.stopPropagation();toggleCheck('3-2')"><i data-lucide="check" class="w-3 h-3 text-white opacity-0 transition-opacity" data-check-icon="3-2"></i></div>
+        <div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-bold text-neutral-500 tracking-widest uppercase">Lesson 3.2</span><span class="tag-pill bg-purple-500/10 text-purple-400 border border-purple-500/20">Media</span></div><h2 class="text-xl md:text-2xl font-medium tracking-tight">Images, Audio & Video</h2></div>
+    </div>
+    <div class="flex items-center gap-3"><i data-lucide="chevron-down" class="w-5 h-5 text-neutral-500 transition-transform duration-300" data-chevron="3-2"></i></div>
+</button>
+<div class="lesson-content" data-content="3-2">
+<div class="px-6 md:px-8 pb-8 space-y-8">
+
+    <div class="teacher-box">
+        <p class="text-sm text-neutral-300 font-light leading-relaxed pl-5"> A web page without images is like a textbook without pictures — boring! The most important thing I want you to remember: <strong class="text-purple-300">always add alt text</strong>. It is not optional. It is required for accessibility.</p>
+    </div>
+
+    <div>
+        <div class="section-title"><i data-lucide="image" class="text-purple-400"></i>&lt;img&gt; — All Attributes</div>
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+            <table class="ref-table">
+                <thead><tr><th>Attribute</th><th>Example</th><th>Purpose</th></tr></thead>
+                <tbody>
+                    <tr><td><code>src</code></td><td class="text-xs"><code>src="photo.jpg"</code></td><td>Path to image (required)</td></tr>
+                    <tr><td><code>alt</code></td><td class="text-xs"><code>alt="Sunset over mountains"</code></td><td>Description for screen readers (required)</td></tr>
+                    <tr><td><code>width / height</code></td><td class="text-xs"><code>width="600" height="400"</code></td><td>Set dimensions to prevent layout shift</td></tr>
+                    <tr><td><code>loading</code></td><td class="text-xs"><code>loading="lazy"</code></td><td>"lazy" = load when near viewport</td></tr>
+                    <tr><td><code>decoding</code></td><td class="text-xs"><code>decoding="async"</code></td><td>Decode off main thread</td></tr>
+                    <tr><td><code>srcset</code></td><td class="text-xs"><code>srcset="sm.jpg 400w, lg.jpg 800w"</code></td><td>Multiple sources for different widths</td></tr>
+                    <tr><td><code>sizes</code></td><td class="text-xs"><code>sizes="(max-width:600px) 100vw, 50vw"</code></td><td>Image size at different breakpoints</td></tr>
+                    <tr><td><code>fetchpriority</code></td><td class="text-xs"><code>fetchpriority="high"</code></td><td>"high" for above-fold, "low" for below</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div>
+        <div class="section-title"><i data-lucide="video" class="text-purple-400"></i>Audio & Video — All Attributes</div>
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+            <table class="ref-table">
+                <thead><tr><th>Attribute</th><th>Applies To</th><th>Purpose</th></tr></thead>
+                <tbody>
+                    <tr><td><code>controls</code></td><td>audio, video</td><td>Show play/pause/volume bar</td></tr>
+                    <tr><td><code>autoplay</code></td><td>audio, video</td><td>Start playing automatically</td></tr>
+                    <tr><td><code>muted</code></td><td>audio, video</td><td>Start with audio off</td></tr>
+                    <tr><td><code>loop</code></td><td>audio, video</td><td>Repeat forever</td></tr>
+                    <tr><td><code>preload</code></td><td>audio, video</td><td>"none" | "metadata" | "auto"</td></tr>
+                    <tr><td><code>poster</code></td><td>video only</td><td>Image shown before video plays</td></tr>
+                    <tr><td><code>playsinline</code></td><td>video only</td><td>Play inline on iOS</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- LIVE DEMO with Code tab -->
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Live Demo — Images, Audio, Video</span>
+            <div class="flex gap-1">
+                <div class="sim-tab active" onclick="switchTab(this,'pv-3-2','cv-3-2')">Preview</div>
+                <div class="sim-tab" onclick="switchTab(this,'cv-3-2','pv-3-2')">Code</div>
+            </div>
+        </div>
+        <div id="pv-3-2" class="sim-frame">
+            <div class="chrome-bar"><div class="chrome-dot bg-red-400"></div><div class="chrome-dot bg-yellow-400"></div><div class="chrome-dot bg-green-400"></div><span class="text-[10px] text-gray-400 ml-3 font-medium">media-demo.html</span></div>
+            <iframe id="frame-3-2" height="500"></iframe>
+        </div>
+        <div id="cv-3-2" class="hidden code-view" style="max-height:540px">
+<div class="relative"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="c">&lt;!-- Image with alt + width/height --&gt;</span>
+<span class="t">&lt;img</span> <span class="a">src=</span><span class="v">"photo.jpg"</span> <span class="a">alt=</span><span class="v">"Mountain landscape"</span>
+     <span class="a">width=</span><span class="v">"300"</span> <span class="a">height=</span><span class="v">"180"</span><span class="t">&gt;</span>
+
+<span class="c">&lt;!-- Figure with figcaption (semantic) --&gt;</span>
+<span class="t">&lt;figure&gt;</span>
+  <span class="t">&lt;img</span> <span class="a">src=</span><span class="v">"city.jpg"</span> <span class="a">alt=</span><span class="v">"City skyline at night"</span><span class="t">&gt;</span>
+  <span class="t">&lt;figcaption&gt;</span><span class="d">Fig 1: Downtown cityscape</span><span class="t">&lt;/figcaption&gt;</span>
+<span class="t">&lt;/figure&gt;</span>
+
+<span class="c">&lt;!-- Lazy-loaded image --&gt;</span>
+<span class="t">&lt;img</span> <span class="a">src=</span><span class="v">"ocean.jpg"</span> <span class="a">alt=</span><span class="v">"Ocean waves"</span> <span class="a">loading=</span><span class="v">"lazy"</span><span class="t">&gt;</span>
+
+<span class="c">&lt;!-- Audio with controls + loop --&gt;</span>
+<span class="t">&lt;audio</span> <span class="a">controls</span> <span class="a">loop&gt;</span>
+  <span class="t">&lt;source</span> <span class="a">src=</span><span class="v">"song.mp3"</span> <span class="a">type=</span><span class="v">"audio/mpeg"</span><span class="t">&gt;</span>
+  <span class="d">Your browser does not support audio.</span>
+<span class="t">&lt;/audio&gt;</span>
+
+<span class="c">&lt;!-- Video with poster + playsinline --&gt;</span>
+<span class="t">&lt;video</span> <span class="a">controls</span> <span class="a">poster=</span><span class="v">"thumb.jpg"</span> <span class="a">playsinline</span>
+         <span class="a">width=</span><span class="v">"320"</span><span class="t">&gt;</span>
+  <span class="t">&lt;source</span> <span class="a">src=</span><span class="v">"clip.mp4"</span> <span class="a">type=</span><span class="v">"video/mp4"</span><span class="t">&gt;</span>
+<span class="t">&lt;/video&gt;</span></pre>
+</div>
+        </div>
+    </div>
+
+    <!-- <div class="bg-white/[0.02] rounded-xl p-6 border border-white/5">
+        <div class="section-title"><i data-lucide="help-circle" class="text-purple-400"></i>Quick Check — Lesson 3.2</div>
+        <div class="space-y-4" data-quiz="3-2">
+            <div><p class="text-sm text-neutral-300 mb-3 font-medium">1. Which attribute prevents layout shift when loading images?</p>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-2')">alt</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,true,'3-2')">width and height</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-2')">loading</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-2')">decoding</button>
+            </div>
+            <div><p class="text-sm text-neutral-300 mb-3 font-medium">2. Why won't a video autoplay with sound on most browsers?</p>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-2')">Video codec not supported</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,true,'3-2')">Browser policy requires muted for autoplay</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-2')">Controls attribute blocks autoplay</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-2')">Autoplay only works with poster</button>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="bg-purple-500/[0.05] rounded-xl p-5 border border-purple-500/10"><div class="flex items-start gap-3"><i data-lucide="pencil" class="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0"></i><div><div class="text-sm font-medium text-purple-300 mb-1">Homework</div><div class="text-sm text-neutral-400 font-light">Build a media gallery: 3 images (one in a figure with figcaption, one lazy-loaded, one with srcset), 1 audio player with loop, 1 video player with poster and playsinline.</div></div></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ==================== LESSON 3.3 ==================== -->
+<section id="lesson-3-3" class="mb-8 scroll-mt-24">
+<div class="lesson-card fade-in" data-lesson="3-3">
+<button onclick="toggleLesson('3-3')" class="w-full flex items-center justify-between p-6 md:p-8 text-left">
+    <div class="flex items-center gap-4">
+        <div class="check-btn" data-check="3-3" onclick="event.stopPropagation();toggleCheck('3-3')"><i data-lucide="check" class="w-3 h-3 text-white opacity-0 transition-opacity" data-check-icon="3-3"></i></div>
+        <div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-bold text-neutral-500 tracking-widest uppercase">Lesson 3.3</span><span class="tag-pill bg-amber-500/10 text-amber-400 border border-amber-500/20">Data & Forms</span></div><h2 class="text-xl md:text-2xl font-medium tracking-tight">Tables, Forms & Every Input Type</h2></div>
+    </div>
+    <div class="flex items-center gap-3"><i data-lucide="chevron-down" class="w-5 h-5 text-neutral-500 transition-transform duration-300" data-chevron="3-3"></i></div>
+</button>
+<div class="lesson-content" data-content="3-3">
+<div class="px-6 md:px-8 pb-8 space-y-8">
+
+    <div class="teacher-box">
+        <p class="text-sm text-neutral-300 font-light leading-relaxed pl-5">There are <strong class="text-amber-300">22 different input types</strong> in HTML5 — each designed for a specific kind of data. Using the right type gives you free validation, the right keyboard on mobile, and better accessibility.</p>
+    </div>
+
+    <div>
+        <div class="section-title"><i data-lucide="table" class="text-amber-400"></i>Complete Table Reference</div>
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+            <table class="ref-table">
+                <thead><tr><th>Element</th><th>Purpose</th><th>Key Attributes</th></tr></thead>
+                <tbody>
+                    <tr><td><code>&lt;table&gt;</code></td><td>Table wrapper</td><td>—</td></tr>
+                    <tr><td><code>&lt;caption&gt;</code></td><td>Table title</td><td>Read by screen readers</td></tr>
+                    <tr><td><code>&lt;colgroup&gt;</code></td><td>Group columns for styling</td><td><code>span="2"</code></td></tr>
+                    <tr><td><code>&lt;thead&gt;</code></td><td>Header section</td><td>—</td></tr>
+                    <tr><td><code>&lt;tbody&gt;</code></td><td>Body section</td><td>—</td></tr>
+                    <tr><td><code>&lt;tfoot&gt;</code></td><td>Footer section (totals)</td><td>—</td></tr>
+                    <tr><td><code>&lt;th&gt;</code></td><td>Header cell</td><td><code>scope="col|row"</code> <code>colspan</code> <code>rowspan</code></td></tr>
+                    <tr><td><code>&lt;td&gt;</code></td><td>Data cell</td><td><code>colspan="2"</code> <code>rowspan="3"</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Table demo with code -->
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Live Demo — Table with colspan, rowspan, caption</span>
+            <div class="flex gap-1">
+                <div class="sim-tab active" onclick="switchTab(this,'pv-3-3a','cv-3-3a')">Preview</div>
+                <div class="sim-tab" onclick="switchTab(this,'cv-3-3a','pv-3-3a')">Code</div>
+            </div>
+        </div>
+        <div id="pv-3-3a" class="sim-frame">
+            <div class="chrome-bar"><div class="chrome-dot bg-red-400"></div><div class="chrome-dot bg-yellow-400"></div><div class="chrome-dot bg-green-400"></div><span class="text-[10px] text-gray-400 ml-3 font-medium">tables-demo.html</span></div>
+            <iframe id="frame-3-3a" height="380"></iframe>
+        </div>
+        <div id="cv-3-3a" class="hidden code-view">
+<div class="relative"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="t">&lt;table&gt;</span>
+  <span class="t">&lt;caption&gt;</span><span class="d">Student Grades — Semester 1</span><span class="t">&lt;/caption&gt;</span>
+  <span class="t">&lt;colgroup&gt;</span>
+    <span class="t">&lt;col</span> <span class="a">style=</span><span class="v">"width:30%"</span><span class="t">&gt;</span>
+    <span class="t">&lt;col</span> <span class="a">style=</span><span class="v">"width:20%"</span><span class="t">&gt;</span>
+    <span class="t">&lt;col</span> <span class="a">style=</span><span class="v">"width:25%"</span><span class="t">&gt;</span>
+    <span class="t">&lt;col</span> <span class="a">style=</span><span class="v">"width:25%"</span><span class="t">&gt;</span>
+  <span class="t">&lt;/colgroup&gt;</span>
+  <span class="t">&lt;thead&gt;</span>
+    <span class="t">&lt;tr&gt;</span>
+      <span class="t">&lt;th</span> <span class="a">scope=</span><span class="v">"col"</span><span class="t">&gt;</span><span class="d">Student</span><span class="t">&lt;/th&gt;</span>
+      <span class="t">&lt;th</span> <span class="a">scope=</span><span class="v">"col"</span><span class="t">&gt;</span><span class="d">Math</span><span class="t">&lt;/th&gt;</span>
+      <span class="t">&lt;th</span> <span class="a">scope=</span><span class="v">"col"</span><span class="t">&gt;</span><span class="d">Science</span><span class="t">&lt;/th&gt;</span>
+      <span class="t">&lt;th</span> <span class="a">scope=</span><span class="v">"col"</span><span class="t">&gt;</span><span class="d">Average</span><span class="t">&lt;/th&gt;</span>
+    <span class="t">&lt;/tr&gt;</span>
+  <span class="t">&lt;/thead&gt;</span>
+  <span class="t">&lt;tbody&gt;</span>
+    <span class="t">&lt;tr&gt;</span><span class="t">&lt;td&gt;</span><span class="d">Alice</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;td&gt;</span><span class="d">95</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;td&gt;</span><span class="d">88</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;td&gt;</span><span class="d">91.5</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;/tr&gt;</span>
+    <span class="t">&lt;tr&gt;</span><span class="t">&lt;td&gt;</span><span class="d">Bob</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;td&gt;</span><span class="d">72</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;td&gt;</span><span class="d">85</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;td&gt;</span><span class="d">78.5</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;/tr&gt;</span>
+    <span class="c">&lt;!-- rowspan: Dan's math spans 2 rows --&gt;</span>
+    <span class="t">&lt;tr&gt;</span><span class="t">&lt;td&gt;</span><span class="d">Dan</span><span class="t">&lt;/td&gt;</span>
+      <span class="t">&lt;td</span> <span class="a">rowspan=</span><span class="v">"2"</span><span class="t">&gt;</span><span class="d">65</span><span class="t">&lt;/td&gt;</span>
+      <span class="t">&lt;td&gt;</span><span class="d">70</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;td&gt;</span><span class="d">67.5</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;/tr&gt;</span>
+    <span class="t">&lt;tr&gt;</span><span class="t">&lt;td&gt;</span><span class="d">Eve</span><span class="t">&lt;/td&gt;</span>
+      <span class="c">&lt;!-- Math cell skipped (rowspan) --&gt;</span>
+      <span class="t">&lt;td&gt;</span><span class="d">78</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;td&gt;</span><span class="d">71.5</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;/tr&gt;</span>
+  <span class="t">&lt;/tbody&gt;</span>
+  <span class="t">&lt;tfoot&gt;</span>
+    <span class="t">&lt;tr&gt;</span><span class="t">&lt;td&gt;</span><span class="d">Class Average</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;td&gt;</span><span class="d">80.0</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;td&gt;</span><span class="d">82.6</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;td&gt;</span><span class="d">81.3</span><span class="t">&lt;/td&gt;</span><span class="t">&lt;/tr&gt;</span>
+  <span class="t">&lt;/tfoot&gt;</span>
+<span class="t">&lt;/table&gt;</span></pre>
+</div>
+        </div>
+    </div>
+
+    <div>
+        <div class="section-title"><i data-lucide="text-cursor-input" class="text-amber-400"></i>All 22 HTML5 Input Types</div>
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+            <table class="ref-table">
+                <thead><tr><th>type=""</th><th>What It Does</th><th>Mobile Keyboard</th><th>Validation</th></tr></thead>
+                <tbody>
+                    <tr><td><code>text</code></td><td>Single-line plain text</td><td>Standard</td><td>None</td></tr>
+                    <tr><td><code>email</code></td><td>Email address</td><td>Email (with @)</td><td class="text-green-400">Must contain @</td></tr>
+                    <tr><td><code>password</code></td><td>Hidden characters</td><td>Standard</td><td>None</td></tr>
+                    <tr><td><code>number</code></td><td>Numeric value</td><td>Number pad</td><td class="text-green-400">Numbers only</td></tr>
+                    <tr><td><code>tel</code></td><td>Phone number</td><td>Phone pad</td><td>None</td></tr>
+                    <tr><td><code>url</code></td><td>Web URL</td><td>URL keyboard</td><td class="text-green-400">Must be valid URL</td></tr>
+                    <tr><td><code>search</code></td><td>Search query</td><td>Standard</td><td>None</td></tr>
+                    <tr><td><code>date</code></td><td>Date picker</td><td>Date picker</td><td class="text-green-400">Must be valid</td></tr>
+                    <tr><td><code>time</code></td><td>Time picker</td><td>Time picker</td><td class="text-green-400">Must be valid</td></tr>
+                    <tr><td><code>datetime-local</code></td><td>Date + time</td><td>Date picker</td><td class="text-green-400">Must be valid</td></tr>
+                    <tr><td><code>month</code></td><td>Month picker</td><td>Month picker</td><td class="text-green-400">Must be valid</td></tr>
+                    <tr><td><code>week</code></td><td>Week picker</td><td>Number pad</td><td class="text-green-400">Must be valid</td></tr>
+                    <tr><td><code>color</code></td><td>Color picker</td><td>—</td><td>Always valid</td></tr>
+                    <tr><td><code>range</code></td><td>Slider</td><td>—</td><td>Always valid</td></tr>
+                    <tr><td><code>file</code></td><td>File picker</td><td>—</td><td>None</td></tr>
+                    <tr><td><code>checkbox</code></td><td>Toggle on/off</td><td>—</td><td>None</td></tr>
+                    <tr><td><code>radio</code></td><td>One from group</td><td>—</td><td>None</td></tr>
+                    <tr><td><code>hidden</code></td><td>Invisible data</td><td>—</td><td>None</td></tr>
+                    <tr><td><code>submit</code></td><td>Submit button</td><td>—</td><td>—</td></tr>
+                    <tr><td><code>reset</code></td><td>Reset button</td><td>—</td><td>—</td></tr>
+                    <tr><td><code>button</code></td><td>Generic button</td><td>—</td><td>—</td></tr>
+                    <tr><td><code>image</code></td><td>Image submit</td><td>—</td><td>—</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div>
+        <div class="section-title"><i data-lucide="settings" class="text-amber-400"></i>Essential Input Attributes</div>
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+            <table class="ref-table">
+                <thead><tr><th>Attribute</th><th>Elements</th><th>Purpose</th></tr></thead>
+                <tbody>
+                    <tr><td><code>name</code></td><td>all inputs</td><td>Key sent to server (required for submission)</td></tr>
+                    <tr><td><code>value</code></td><td>all inputs</td><td>Default/initial value</td></tr>
+                    <tr><td><code>placeholder</code></td><td>text inputs</td><td>Hint when empty (NOT a label replacement!)</td></tr>
+                    <tr><td><code>required</code></td><td>most inputs</td><td>Form won't submit if empty</td></tr>
+                    <tr><td><code>disabled</code></td><td>all inputs</td><td>Grayed out, NOT submitted</td></tr>
+                    <tr><td><code>readonly</code></td><td>text, textarea</td><td>Can see but not edit, IS submitted</td></tr>
+                    <tr><td><code>minlength / maxlength</code></td><td>text inputs</td><td>Character length limits</td></tr>
+                    <tr><td><code>min / max</code></td><td>number, date, range</td><td>Value range limits</td></tr>
+                    <tr><td><code>step</code></td><td>number, date</td><td>Increment (e.g., step="5")</td></tr>
+                    <tr><td><code>pattern</code></td><td>text inputs</td><td>Regex validation</td></tr>
+                    <tr><td><code>autofocus</code></td><td>any input</td><td>Focus on page load (one per page)</td></tr>
+                    <tr><td><code>autocomplete</code></td><td>text inputs</td><td>"email" | "current-password" etc.</td></tr>
+                    <tr><td><code>multiple</code></td><td>file, email</td><td>Allow multiple selections</td></tr>
+                    <tr><td><code>accept</code></td><td>file</td><td>"image/*" | ".pdf" | "video/mp4"</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div>
+        <div class="section-title"><i data-lucide="blocks" class="text-amber-400"></i>Other Form Elements</div>
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+            <table class="ref-table">
+                <thead><tr><th>Element</th><th>Purpose</th><th>Key Attributes</th></tr></thead>
+                <tbody>
+                    <tr><td><code>&lt;textarea&gt;</code></td><td>Multi-line text</td><td><code>rows</code> <code>cols</code> <code>maxlength</code> <code>wrap</code></td></tr>
+                    <tr><td><code>&lt;select&gt;</code></td><td>Dropdown menu</td><td><code>name</code> <code>size</code> <code>multiple</code></td></tr>
+                    <tr><td><code>&lt;option&gt;</code></td><td>Choice in select</td><td><code>value</code> <code>selected</code> <code>disabled</code></td></tr>
+                    <tr><td><code>&lt;optgroup&gt;</code></td><td>Group options</td><td><code>label</code> (required)</td></tr>
+                    <tr><td><code>&lt;datalist&gt;</code></td><td>Autocomplete suggestions</td><td>Linked via <code>list="id"</code> on input</td></tr>
+                    <tr><td><code>&lt;fieldset&gt;</code></td><td>Group related controls</td><td><code>disabled</code> disables all inside</td></tr>
+                    <tr><td><code>&lt;legend&gt;</code></td><td>Caption for fieldset</td><td>First child of fieldset</td></tr>
+                    <tr><td><code>&lt;output&gt;</code></td><td>Calculation result</td><td><code>for</code> links to input ids</td></tr>
+                    <tr><td><code>&lt;progress&gt;</code></td><td>Progress bar</td><td><code>value</code> <code>max</code></td></tr>
+                    <tr><td><code>&lt;meter&gt;</code></td><td>Gauge within range</td><td><code>value</code> <code>min</code> <code>max</code> <code>low</code> <code>high</code> <code>optimum</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- All inputs demo with code -->
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Live Demo — Try Every Input Type</span>
+            <div class="flex gap-1">
+                <div class="sim-tab active" onclick="switchTab(this,'pv-3-3b','cv-3-3b')">Preview</div>
+                <div class="sim-tab" onclick="switchTab(this,'cv-3-3b','pv-3-3b')">Code</div>
+            </div>
+        </div>
+        <div id="pv-3-3b" class="sim-frame">
+            <div class="chrome-bar"><div class="chrome-dot bg-red-400"></div><div class="chrome-dot bg-yellow-400"></div><div class="chrome-dot bg-green-400"></div><span class="text-[10px] text-gray-400 ml-3 font-medium">all-inputs.html</span></div>
+            <iframe id="frame-3-3b" height="1100"></iframe>
+        </div>
+        <div id="cv-3-3b" class="hidden code-view">
+<div class="relative"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="c">&lt;!-- Text Inputs --&gt;</span>
+<span class="t">&lt;label</span> <span class="a">for=</span><span class="v">"name"</span><span class="t">&gt;</span>Full Name<span class="t">&lt;/label&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"text"</span> <span class="a">id=</span><span class="v">"name"</span> <span class="a">placeholder=</span><span class="v">"John Doe"</span><span class="t">&gt;</span>
+
+<span class="t">&lt;label</span> <span class="a">for=</span><span class="v">"email"</span><span class="t">&gt;</span>Email<span class="t">&lt;/label&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"email"</span> <span class="a">id=</span><span class="v">"email"</span> <span class="a">placeholder=</span><span class="v">"you@example.com"</span> <span class="a">required&gt;</span>
+
+<span class="t">&lt;label</span> <span class="a">for=</span><span class="v">"pass"</span><span class="t">&gt;</span>Password<span class="t">&lt;/label&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"password"</span> <span class="a">id=</span><span class="v">"pass"</span> <span class="a">minlength=</span><span class="v">"8"</span> <span class="a">required&gt;</span>
+
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"tel"</span> <span class="a">placeholder=</span><span class="v">"+1 234 567 890"</span><span class="t">&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"url"</span> <span class="a">placeholder=</span><span class="v">"https://example.com"</span><span class="t">&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"search"</span> <span class="a">placeholder=</span><span class="v">"Search..."</span><span class="t">&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"number"</span> <span class="a">min=</span><span class="v">"0"</span> <span class="a">max=</span><span class="v">"100"</span> <span class="a">step=</span><span class="v">"5"</span> <span class="a">value=</span><span class="v">"50"</span><span class="t">&gt;</span>
+
+<span class="c">&lt;!-- Date &amp; Time --&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"date"</span><span class="t">&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"time"</span><span class="t">&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"datetime-local"</span><span class="t">&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"month"</span><span class="t">&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"week"</span><span class="t">&gt;</span>
+
+<span class="c">&lt;!-- Color &amp; Range --&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"color"</span> <span class="a">value=</span><span class="v">"#3b82f6"</span><span class="t">&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"range"</span> <span class="a">min=</span><span class="v">"0"</span> <span class="a">max=</span><span class="v">"100"</span> <span class="a">value=</span><span class="v">"60"</span><span class="t">&gt;</span>
+
+<span class="c">&lt;!-- File --&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"file"</span> <span class="a">accept=</span><span class="v">"image/*"</span><span class="t">&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"file"</span> <span class="a">multiple&gt;</span>
+
+<span class="c">&lt;!-- Checkbox &amp; Radio --&gt;</span>
+<span class="t">&lt;label&gt;&lt;input</span> <span class="a">type=</span><span class="v">"checkbox"</span> <span class="a">name=</span><span class="v">"hobby"</span><span class="t">&gt;</span> Reading<span class="t">&lt;/label&gt;</span>
+<span class="t">&lt;label&gt;&lt;input</span> <span class="a">type=</span><span class="v">"checkbox"</span> <span class="a">name=</span><span class="v">"hobby"</span><span class="t">&gt;</span> Coding<span class="t">&lt;/label&gt;</span>
+
+<span class="t">&lt;label&gt;&lt;input</span> <span class="a">type=</span><span class="v">"radio"</span> <span class="a">name=</span><span class="v">"level"</span><span class="t">&gt;</span> Beginner<span class="t">&lt;/label&gt;</span>
+<span class="t">&lt;label&gt;&lt;input</span> <span class="a">type=</span><span class="v">"radio"</span> <span class="a">name=</span><span class="v">"level"</span><span class="t">&gt;</span> Advanced<span class="t">&lt;/label&gt;</span>
+
+<span class="c">&lt;!-- Other Elements --&gt;</span>
+<span class="t">&lt;textarea</span> <span class="a">rows=</span><span class="v">"3"</span> <span class="a">placeholder=</span><span class="v">"Message..."</span><span class="a">maxlength=</span><span class="v">"200"</span><span class="t">&lt;/textarea&gt;</span>
+
+<span class="t">&lt;select&gt;</span>
+  <span class="t">&lt;optgroup</span> <span class="a">label=</span><span class="v">"Frontend"</span><span class="t">&gt;</span>
+    <span class="t">&lt;option</span> <span class="a">value=</span><span class="v">"html"</span><span class="t">&gt;</span>HTML<span class="t">&lt;/option&gt;</span>
+    <span class="t">&lt;option</span> <span class="a">value=</span><span class="v">"js"</span> <span class="a">selected&gt;</span>JavaScript<span class="t">&lt;/option&gt;</span>
+  <span class="t">&lt;/optgroup&gt;</span>
+  <span class="t">&lt;optgroup</span> <span class="a">label=</span><span class="v">"Backend"</span><span class="t">&gt;</span>
+    <span class="t">&lt;option</span> <span class="a">value=</span><span class="v">"python"</span><span class="t">&gt;</span>Python<span class="t">&lt;/option&gt;</span>
+  <span class="t">&lt;/optgroup&gt;</span>
+<span class="t">&lt;/select&gt;</span>
+
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"text"</span> <span class="a">list=</span><span class="v">"langs"</span> <span class="a">placeholder=</span><span class="v">"Type..."</span><span class="t">&gt;</span>
+<span class="t">&lt;datalist</span> <span class="a">id=</span><span class="v">"langs"</span><span class="t">&gt;</span>
+  <span class="t">&lt;option</span> <span class="a">value=</span><span class="v">"JavaScript"</span><span class="t">&lt;/option&gt;</span>
+  <span class="t">&lt;option</span> <span class="a">value=</span><span class="v">"Python"</span><span class="t">&lt;/option&gt;</span>
+<span class="t">&lt;/datalist&gt;</span>
+
+<span class="c">&lt;!-- Special --&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"hidden"</span> <span class="a">name=</span><span class="v">"csrf"</span> <span class="a">value=</span><span class="v">"abc123"</span><span class="t">&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"text"</span> <span class="a">value=</span><span class="v">"Read only"</span> <span class="a">readonly&gt;</span>
+<span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"text"</span> <span class="a">value=</span><span class="v">"Disabled"</span> <span class="a">disabled&gt;</span>
+
+<span class="t">&lt;progress</span> <span class="a">value=</span><span class="v">"65"</span> <span class="a">max=</span><span class="v">"100"</span><span class="t">&gt;</span>65%<span class="t">&lt;/progress&gt;</span>
+<span class="t">&lt;meter</span> <span class="a">value=</span><span class="v">"0.7"</span> <span class="a">min=</span><span class="v">"0"</span> <span class="a">max=</span><span class="v">"1"</span> <span class="a">low=</span><span class="v">"0.3"</span> <span class="a">high=</span><span class="v">"0.8"</span><span class="t">&gt;</span><span class="t">&lt;/meter&gt;</span>
+
+<span class="t">&lt;button</span> <span class="a">type=</span><span class="v">"submit"</span><span class="t">&gt;</span>Submit<span class="t">&lt;/button&gt;</span>
+<span class="t">&lt;button</span> <span class="a">type=</span><span class="v">"reset"</span><span class="t">&gt;</span>Reset<span class="t">&lt;/button&gt;</span>
+<span class="t">&lt;button</span> <span class="a">type=</span><span class="v">"button"</span><span class="t">&gt;</span>No Action<span class="t">&lt;/button&gt;</span></pre>
+</div>
+        </div>
+    </div>
+
+    <!-- <div class="bg-white/[0.02] rounded-xl p-6 border border-white/5">
+        <div class="section-title"><i data-lucide="help-circle" class="text-amber-400"></i>Quick Check — Lesson 3.3</div>
+        <div class="space-y-4" data-quiz="3-3">
+            <div><p class="text-sm text-neutral-300 mb-3 font-medium">1. Which input type shows a slider?</p>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-3')">number</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,true,'3-3')">range</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-3')">meter</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-3')">progress</button>
+            </div>
+            <div><p class="text-sm text-neutral-300 mb-3 font-medium">2. What is the difference between disabled and readonly?</p>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-3')">No difference</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,true,'3-3')">disabled is not submitted, readonly is submitted</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-3')">readonly only works on checkboxes</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-3')">disabled makes text italic</button>
+            </div>
+            <div><p class="text-sm text-neutral-300 mb-3 font-medium">3. Which element groups radio buttons so only one can be selected?</p>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-3')">fieldset</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,true,'3-3')">Same name attribute</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-3')">optgroup</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-3')">datalist</button>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="bg-amber-500/[0.05] rounded-xl p-5 border border-amber-500/10"><div class="flex items-start gap-3"><i data-lucide="pencil" class="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0"></i><div><div class="text-sm font-medium text-amber-300 mb-1">Homework</div><div class="text-sm text-neutral-400 font-light">Build a student registration form using: text, email, password, date, number, radio buttons, checkboxes, select with optgroup, textarea, file upload (accept="image/*"), range, and a progress element. Wrap in fieldsets with legends. Add proper labels, placeholders, required, and validation attributes.</div></div></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ==================== LESSON 3.4 ==================== -->
+<section id="lesson-3-4" class="mb-8 scroll-mt-24">
+<div class="lesson-card fade-in" data-lesson="3-4">
+<button onclick="toggleLesson('3-4')" class="w-full flex items-center justify-between p-6 md:p-8 text-left">
+    <div class="flex items-center gap-4">
+        <div class="check-btn" data-check="3-4" onclick="event.stopPropagation();toggleCheck('3-4')"><i data-lucide="check" class="w-3 h-3 text-white opacity-0 transition-opacity" data-check-icon="3-4"></i></div>
+        <div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-bold text-neutral-500 tracking-widest uppercase">Lesson 3.4</span><span class="tag-pill bg-green-500/10 text-green-400 border border-green-500/20">Semantic</span></div><h2 class="text-xl md:text-2xl font-medium tracking-tight">Semantic HTML — The Right Way</h2></div>
+    </div>
+    <div class="flex items-center gap-3"><i data-lucide="chevron-down" class="w-5 h-5 text-neutral-500 transition-transform duration-300" data-chevron="3-4"></i></div>
+</button>
+<div class="lesson-content" data-content="3-4">
+<div class="px-6 md:px-8 pb-8 space-y-8">
+
+    <div class="teacher-box">
+        <p class="text-sm text-neutral-300 font-light leading-relaxed pl-5">This is where you go from "someone who writes HTML" to "someone who writes <em>good</em> HTML." For years, developers used &lt;div&gt; for everything — headers, navs, footers, articles. It was a mess. HTML5 gave us semantic elements that tell the browser <strong class="text-green-300">what each section IS</strong>. This helps screen readers navigate, helps Google understand your page, and makes your code readable. If you remember nothing else from today: <strong class="text-green-300">stop using divs for everything.</strong></p>
+    </div>
+
+    <div>
+        <div class="section-title"><i data-lucide="layout-template" class="text-green-400"></i>Complete Semantic Element Reference</div>
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+            <table class="ref-table">
+                <thead><tr><th>Element</th><th>What It Represents</th><th>Key Rules</th></tr></thead>
+                <tbody>
+                    <tr><td><code>&lt;header&gt;</code></td><td>Introductory content</td><td>Multiple per page allowed</td></tr>
+                    <tr><td><code>&lt;nav&gt;</code></td><td>Major navigation</td><td>Only for major nav, not every link group</td></tr>
+                    <tr><td><code>&lt;main&gt;</code></td><td>Primary content</td><td>Only ONE per page</td></tr>
+                    <tr><td><code>&lt;section&gt;</code></td><td>Thematic grouping</td><td>Must have a heading</td></tr>
+                    <tr><td><code>&lt;article&gt;</td><td>Self-contained content</td><td>Could be independently shared</td></tr>
+                    <tr><td><code>&lt;aside&gt;</td><td>Tangentially related</td><td>Sidebars, pull quotes, ads</td></tr>
+                    <tr><td><code>&lt;footer&gt;</td><td>Footer for ancestor</td><td>Multiple allowed</td></tr>
+                    <tr><td><code>&lt;figure&gt;</code></td><td>Media with caption</td><td>Wraps img, video, code</td></tr>
+                    <tr><td><code>&lt;details&gt;</code></td><td>Expandable content</td><td>Contains &lt;summary&gt; as first child</td></tr>
+                    <tr><td><code>&lt;dialog&gt;</code></td><td>Dialog box</td><td>.showModal() for modal</td></tr>
+                    <tr><td><code>&lt;time&gt;</code></td><td>Machine-readable date</td><td>datetime attribute for machines</td></tr>
+                    <tr><td><code>&lt;address&gt;</code></td><td>Contact info</td><td>Only for author/owner contact</td></tr>
+                    <tr><td><code>&lt;search&gt;</code></td><td>Search wrapper</td><td>NEW — wraps search controls</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="bg-white/[0.02] rounded-xl p-6 border border-white/5">
+        <div class="section-title"><i data-lucide="layout" class="text-green-400"></i>Semantic Page Layout Diagram</div>
+        <div class="border-2 border-dashed border-green-500/20 rounded-xl p-3 space-y-2">
+            <div class="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center"><span class="text-xs font-bold text-green-400 tracking-wider">&lt;header&gt;</span><div class="flex gap-2 mt-1 justify-center"><div class="bg-green-500/10 border border-green-500/15 rounded px-3 py-1.5"><span class="text-[10px] text-green-400 font-semibold">&lt;nav&gt;</span></div><div class="bg-green-500/10 border border-green-500/15 rounded px-3 py-1.5"><span class="text-[10px] text-green-400 font-semibold">&lt;search&gt;</span></div></div></div>
+            <div class="flex gap-2">
+                <div class="flex-1 bg-blue-500/10 border border-blue-500/20 rounded-lg p-3"><span class="text-xs font-bold text-blue-400 tracking-wider">&lt;main&gt;</span><div class="space-y-2 mt-2"><div class="bg-blue-500/5 border border-blue-500/15 rounded p-2"><span class="text-[10px] text-blue-400 font-semibold">&lt;section&gt; Hero</span></div><div class="bg-purple-500/5 border border-purple-500/15 rounded p-2"><span class="text-[10px] text-purple-400 font-semibold">&lt;article&gt; Blog Post</span></div></div></div>
+                <div class="w-1/4 bg-amber-500/10 border border-amber-500/20 rounded-lg p-3"><span class="text-xs font-bold text-amber-400 tracking-wider">&lt;aside&gt;</span></div>
+            </div>
+            <div class="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center"><span class="text-xs font-bold text-green-400 tracking-wider">&lt;footer&gt;</span></div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-red-500/[0.05] rounded-xl p-5 border border-red-500/10">
+            <div class="text-xs font-bold text-red-400 tracking-wider uppercase mb-3">Before (Div Soup)</div>
+            <div class="code-block p-4 text-[11px] leading-relaxed"><pre class="text-red-300/70">&lt;div class="header"&gt;
+  &lt;div class="nav"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="content"&gt;
+  &lt;div class="post"&gt;
+    &lt;div class="post-img"&gt;
+      &lt;img src="x"&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="footer"&gt;...&lt;/div&gt;</pre></div>
+        </div>
+        <div class="bg-green-500/[0.05] rounded-xl p-5 border border-green-500/10">
+            <div class="text-xs font-bold text-green-400 tracking-wider uppercase mb-3">After (Semantic)</div>
+            <div class="code-block p-4 text-[11px] leading-relaxed"><pre class="text-green-300/70">&lt;header&gt;
+  &lt;nav&gt;...&lt;/nav&gt;
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;article&gt;
+    &lt;time datetime="2025-01-15"&gt;
+      Jan 15
+    &lt;/time&gt;
+    &lt;figure&gt;
+      &lt;img src="x" alt="..."&gt;
+    &lt;/figure&gt;
+  &lt;/article&gt;
+&lt;/main&gt;
+&lt;footer&gt;...&lt;/footer&gt;</pre></div>
+        </div>
+    </div>
+
+    <!-- Semantic demo with code -->
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Live Demo — Semantic Page with details, dialog, time, address</span>
+            <div class="flex gap-1">
+                <div class="sim-tab active" onclick="switchTab(this,'pv-3-4','cv-3-4')">Preview</div>
+                <div class="sim-tab" onclick="switchTab(this,'cv-3-4','pv-3-4')">Code</div>
+            </div>
+        </div>
+        <div id="pv-3-4" class="sim-frame">
+            <div class="chrome-bar"><div class="chrome-dot bg-red-400"></div><div class="chrome-dot bg-yellow-400"></div><div class="chrome-dot bg-green-400"></div><span class="text-[10px] text-gray-400 ml-3 font-medium">semantic-demo.html</span></div>
+            <iframe id="frame-3-4" height="580"></iframe>
+        </div>
+        <div id="cv-3-4" class="hidden code-view" style="max-height:620px">
+<div class="relative"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="t">&lt;header&gt;</span>
+  <span class="t">&lt;h1&gt;</span><span class="d">My Blog</span><span class="t">&lt;/h1&gt;</span>
+  <span class="t">&lt;nav&gt;</span>
+    <span class="t">&lt;a</span> <span class="a">href=</span><span class="v">"#"</span><span class="t">&gt;</span>Home<span class="t">&lt;/a&gt;</span>
+    <span class="t">&lt;a</span> <span class="a">href=</span><span class="v">"#"</span><span class="t">&gt;</span>About<span class="t">&lt;/a&gt;</span>
+    <span class="t">&lt;a</span> <span class="a">href=</span><span class="v">"#"</span><span class="t">&gt;</span>Contact<span class="t">&lt;/a&gt;</span>
+  <span class="t">&lt;/nav&gt;</span>
+<span class="t">&lt;/header&gt;</span>
+
+<span class="t">&lt;main&gt;</span>
+  <span class="t">&lt;section&gt;</span>
+    <span class="t">&lt;h2&gt;</span><span class="d">Welcome to My Blog</span><span class="t">&lt;/h2&gt;</span>
+    <span class="t">&lt;p&gt;</span><span class="d">I write about web development.</span><span class="t">&lt;/p&gt;</span>
+  <span class="t">&lt;/section&gt;</span>
+
+  <span class="t">&lt;article&gt;</span>
+    <span class="t">&lt;h2&gt;</span><span class="d">Getting Started with HTML</span><span class="t">&lt;/h2&gt;</span>
+    <span class="t">&lt;time</span> <span class="a">datetime=</span><span class="v">"2025-01-15"</span><span class="t">&gt;</span>Jan 15, 2025<span class="t">&lt;/time&gt;</span>
+    <span class="t">&lt;figure&gt;</span>
+      <span class="t">&lt;img</span> <span class="a">src=</span><span class="v">"code.jpg"</span> <span class="a">alt=</span><span class="v">"Code editor"</span><span class="t">&gt;</span>
+      <span class="t">&lt;figcaption&gt;</span><span class="d">Fig 1: Writing HTML</span><span class="t">&lt;/figcaption&gt;</span>
+    <span class="t">&lt;/figure&gt;</span>
+    <span class="t">&lt;details&gt;</span>
+      <span class="t">&lt;summary&gt;</span><span class="d">What is semantic HTML?</span><span class="t">&lt;/summary&gt;</span>
+      <span class="t">&lt;p&gt;</span><span class="d">Elements that describe meaning.</span><span class="t">&lt;/p&gt;</span>
+    <span class="t">&lt;/details&gt;</span>
+    <span class="t">&lt;button</span> <span class="a">onclick=</span><span class="v">"document.getElementById('dlg').showModal()"</span><span class="t">&gt;</span>
+      Open Dialog
+    <span class="t">&lt;/button&gt;</span>
+  <span class="t">&lt;/article&gt;</span>
+
+  <span class="t">&lt;aside&gt;</span>
+    <span class="t">&lt;h4&gt;</span><span class="d">Related Links</span><span class="t">&lt;/h4&gt;</span>
+    <span class="t">&lt;ul&gt;</span>
+      <span class="t">&lt;li&gt;</span><span class="t">&lt;a</span> <span class="a">href=</span><span class="v">"#"</span><span class="t">&gt;</span>CSS Basics<span class="t">&lt;/a&gt;</span><span class="t">&lt;/li&gt;</span>
+      <span class="t">&lt;li&gt;</span><span class="t">&lt;a</span> <span class="a">href=</span><span class="v">"#"</span><span class="t">&gt;</span>JS Guide<span class="t">&lt;/a&gt;</span><span class="t">&lt;/li&gt;</span>
+    <span class="t">&lt;/ul&gt;</span>
+  <span class="t">&lt;/aside&gt;</span>
+<span class="t">&lt;/main&gt;</span>
+
+<span class="t">&lt;footer&gt;</span>
+  <span class="t">&lt;address&gt;</span>jane@blog.com | San Francisco, CA<span class="t">&lt;/address&gt;</span>
+  <span class="t">&lt;p&gt;</span><span class="d">&amp;copy; 2025 My Blog</span><span class="t">&lt;/p&gt;</span>
+<span class="t">&lt;/footer&gt;</span>
+
+<span class="c">&lt;!-- Modal dialog --&gt;</span>
+<span class="t">&lt;dialog</span> <span class="a">id=</span><span class="v">"dlg"</span><span class="t">&gt;</span>
+  <span class="t">&lt;h3&gt;</span><span class="d">Semantic Dialog</span><span class="t">&lt;/h3&gt;</span>
+  <span class="t">&lt;p&gt;</span><span class="d">No JavaScript library needed!</span><span class="t">&lt;/p&gt;</span>
+  <span class="t">&lt;button</span> <span class="a">onclick=</span><span class="v">"this.closest('dialog').close()"</span><span class="t">&gt;</span>Close<span class="t">&lt;/button&gt;</span>
+<span class="t">&lt;/dialog&gt;</span></pre>
+</div>
+        </div>
+    </div>
+
+    <!-- <div class="bg-white/[0.02] rounded-xl p-6 border border-white/5">
+        <div class="section-title"><i data-lucide="help-circle" class="text-green-400"></i>Quick Check — Lesson 3.4</div>
+        <div class="space-y-4" data-quiz="3-4">
+            <div><p class="text-sm text-neutral-300 mb-3 font-medium">1. How many &lt;main&gt; elements should a page have?</p>
+                <button class="quiz-opt" onclick="checkQuiz(this,true,'3-4')">Exactly one</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-4')">As many as needed</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-4')">Zero (optional)</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-4')">Two (desktop + mobile)</button>
+            </div>
+            <div><p class="text-sm text-neutral-300 mb-3 font-medium">2. What must a &lt;section&gt; always contain?</p>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-4')">An id attribute</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,true,'3-4')">A heading (h2-h6)</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-4')">A &lt;p&gt; element</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-4')">An aria-label</button>
+            </div>
+            <div><p class="text-sm text-neutral-300 mb-3 font-medium">3. Which element creates an expandable section without JavaScript?</p>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-4')">section</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-4')">dialog</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,true,'3-4')">details</button>
+                <button class="quiz-opt" onclick="checkQuiz(this,false,'3-4')">aside</button>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="bg-green-500/[0.05] rounded-xl p-5 border border-green-500/10"><div class="flex items-start gap-3"><i data-lucide="pencil" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i><div><div class="text-sm font-medium text-green-300 mb-1">Homework</div><div class="text-sm text-neutral-400 font-light">Refactor a div-based page into fully semantic HTML. Include: header with nav, main with 2 sections and 1 article (with figure, time, details), aside, footer with address, and a dialog element opened via a button.</div></div></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<div class="glow-line my-16"></div>
+
+<!-- ==================== HANDS-ON 1 ==================== -->
+<section id="hands-on-1" class="mb-8 scroll-mt-24">
+<div class="lesson-card fade-in" data-lesson="ho-1">
+<button onclick="toggleLesson('ho-1')" class="w-full flex items-center justify-between p-6 md:p-8 text-left">
+    <div class="flex items-center gap-4">
+        <div class="check-btn" data-check="ho-1" onclick="event.stopPropagation();toggleCheck('ho-1')"><i data-lucide="check" class="w-3 h-3 text-white opacity-0 transition-opacity" data-check-icon="ho-1"></i></div>
+        <div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-bold text-neutral-500 tracking-widest uppercase">Hands-on Project</span><span class="tag-pill bg-blue-500/10 text-blue-400 border border-blue-500/20">Project</span></div><h2 class="text-xl md:text-2xl font-medium tracking-tight">Build a Basic Multipage Website</h2></div>
+    </div>
+    <div class="flex items-center gap-3"><i data-lucide="chevron-down" class="w-5 h-5 text-neutral-500 transition-transform duration-300" data-chevron="ho-1"></i></div>
+</button>
+<div class="lesson-content" data-content="ho-1">
+<div class="px-6 md:px-8 pb-8 space-y-6">
+    <div class="teacher-box">
+        <p class="text-sm text-neutral-300 font-light leading-relaxed pl-5">You are going to build a 3-page personal portfolio from scratch. This combines everything from Lessons 3.1 through 3.4.</p>
+    </div>
+    <div class="bg-gradient-to-br rounded-xl p-6 border border-blue-500/15">
+        <h3 class="text-sm font-semibold mb-3 flex items-center gap-2 text-blue-300"><i data-lucide="target" class="w-4 h-4"></i>Project Brief</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="bg-black/20 rounded-lg p-3"><div class="text-xs font-bold text-blue-400 mb-1">index.html</div><div class="text-[11px] text-neutral-500">Semantic header/nav, hero with formatted text, about section with image (figure), skills list, footer</div></div>
+            <div class="bg-black/20 rounded-lg p-3"><div class="text-xs font-bold text-blue-400 mb-1">projects.html</div><div class="text-[11px] text-neutral-500">3 project cards using article tags, each with image, description, external link</div></div>
+            <div class="bg-black/20 rounded-lg p-3"><div class="text-xs font-bold text-blue-400 mb-1">contact.html</div><div class="text-[11px] text-neutral-500">Full contact form (text, email, select, radio, textarea, submit), social links (dl), address</div></div>
+        </div>
+    </div>
+    <div class="bg-white/[0.02] rounded-xl p-6 border border-white/5">
+        <h3 class="text-sm font-semibold mb-4 flex items-center gap-2"><i data-lucide="clipboard-check" class="w-4 h-4 text-blue-400"></i>Requirements (8 items)</h3>
+        <div class="space-y-2.5">
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">Semantic tags on all 3 pages (header, nav, main, footer)</span></label>
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">Working nav links between all 3 pages using relative paths</span></label>
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">At least 5 different text formatting tags</span></label>
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">3+ images with alt text, at least 1 in figure+figcaption</span></label>
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">1 unordered list + 1 ordered list + 1 description list</span></label>
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">Contact form with 5+ different input types, proper labels, fieldset/legend</span></label>
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">At least 3 different link types (external, anchor, mailto/tel)</span></label>
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">time element, address element, and details element used somewhere</span></label>
+        </div>
+    </div>
+    <div><span class="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-3 block">Starter Template</span>
+    <div class="code-block relative p-5"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="text-neutral-300"><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span><span class="txt">My Portfolio</span><span class="tag">&lt;/title&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;header&gt;</span>
+    <span class="tag">&lt;nav&gt;</span>
+      <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="val">"index.html"</span><span class="tag">&gt;</span><span class="txt">Home</span><span class="tag">&lt;/a&gt;</span>
+      <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="val">"projects.html"</span><span class="tag">&gt;</span><span class="txt">Projects</span><span class="tag">&lt;/a&gt;</span>
+      <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="val">"contact.html"</span><span class="tag">&gt;</span><span class="txt">Contact</span><span class="tag">&lt;/a&gt;</span>
+    <span class="tag">&lt;/nav&gt;</span>
+  <span class="tag">&lt;/header&gt;</span>
+  <span class="tag">&lt;main&gt;</span>
+    <span class="cmt">&lt;!-- Your content here --&gt;</span>
+  <span class="tag">&lt;/main&gt;</span>
+  <span class="tag">&lt;footer&gt;</span>
+    <span class="tag">&lt;p&gt;</span><span class="txt">&amp;copy; 2025</span><span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/footer&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></pre></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ==================== HANDS-ON 2 ==================== -->
+<section id="hands-on-2" class="mb-8 scroll-mt-24">
+<div class="lesson-card fade-in" data-lesson="ho-2">
+<button onclick="toggleLesson('ho-2')" class="w-full flex items-center justify-between p-6 md:p-8 text-left">
+    <div class="flex items-center gap-4">
+        <div class="check-btn" data-check="ho-2" onclick="event.stopPropagation();toggleCheck('ho-2')"><i data-lucide="check" class="w-3 h-3 text-white opacity-0 transition-opacity" data-check-icon="ho-2"></i></div>
+        <div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-bold text-neutral-500 tracking-widest uppercase">Hands-on Project</span><span class="tag-pill bg-blue-500/10 text-blue-400 border border-blue-500/20">Project</span></div><h2 class="text-xl md:text-2xl font-medium tracking-tight">Create a Complete HTML Login Form</h2></div>
+    </div>
+    <div class="flex items-center gap-3"><i data-lucide="chevron-down" class="w-5 h-5 text-neutral-500 transition-transform duration-300" data-chevron="ho-2"></i></div>
+</button>
+<div class="lesson-content" data-content="ho-2">
+<div class="px-6 md:px-8 pb-8 space-y-6">
+    <div class="teacher-box">
+        <p class="text-sm text-neutral-300 font-light leading-relaxed pl-5">Build a professional login form — one of the most common things you will ever build as a web developer.</p>
+    </div>
+    <div class="bg-white/[0.02] rounded-xl p-6 border border-white/5">
+        <h3 class="text-sm font-semibold mb-4 flex items-center gap-2"><i data-lucide="clipboard-check" class="w-4 h-4 text-blue-400"></i>Requirements (7 items)</h3>
+        <div class="space-y-2.5">
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">Email input (type="email", required, proper label with for/id)</span></label>
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">Password input (type="password", minlength="8", required, proper label)</span></label>
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">"Remember me" checkbox + "Forgot password?" link</span></label>
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">Submit button (type="submit") + "Sign up" link below</span></label>
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">Wrapped in semantic HTML (header, main, section, footer)</span></label>
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">Placeholders to guide users (but still has labels!)</span></label>
+            <label class="flex items-start gap-3 cursor-pointer group"><input type="checkbox" class="mt-0.5 accent-blue-500"><span class="text-sm text-neutral-400 font-light group-hover:text-neutral-300 transition-colors">Autofocus on email field, autocomplete attributes</span></label>
+        </div>
+    </div>
+
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Live Preview — Working Login Form</span>
+            <div class="flex gap-1">
+                <div class="sim-tab active" onclick="switchTab(this,'pv-ho-2','cv-ho-2')">Preview</div>
+                <div class="sim-tab" onclick="switchTab(this,'cv-ho-2','pv-ho-2')">Code</div>
+            </div>
+        </div>
+        <div id="pv-ho-2" class="sim-frame">
+            <div class="chrome-bar"><div class="chrome-dot bg-red-400"></div><div class="chrome-dot bg-yellow-400"></div><div class="chrome-dot bg-green-400"></div><span class="text-[10px] text-gray-400 ml-3 font-medium">login.html</span></div>
+            <iframe id="frame-ho-2" height="480"></iframe>
+        </div>
+        <div id="cv-ho-2" class="hidden code-view">
+<div class="relative"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="t">&lt;!DOCTYPE html&gt;</span>
+<span class="t">&lt;html</span> <span class="a">lang=</span><span class="v">"en"</span><span class="t">&gt;</span>
+<span class="t">&lt;head&gt;</span>
+  <span class="t">&lt;meta</span> <span class="a">charset=</span><span class="v">"UTF-8"</span><span class="t">&gt;</span>
+  <span class="t">&lt;meta</span> <span class="a">name=</span><span class="v">"viewport"</span> <span class="a">content=</span><span class="v">"width=device-width, initial-scale=1.0"</span><span class="t">&gt;</span>
+  <span class="t">&lt;title&gt;</span><span class="d">Login</span><span class="t">&lt;/title&gt;</span>
+<span class="t">&lt;/head&gt;</span>
+<span class="t">&lt;body&gt;</span>
+  <span class="t">&lt;header&gt;</span><span class="t">&lt;h1&gt;</span><span class="d">MyWebsite</span><span class="t">&lt;/h1&gt;</span><span class="t">&lt;/header&gt;</span>
+
+  <span class="t">&lt;main&gt;</span>
+    <span class="t">&lt;section&gt;</span>
+      <span class="t">&lt;h2&gt;</span><span class="d">Welcome back</span><span class="t">&lt;/h2&gt;</span>
+      <span class="t">&lt;form</span> <span class="a">action=</span><span class="v">"/login"</span> <span class="a">method=</span><span class="v">"POST"</span><span class="t">&gt;</span>
+        <span class="t">&lt;label</span> <span class="a">for=</span><span class="v">"email"</span><span class="t">&gt;</span><span class="d">Email address</span><span class="t">&lt;/label&gt;</span>
+        <span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"email"</span> <span class="a">id=</span><span class="v">"email"</span> <span class="a">name=</span><span class="v">"email"</span>
+               <span class="a">placeholder=</span><span class="v">"you@example.com"</span>
+               <span class="a">autocomplete=</span><span class="v">"email"</span>
+               <span class="a">autofocus</span> <span class="a">required&gt;</span>
+
+        <span class="t">&lt;label</span> <span class="a">for=</span><span class="v">"password"</span><span class="t">&gt;</span><span class="d">Password</span><span class="t">&lt;/label&gt;</span>
+        <span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"password"</span> <span class="a">id=</span><span class="v">"password"</span> <span class="a">name=</span><span class="v">"password"</span>
+               <span class="a">placeholder=</span><span class="v">"Enter your password"</span>
+               <span class="a">autocomplete=</span><span class="v">"current-password"</span>
+               <span class="a">minlength=</span><span class="v">"8"</span> <span class="a">required&gt;</span>
+
+        <span class="t">&lt;label&gt;</span>
+          <span class="t">&lt;input</span> <span class="a">type=</span><span class="v">"checkbox"</span> <span class="a">name=</span><span class="v">"remember"</span><span class="t">&gt;</span>
+          <span class="d">Remember me</span>
+        <span class="t">&lt;/label&gt;</span>
+        <span class="t">&lt;a</span> <span class="a">href=</span><span class="v">"/forgot"</span><span class="t">&gt;</span><span class="d">Forgot password?</span><span class="t">&lt;/a&gt;</span>
+
+        <span class="t">&lt;button</span> <span class="a">type=</span><span class="v">"submit"</span><span class="t">&gt;</span><span class="d">Sign In</span><span class="t">&lt;/button&gt;</span>
+      <span class="t">&lt;/form&gt;</span>
+      <span class="t">&lt;p&gt;</span><span class="d">No account? </span><span class="t">&lt;a</span> <span class="a">href=</span><span class="v">"/signup"</span><span class="t">&gt;</span><span class="d">Sign up</span><span class="t">&lt;/a&gt;</span><span class="t">&lt;/p&gt;</span>
+    <span class="t">&lt;/section&gt;</span>
+  <span class="t">&lt;/main&gt;</span>
+
+  <span class="t">&lt;footer&gt;</span>
+    <span class="t">&lt;p&gt;</span><span class="d">&amp;copy; 2025 MyWebsite</span><span class="t">&lt;/p&gt;</span>
+  <span class="t">&lt;/footer&gt;</span>
+<span class="t">&lt;/body&gt;</span>
+<span class="t">&lt;/html&gt;</span></pre>
+</div>
+        </div>
+    </div>
+
+    <div class="bg-blue-500/[0.05] rounded-xl p-5 border border-blue-500/10"><div class="flex items-start gap-3"><i data-lucide="lightbulb" class="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0"></i><div><div class="text-sm font-medium text-blue-300 mb-1">Bonus Challenges</div><div class="text-sm text-neutral-400 font-light space-y-1"><p>&#8226; Wrap the form in a fieldset with a legend</p><p>&#8226; Add a hidden input: &lt;input type="hidden" name="csrf" value="abc123"&gt;</p><p>&#8226; Create a Sign Up page with confirm-password, date of birth, select for country</p><p>&#8226; Add a details element with FAQ below the form</p></div></div></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- <footer class="py-16 text-center border-t border-gray-200 mt-16">
+    <div class="flex items-center justify-center gap-2 mb-3"><div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center"><i data-lucide="graduation-cap" class="w-4 h-4 text-white"></i></div><span class="text-sm font-medium">HTML Foundations</span></div>
+    <p class="text-xs text-neutral-500">Module 3 &#8212; Complete Classroom Edition</p>
+    <p class="text-xs text-neutral-600 mt-1">Progress saved in localStorage</p>
+</footer> -->
+</div>
+
+<!-- ==================== TEMPLATES (unchanged) ==================== -->
+<template id="tmpl-3-1a"><html><head><style>body{font-family:system-ui,sans-serif;padding:28px;color:#1a1a1a;line-height:1.8;font-size:14px}h2{font-size:18px;margin:0 0 16px;border-bottom:2px solid #e5e5e5;padding-bottom:8px}h3{font-size:15px;margin:20px 0 10px;color:#2563eb}.row{display:flex;gap:16px;margin-bottom:8px;align-items:baseline}.row .label{width:140px;font-weight:600;font-size:12px;color:#666;font-family:monospace;flex-shrink:0}hr{border:none;border-top:1px solid #f0f0f0;margin:20px 0}mark{background:#fef08a;padding:2px 4px;border-radius:3px}del{color:#999}ins{color:#16a34a;text-decoration: underline}kbd{background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;padding:2px 6px;font-size:12px;font-family:monospace}code{background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:12px;font-family:monospace;color:#7c3aed}samp{font-family:monospace;color:#666;font-size:12px;background:#f9fafb;padding:2px 6px;border-radius:4px}var{font-style:italic;color:#7c3aed}blockquote{border-left:4px solid #3b82f6;padding:8px 16px;margin:8px 0;background:#f8fafc;border-radius:0 8px 8px 0;font-style:italic;color:#555}pre{background:#1e1e1e;color:#d4d4d4;padding:12px;border-radius:8px;overflow-x:auto;font-size:12px;line-height:1.5}address{font-style:italic;color:#666}</style></head><body>
+    <h2>All Text Formatting Tags</h2>
+    <h3>Basic Styling</h3>
+    <div class="row"><span class="label">&lt;b&gt;</span><span><b>Bold text</b></span></div>
+    <div class="row"><span class="label">&lt;strong&gt;</span><span><strong>Strong (important) text</strong></span></div>
+    <div class="row"><span class="label">&lt;i&gt;</span><span><i>Italic text</i></span></div>
+    <div class="row"><span class="label">&lt;em&gt;</span><span><em>Emphasized text</em></span></div>
+    <div class="row"><span class="label">&lt;u&gt;</span><span><u>Underlined text</u></span></div>
+    <h3>Edits & Marks</h3>
+    <div class="row"><span class="label">&lt;ins&gt;</span><span><ins>Inserted text</ins></span></div>
+    <div class="row"><span class="label">&lt;del&gt;</span><span><del>Deleted text</del></span></div>
+    <div class="row"><span class="label">&lt;s&gt;</span><span><s>No longer correct</s></span></div>
+    <div class="row"><span class="label">&lt;mark&gt;</span><span><mark>Highlighted text</mark></span></div>
+    <h3>Size & Position</h3>
+    <div class="row"><span class="label">&lt;small&gt;</span><span><small>Small text (fine print)</small></span></div>
+    <div class="row"><span class="label">&lt;sub&gt;</span><span>H<sub>2</sub>O (water formula)</span></div>
+    <div class="row"><span class="label">&lt;sup&gt;</span><span>E=mc<sup>2</sup> (Einstein)</span></div>
+    <h3>Technical & Code</h3>
+    <div class="row"><span class="label">&lt;code&gt;</span><span>Use <code>x = Math.sqrt(y)</code> to calculate</span></div>
+    <div class="row"><span class="label">&lt;kbd&gt;</span><span>Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to copy</span></div>
+    <div class="row"><span class="label">&lt;samp&gt;</span><span>Output: <samp>Error: file not found</samp></span></div>
+    <div class="row"><span class="label">&lt;var&gt;</span><span>If <var>x</var> = 5, then <var>y</var> = <var>x</var> + 3</span></div>
+    <div class="row"><span class="label">&lt;pre&gt;</span></div>
+    <pre>function hello() {
+      console.log("World");
+    }</pre>
+    <h3>Quotations & Citations</h3>
+    <blockquote>The only way to do great work is to love what you do.<br><small>&mdash; <cite>Steve Jobs</cite></small></blockquote>
+    <div class="row"><span class="label">&lt;q&gt;</span><span><q>Short inline quote</q> adds quotes automatically</span></div>
+    <div class="row"><span class="label">&lt;dfn&gt;</span><span><dfn>HTML</dfn> stands for HyperText Markup Language</span></div>
+    <div class="row"><span class="label">&lt;abbr&gt;</span><span>The <abbr title="World Health Organization">WHO</abbr> is a UN agency</span></div>
+    <div class="row"><span class="label">&lt;address&gt;</span><address>Contact: teacher@school.edu | Room 204</address></div>
+    </body></html>
+    </template>
+    
+    <template id="tmpl-3-1b"><html><head><style>
+    body{font-family:system-ui,sans-serif;padding:28px;color:#1a1a1a;line-height:1.8;font-size:14px}
+    h2{font-size:18px;margin:0 0 16px;border-bottom:2px solid #e5e5e5;padding-bottom:8px}
+    h3{font-size:15px;margin:20px 0 10px;color:#2563eb}
+    a{color:#2563eb}a:hover{text-decoration:underline}
+    ul,ol{padding-left:24px;margin:8px 0}
+    li{margin-bottom:4px}
+    dl{margin:8px 0}dt{font-weight:600;color:#1a1a1a;margin-top:8px}dd{margin-left:20px;color:#555}
+    .badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;margin-left:8px}
+    .ext{background:#dbeafe;color:#1d4ed8}.anc{background:#fef3c7;color:#92400e}.mail{background:#dcfce7;color:#166534}.tel{background:#fce7f3;color:#9d174d}.dl{background:#e0e7ff;color:#3730a3}
+    hr{border:none;border-top:1px solid #f0f0f0;margin:20px 0}
+    </style></head><body>
+    <h2>All Link Types</h2>
+    <p><a href="https://example.com" target="_blank">External Link (new tab)</a> <span class="badge ext">external</span></p>
+    <p><a href="about.html">Relative Link (same site)</a> <span class="badge anc">relative</span></p>
+    <p><a href="#demo-lists">Jump to Lists section below</a> <span class="badge anc">anchor</span></p>
+    <p><a href="mailto:teacher@school.edu">Send email to teacher</a> <span class="badge mail">mailto</span></p>
+    <p><a href="tel:+1234567890">Call the office: +1 234 567 890</a> <span class="badge tel">tel</span></p>
+    <p><a href="syllabus.pdf" download>Download syllabus (PDF)</a> <span class="badge dl">download</span></p>
+    <hr>
+    <h2>All List Types</h2>
+    <h3>Unordered List (default)</h3>
+    <ul>
+      <li>HTML</li>
+      <li>CSS
+        <ul>
+          <li>Flexbox</li>
+          <li>Grid</li>
+          <li>Animations</li>
+        </ul>
+      </li>
+      <li>JavaScript</li>
+    </ul>
+    <h3>Ordered List (type="A", start="3")</h3>
+    <ol type="A" start="3">
+      <li>First item shows as C</li>
+      <li>Second item shows as D</li>
+      <li>Third item shows as E</li>
+    </ol>
+    <h3>Ordered List (type="i", reversed)</h3>
+    <ol type="i" reversed>
+      <li>Countdown step 1</li>
+      <li>Countdown step 2</li>
+      <li>Countdown step 3</li>
+    </ol>
+    <h3>Description List</h3>
+    <dl id="demo-lists">
+      <dt>HTML</dt><dd>HyperText Markup Language — the structure of web pages</dd>
+      <dt>CSS</dt><dd>Cascading Style Sheets — the visual styling of web pages</dd>
+      <dt>JS</dt><dd>JavaScript — the interactive behavior of web pages</dd>
+      <dt>API</dt>
+      <dd>Application Programming Interface</dd>
+      <dd>A way for programs to talk to each other</dd>
+    </dl>
+    </body></html>
+    </template>
+    
+    <template id="tmpl-3-2"><html><head><style>
+    body{font-family:system-ui,sans-serif;padding:28px;color:#1a1a1a;font-size:14px;line-height:1.7}
+    h2{font-size:18px;margin:0 0 12px;border-bottom:2px solid #e5e5e5;padding-bottom:8px}
+    h3{font-size:15px;margin:16px 0 10px;color:#2563eb}
+    img{border-radius:8px;border:1px solid #e5e5e5}
+    figure{margin:12px 0}figcaption{font-size:12px;color:#888;margin-top:6px;font-style:italic}
+    audio,video{border-radius:8px}
+    .note{background:#eff6ff;padding:10px 14px;border-radius:8px;font-size:12px;color:#1e40af;margin:8px 0}
+    hr{border:none;border-top:1px solid #f0f0f0;margin:20px 0}
+    </style></head><body>
+    <h2>Images</h2>
+    <h3>Basic image with alt + width/height</h3>
+    <img src="https://picsum.photos/seed/htmlimg1/300/180.jpg" alt="Mountain landscape at sunset" width="300" height="180">
+    <p class="note">width and height set to prevent layout shift. Always add alt text!</p>
+    <h3>Figure with figcaption (semantic)</h3>
+    <figure>
+      <img src="https://picsum.photos/seed/htmlimg2/300/180.jpg" alt="City skyline at night" width="300" height="180">
+      <figcaption>Figure 1: Downtown cityscape captured at golden hour</figcaption>
+    </figure>
+    <h3>Lazy-loaded image</h3>
+    <img src="https://picsum.photos/seed/htmlimg3/300/180.jpg" alt="Ocean waves on the beach" width="300" height="180" loading="lazy">
+    <p class="note">loading="lazy" — this image loads only when the user scrolls near it</p>
+    <hr>
+    <h2>Audio</h2>
+    <h3>Audio with controls + loop</h3>
+    <audio controls loop style="width:100%;max-width:320px;">
+      <source src="https://www.w3schools.com/html/horse.mp3" type="audio/mpeg">
+      Your browser does not support audio.
+    </audio>
+    <hr>
+    <h2>Video</h2>
+    <h3>Video with poster, controls, playsinline</h3>
+    <video controls poster="https://picsum.photos/seed/vidpost2/320/180.jpg" width="320" playsinline style="border-radius:8px;">
+      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+      Your browser does not support video.
+    </video>
+    <p class="note">poster shows a thumbnail before play. playsinline allows inline playback on iOS.</p>
+    </body></html>
+    </template>
+    
+    <template id="tmpl-3-3a"><html><head><style>
+    body{font-family:system-ui,sans-serif;padding:28px;color:#1a1a1a;font-size:14px}
+    h2{font-size:18px;margin:0 0 12px}
+    table{width:100%;max-width:550px;border-collapse:collapse}
+    caption{font-size:13px;font-weight:600;color:#555;margin-bottom:8px;text-align:left;caption-side:top}
+    th{padding:10px 12px;text-align:left;background:#f3f4f6;font-size:13px;border-bottom:2px solid #d1d5db}
+    td{padding:10px 12px;border-bottom:1px solid #e5e5e5;font-size:13px}
+    tbody tr:hover{background:#f9fafb}
+    tfoot td{font-weight:600;border-top:2px solid #d1d5db;border-bottom:none;color:#1a1a1a;background:#f9fafb}
+    .note{font-size:12px;color:#888;margin-top:12px}
+    </style></head><body>
+    <h2>Complete Table Demo</h2>
+    <table>
+      <caption>Student Grades — Semester 1, 2025</caption>
+      <colgroup><col style="width:30%"><col style="width:20%"><col style="width:25%"><col style="width:25%"></colgroup>
+      <thead>
+        <tr><th scope="col">Student</th><th scope="col">Math</th><th scope="col">Science</th><th scope="col">Average</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Alice</td><td>95</td><td>88</td><td>91.5</td></tr>
+        <tr><td>Bob</td><td>72</td><td>85</td><td>78.5</td></tr>
+        <tr><td>Carol</td><td>88</td><td>92</td><td>90.0</td></tr>
+        <tr><td>Dan</td><td rowspan="2">65</td><td>70</td><td>67.5</td></tr>
+        <tr><td>Eve</td><td></td><td>78</td><td>71.5</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><td>Class Average</td><td>80.0</td><td>82.6</td><td>81.3</td></tr>
+      </tfoot>
+    </table>
+    <p class="note">Note: Dan's Math grade spans 2 rows (rowspan="2"). colgroup sets column widths. tfoot shows totals. caption provides a title.</p>
+    </body></html>
+    </template>
+    
+    <template id="tmpl-3-3b"><html><head><style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:system-ui,sans-serif;padding:28px;color:#1a1a1a;font-size:13px;line-height:1.6}
+    h2{font-size:17px;margin:0 0 6px;color:#2563eb}
+    h3{font-size:14px;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid #e5e5e5}
+    .field{margin-bottom:12px}
+    label.field-label{display:block;font-weight:500;margin-bottom:4px;color:#374151;font-size:12px}
+    input[type=text],input[type=email],input[type=password],input[type=tel],input[type=url],input[type=search],input[type=number],input[type=date],input[type=time],input[type=datetime-local],input[type=month],input[type=week],select,textarea{width:100%;max-width:320px;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;outline:none;font-family:inherit;box-sizing:border-box}
+    input:focus,select:focus,textarea:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.15)}
+    textarea{resize:vertical;font-family:inherit}
+    .hint{font-size:11px;color:#888;margin-top:3px}
+    .radio-group,.check-group{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px}
+    .radio-group label,.check-group label{font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer}
+    output{font-weight:600;color:#2563eb;font-size:14px}
+    progress{width:200px;height:8px;border-radius:4px}
+    meter{width:200px;height:8px;border-radius:4px}
+    .color-demo{display:flex;align-items:center;gap:8px}
+    .color-swatch{width:32px;height:32px;border-radius:6px;border:1px solid #d1d5db}
+    hr{border:none;border-top:1px solid #f0f0f0;margin:16px 0}
+    .badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;background:#dbeafe;color:#1d4ed8;margin-left:4px;vertical-align:middle}
+    </style></head><body>
+    <h2>Try Every Input Type</h2>
+    <h3>Text Inputs</h3>
+    <div class="field"><label class="field-label">text <span class="badge">basic</span></label><input type="text" name="fname" placeholder="Full name"></div>
+    <div class="field"><label class="field-label">email <span class="badge">validates @</span></label><input type="email" placeholder="you@example.com"></div>
+    <div class="field"><label class="field-label">password <span class="badge">hidden chars</span></label><input type="password" placeholder="Enter password" minlength="4"></div>
+    <div class="field"><label class="field-label">tel <span class="badge">phone keyboard</span></label><input type="tel" placeholder="+1 234 567 890"></div>
+    <div class="field"><label class="field-label">url <span class="badge">validates URL</span></label><input type="url" placeholder="https://example.com"></div>
+    <div class="field"><label class="field-label">search <span class="badge">clear X</span></label><input type="search" placeholder="Search..."></div>
+    <h3>Number</h3>
+    <div class="field"><label class="field-label">number <span class="badge">spinners</span></label><input type="number" min="0" max="100" step="5" value="50"><p class="hint">min=0, max=100, step=5</p></div>
+    <h3>Date & Time</h3>
+    <div class="field"><label class="field-label">date</label><input type="date"></div>
+    <div class="field"><label class="field-label">time</label><input type="time"></div>
+    <div class="field"><label class="field-label">datetime-local</label><input type="datetime-local"></div>
+    <div class="field"><label class="field-label">month</label><input type="month"></div>
+    <div class="field"><label class="field-label">week</label><input type="week"></div>
+    <h3>Color</h3>
+    <div class="field"><label class="field-label">color</label>
+    <div class="color-demo"><input type="color" value="#3b82f6" oninput="this.nextElementSibling.style.background=this.value"><div class="color-swatch" style="background:#3b82f6"></div></div></div>
+    <h3>Range (Slider)</h3>
+    <div class="field"><label class="field-label">range <span class="badge">slider</span></label>
+    <input type="range" min="0" max="100" value="60" oninput="document.getElementById('rangeOut').textContent=this.value">
+    <output id="rangeOut">60</output></div>
+    <h3>File</h3>
+    <div class="field"><label class="field-label">file <span class="badge">accept filter</span></label><input type="file" accept="image/*"><p class="hint">accept="image/*" — only shows image files</p></div>
+    <div class="field"><label class="field-label">file (multiple) <span class="badge">multi-select</span></label><input type="file" multiple><p class="hint">multiple — select more than one file</p></div>
+    <h3>Checkbox & Radio</h3>
+    <div class="field"><label class="field-label">checkbox <span class="badge">toggle</span></label>
+    <div class="check-group">
+      <label><input type="checkbox" name="hobby" value="reading"> Reading</label>
+      <label><input type="checkbox" name="hobby" value="coding"> Coding</label>
+      <label><input type="checkbox" name="hobby" value="music"> Music</label>
+      <label><input type="checkbox" name="hobby" value="sports"> Sports</label>
+    </div></div>
+    <div class="field"><label class="field-label">radio <span class="badge">one choice</span></label>
+    <div class="radio-group">
+      <label><input type="radio" name="level" value="beginner"> Beginner</label>
+      <label><input type="radio" name="level" value="intermediate"> Intermediate</label>
+      <label><input type="radio" name="level" value="advanced"> Advanced</label>
+    </div></div>
+    <h3>Other Form Elements</h3>
+    <div class="field"><label class="field-label">textarea <span class="badge">multi-line</span></label>
+    <textarea rows="3" placeholder="Write your message here..." maxlength="200"></textarea></div>
+    <div class="field"><label class="field-label">select (dropdown)</label>
+    <select>
+      <optgroup label="Frontend">
+        <option value="html">HTML</option>
+        <option value="css">CSS</option>
+        <option value="js" selected>JavaScript</option>
+      </optgroup>
+      <optgroup label="Backend">
+        <option value="python">Python</option>
+        <option value="node">Node.js</option>
+        <option value="php">PHP</option>
+      </optgroup>
+    </select></div>
+    <div class="field"><label class="field-label">select (multiple)</label>
+    <select multiple size="4" style="height:auto">
+      <option>HTML</option><option>CSS</option><option>JavaScript</option><option>Python</option><option>Java</option>
+    </select></div>
+    <div class="field"><label class="field-label">datalist (suggestions)</label>
+    <input type="text" list="languages" placeholder="Start typing...">
+    <datalist id="languages">
+      <option value="JavaScript"><option value="Python"><option value="Java"><option value="C++"><option value="Ruby"><option value="Go"><option value="Rust">
+    </datalist></div>
+    <h3>Special: hidden, disabled, readonly</h3>
+    <div class="field"><label class="field-label">hidden <span class="badge">invisible</span></label><input type="hidden" name="csrf" value="abc123"><p class="hint">Not visible but submitted with form</p></div>
+    <div class="field"><label class="field-label">disabled <span class="badge">grayed out</span></label><input type="text" value="Cannot edit" disabled><p class="hint">Grayed out, NOT submitted</p></div>
+    <div class="field"><label class="field-label">readonly <span class="badge">view only</span></label><input type="text" value="Can see but not edit" readonly><p class="hint">User can see value but not change it. IS submitted</p></div>
+    <h3>Progress & Meter</h3>
+    <div class="field"><label class="field-label">progress</label><progress value="65" max="100">65%</progress></div>
+    <div class="field"><label class="field-label">meter</label><meter value="0.7" min="0" max="1" low="0.3" high="0.8" optimum="0.6">70%</meter></div>
+    <h3>Buttons</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <button type="submit" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer">Submit</button>
+      <button type="reset" style="padding:8px 16px;background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:6px;font-size:13px;cursor:pointer">Reset</button>
+      <button type="button" style="padding:8px 16px;background:#fff;color:#374151;border:1px solid #d1d5db;border-radius:6px;font-size:13px;cursor:pointer">Button (no action)</button>
+    </div>
+    </body></html>
+    </template>
+    
+    <template id="tmpl-3-4"><html><head><style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:system-ui,sans-serif;padding:28px;color:#1a1a1a;font-size:14px;line-height:1.7}
+    header{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:20px}
+    header h1{font-size:20px;margin-bottom:8px}
+    header nav a{color:#2563eb;text-decoration:none;margin-right:16px;font-size:13px;font-weight:500}
+    main{display:flex;gap:20px}
+    .content{flex:1}
+    aside{width:200px;background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px;font-size:12px;flex-shrink:0}
+    aside h4{font-size:13px;margin-bottom:8px;color:#92400e}
+    aside ul{padding-left:16px}aside li{margin-bottom:4px}aside a{color:#2563eb;text-decoration:none;font-size:12px}
+    section{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:16px}
+    section h2{font-size:17px;margin-bottom:8px}
+    article{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:16px}
+    article h2{font-size:17px;margin-bottom:4px}
+    time{font-size:12px;color:#888}
+    figure{margin:12px 0}figure img{width:100%;max-width:300px;border-radius:8px;border:1px solid #e5e5e5}
+    figcaption{font-size:11px;color:#888;margin-top:4px;font-style:italic}
+    details{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;margin:12px 0}
+    summary{padding:10px 14px;cursor:pointer;font-weight:500;font-size:13px}
+    summary:hover{background:#dcfce7;border-radius:8px}
+    details p{padding:10px 14px;font-size:13px;color:#555}
+    button{padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;margin-top:8px}
+    dialog{border:none;border-radius:16px;padding:24px;max-width:360px;box-shadow:0 25px 50px rgba(0,0,0,.2)}
+    dialog h3{margin-bottom:8px}dialog p{font-size:13px;color:#555;margin-bottom:16px}
+    dialog button{margin:0 4px 0 0}
+    dialog::backdrop{background:rgba(0,0,0,.5)}
+    footer{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-top:20px;font-size:12px;color:#888}
+    address{font-style:normal;font-size:12px}
+    .tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:4px}
+    .sem{background:#dcfce7;color:#166534}
+    </style></head><body>
+    <header>
+      <h1>My Blog <span class="tag sem">header</span></h1>
+      <nav><span class="tag sem">nav</span>
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </nav>
+    </header>
+    <main><span class="tag sem">main</span>
+      <div class="content">
+        <section><span class="tag sem">section</span>
+          <h2>Welcome to My Blog</h2>
+          <p>I write about <strong>web development</strong>, <em>design</em>, and <mark>technology</mark>.</p>
+        </section>
+        <article><span class="tag sem">article</span>
+          <h2>Getting Started with HTML</h2>
+          <time datetime="2025-01-15"><span class="tag sem">time</span> January 15, 2025</time>
+          <p style="margin-top:8px">HTML is the foundation of every website. Let me show you the basics...</p>
+          <figure><span class="tag sem">figure</span>
+            <img src="https://picsum.photos/seed/semhtml/300/160.jpg" alt="Code editor showing HTML">
+            <figcaption>Fig 1: Writing HTML in a code editor</figcaption>
+          </figure>
+          <details><span class="tag sem">details</span>
+            <summary>What is semantic HTML?</summary>
+            <p>Semantic HTML uses elements like header, nav, main, article, section, and footer to describe the meaning of content, not just its appearance.</p>
+          </details>
+          <details>
+            <summary>Why does it matter?</summary>
+            <p>It improves accessibility for screen readers, helps SEO, and makes code more readable for developers.</p>
+          </details>
+          <button onclick="document.getElementById('myDialog').showModal()">Open Dialog</button>
+        </article>
+      </div>
+      <aside><span class="tag sem">aside</span>
+        <h4>Related Links</h4>
+        <ul>
+          <li><a href="#">CSS Basics</a></li>
+          <li><a href="#">JS Guide</a></li>
+          <li><a href="#">Flexbox</a></li>
+        </ul>
+      </aside>
+    </main>
+    <footer><span class="tag sem">footer</span>
+      <address><span class="tag sem">address</span>Written by Jane Doe &#8226; jane@blog.com &#8226; San Francisco, CA</address>
+      <p style="margin-top:6px">&copy; 2025 My Blog. All rights reserved.</p>
+    </footer>
+    <dialog id="myDialog"><span class="tag sem">dialog</span>
+      <h3>Semantic Dialog</h3>
+      <p>This is a native HTML dialog element. No JavaScript library needed! Use showModal() for a modal, or show() for non-modal.</p>
+      <button onclick="this.closest('dialog').close()">Close</button>
+    </dialog>
+    </body></html>
+    </template>
+    
+    <template id="tmpl-ho-2"><html><head><style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:system-ui,sans-serif;background:#f9fafb;min-height:100vh;display:flex;flex-direction:column;color:#1a1a1a}
+    header{background:#fff;border-bottom:1px solid #e5e7eb;padding:16px 24px;display:flex;align-items:center;gap:12px}
+    header .logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
+    header h1{font-size:16px;font-weight:600}
+    main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:20px;padding:40px;width:100%;max-width:400px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+    .card h2{font-size:24px;font-weight:600;margin-bottom:2px}
+    .card .sub{font-size:14px;color:#6b7280;margin-bottom:28px}
+    .field{margin-bottom:18px}
+    .field label{display:block;font-size:13px;font-weight:500;color:#374151;margin-bottom:6px}
+    .field input{width:100%;padding:11px 14px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;font-family:inherit;box-sizing:border-box}
+    .field input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+    .field input::placeholder{color:#9ca3af}
+    .field .hint{font-size:11px;color:#9ca3af;margin-top:4px}
+    .between{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+    .between label{font-size:13px;color:#4b5563;display:flex;align-items:center;gap:6px;cursor:pointer}
+    .between a{font-size:13px;color:#2563eb;text-decoration:none;font-weight:500}
+    .between a:hover{text-decoration:underline}
+    .submit-btn{width:100%;padding:12px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;transition:background .2s}
+    .submit-btn:hover{background:#1d4ed8}
+    .signup{text-align:center;margin-top:20px;font-size:13px;color:#6b7280}
+    .signup a{color:#2563eb;text-decoration:none;font-weight:500}
+    .signup a:hover{text-decoration:underline}
+    .faq{margin-top:24px}
+    .faq details{border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px}
+    .faq summary{padding:12px 14px;cursor:pointer;font-size:13px;font-weight:500;color:#374151}
+    .faq summary:hover{background:#f9fafb;border-radius:10px}
+    .faq p{padding:0 14px 12px;font-size:12px;color:#6b7280;line-height:1.6}
+    .msg{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none}
+    .msg.ok{display:block;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+    footer{text-align:center;padding:16px;font-size:11px;color:#9ca3af;border-top:1px solid #e5e7eb}
+    </style></head><body>
+    <header>
+      <div class="logo">M</div>
+      <h1>MyWebsite</h1>
+    </header>
+    <main>
+      <section class="card">
+        <h2>Welcome back</h2>
+        <p class="sub">Sign in to your account to continue</p>
+        <div id="lmsg" class="msg"></div>
+        <form id="loginForm" onsubmit="event.preventDefault();var m=document.getElementById('lmsg');m.textContent='Login successful! Redirecting...';m.className='msg ok';">
+          <div class="field">
+            <label for="lem">Email address</label>
+            <input type="email" id="lem" name="email" placeholder="you@example.com" autocomplete="email" autofocus required>
+            <p class="hint">We will never share your email</p>
+          </div>
+          <div class="field">
+            <label for="lpass">Password</label>
+            <input type="password" id="lpass" name="password" placeholder="Enter your password" autocomplete="current-password" minlength="8" required>
+            <p class="hint">Must be at least 8 characters</p>
+          </div>
+          <div class="between">
+            <label><input type="checkbox" name="remember"> Remember me</label>
+            <a href="#">Forgot password?</a>
+          </div>
+          <button type="submit" class="submit-btn">Sign In</button>
+        </form>
+        <p class="signup">Don't have an account? <a href="#">Sign up</a></p>
+        <div class="faq">
+          <details>
+            <summary>How do I reset my password?</summary>
+            <p>Click "Forgot password?" above and enter your email. We will send you a reset link.</p>
+          </details>
+          <details>
+            <summary>Is my data secure?</summary>
+            <p>Yes. All passwords are encrypted and we use HTTPS for all connections.</p>
+          </details>
+          <details>
+            <summary>Can I use two-factor authentication?</summary>
+            <p>Yes! Go to Settings after logging in to enable 2FA with an authenticator app.</p>
+          </details>
+        </div>
+      </section>
+    </main>
+    <footer>Copyright 2025 MyWebsite. All rights reserved.</footer>
+    </body></html>
+    </template>
+    
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const p = document.getElementById('preloader');
+            p.style.opacity = '0';
+            p.style.pointerEvents = 'none';
+            p.style.transition = 'opacity 0.8s ease-out';
+            setTimeout(() => p.style.display = 'none', 800);
+        }, 600);
+        lucide.createIcons();
+        loadProgress();
+        initScrollObserver();
+        injectAllFrames();
+    });
+    
+    function injectAllFrames() {
+        const map = {
+            'frame-3-1a': 'tmpl-3-1a',
+            'frame-3-1b': 'tmpl-3-1b',
+            'frame-3-2':  'tmpl-3-2',
+            'frame-3-3a': 'tmpl-3-3a',
+            'frame-3-3b': 'tmpl-3-3b',
+            'frame-3-4':  'tmpl-3-4',
+            'frame-ho-2': 'tmpl-ho-2'
+        };
+        Object.entries(map).forEach(([frameId, tmplId]) => {
+            const frame = document.getElementById(frameId);
+            const tmpl = document.getElementById(tmplId);
+            if (frame && tmpl) frame.srcdoc = tmpl.innerHTML;
+        });
+    }
+    
+    function toggleLesson(id) {
+        const content = document.querySelector('[data-content="' + id + '"]');
+        const chevron = document.querySelector('[data-chevron="' + id + '"]');
+        const card = document.querySelector('[data-lesson="' + id + '"]');
+        const isOpen = content.classList.contains('open');
+        if (isOpen) {
+            content.classList.remove('open');
+            chevron.style.transform = 'rotate(0deg)';
+            card.classList.remove('active');
+        } else {
+            content.classList.add('open');
+            chevron.style.transform = 'rotate(180deg)';
+            card.classList.add('active');
+        }
+    }
+    
+    function toggleCheck(id) {
+        const btn = document.querySelector('[data-check="' + id + '"]');
+        const icon = document.querySelector('[data-check-icon="' + id + '"]');
+        const isChecked = btn.classList.contains('checked');
+        if (isChecked) {
+            btn.classList.remove('checked');
+            icon.style.opacity = '0';
+        } else {
+            btn.classList.add('checked');
+            icon.style.opacity = '1';
+            showToast('Lesson marked as complete!');
+        }
+        saveProgress();
+        updateProgressUI();
+    }
+    
+    const lessons = ['3-1', '3-2', '3-3', '3-4', 'ho-1', 'ho-2'];
+    
+    function saveProgress() {
+        const state = {};
+        lessons.forEach(id => {
+            const btn = document.querySelector('[data-check="' + id + '"]');
+            state[id] = btn ? btn.classList.contains('checked') : false;
+        });
+        localStorage.setItem('html-m3-classroom', JSON.stringify(state));
+    }
+    
+    function loadProgress() {
+        const raw = localStorage.getItem('html-m3-classroom');
+        if (!raw) return;
+        try {
+            const state = JSON.parse(raw);
+            lessons.forEach(id => {
+                if (state[id]) {
+                    const btn = document.querySelector('[data-check="' + id + '"]');
+                    const icon = document.querySelector('[data-check-icon="' + id + '"]');
+                    if (btn) btn.classList.add('checked');
+                    if (icon) icon.style.opacity = '1';
+                }
+            });
+            updateProgressUI();
+        } catch(e) {}
+    }
+    
+    function resetProgress() {
+        localStorage.removeItem('html-m3-classroom');
+        lessons.forEach(id => {
+            const btn = document.querySelector('[data-check="' + id + '"]');
+            const icon = document.querySelector('[data-check-icon="' + id + '"]');
+            if (btn) btn.classList.remove('checked');
+            if (icon) icon.style.opacity = '0';
+        });
+        document.querySelectorAll('.lesson-content.open').forEach(el => el.classList.remove('open'));
+        document.querySelectorAll('[data-chevron]').forEach(el => el.style.transform = 'rotate(0deg)');
+        document.querySelectorAll('.lesson-card.active').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.quiz-opt').forEach(b => { b.classList.remove('correct','wrong','disabled'); });
+        updateProgressUI();
+        showToast('Progress reset');
+    }
+    
+    function updateProgressUI() {
+        let done = 0;
+        lessons.forEach(id => {
+            const btn = document.querySelector('[data-check="' + id + '"]');
+            if (btn && btn.classList.contains('checked')) done++;
+        });
+        const pct = Math.round((done / lessons.length) * 100);
+        const ring = document.getElementById('progress-ring');
+        const circ = 2 * Math.PI * 20;
+        ring.style.strokeDashoffset = circ - (circ * pct / 100);
+        document.getElementById('progress-pct').textContent = pct + '%';
+        document.getElementById('done-count').textContent = done;
+        document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+            dot.classList.remove('done');
+            if (i > 0 && i <= done) dot.classList.add('done');
+        });
+    }
+    
+    function checkQuiz(btn, isCorrect, quizId) {
+        const siblingOpts = btn.parentElement.querySelectorAll('.quiz-opt');
+        siblingOpts.forEach(o => o.classList.add('disabled'));
+        if (isCorrect) {
+            btn.classList.add('correct');
+        } else {
+            btn.classList.add('wrong');
+            siblingOpts.forEach(o => {
+                if (o !== btn && o.getAttribute('onclick').includes('true')) o.classList.add('correct');
+            });
+        }
+    }
+    
+    function switchTab(clickedTab, showId, hideId) {
+        const parent = clickedTab.parentElement;
+        parent.querySelectorAll('.sim-tab').forEach(t => t.classList.remove('active'));
+        clickedTab.classList.add('active');
+        document.getElementById(showId).classList.remove('hidden');
+        document.getElementById(hideId).classList.add('hidden');
+    }
+    
+    function copyCode(btn) {
+        const pre = btn.parentElement.querySelector('pre');
+        const text = pre.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            btn.textContent = 'Copied!';
+            btn.style.color = '#4ade80';
+            setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 2000);
+        });
+    }
+    
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-msg').textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+    
+    function initScrollObserver() {
+        const fadeEls = document.querySelectorAll('.fade-in');
+        const fadeObs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.style.animationPlayState = 'running';
+            });
+        }, { threshold: 0.1 });
+        fadeEls.forEach(el => { el.style.animationPlayState = 'paused'; fadeObs.observe(el); });
+        const sectionIds = ['hero','lesson-3-1','lesson-3-2','lesson-3-3','lesson-3-4','hands-on-1','hands-on-2'];
+        const dots = document.querySelectorAll('.nav-dot');
+        const secObs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const idx = sectionIds.indexOf(entry.target.id);
+                    dots.forEach((d, i) => { d.classList.remove('active'); if (i === idx) d.classList.add('active'); });
+                }
+            });
+        }, { threshold: 0.3 });
+        sectionIds.forEach(id => { const el = document.getElementById(id); if (el) secObs.observe(el); });
+        dots.forEach((dot, i) => {
+            dot.addEventListener('click', () => {
+                const t = document.getElementById(sectionIds[i]);
+                if (t) t.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    }
+    </script>
+    </body>
+    </html>
