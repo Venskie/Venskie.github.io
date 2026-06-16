@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Scanner Demo</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/vue-qrcode-reader/dist/vue-qrcode-reader.umd.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>QR Scanner (Vanilla + Vue)</h1>
+    <qrcode-stream @detect="onDetect"></qrcode-stream>
+    <p v-if="result">Scanned Code: {{ result }}</p>
+  </div>
+
+  <script>
+    const { createApp, ref } = Vue
+    const { QrcodeStream } = VueQrcodeReader
+
+    createApp({
+      components: { QrcodeStream },
+      setup() {
+        const result = ref('')
+        function onDetect(detectedCodes) {
+          if (detectedCodes.length > 0) {
+            result.value = detectedCodes[0].rawValue
+            console.log('QR Code detected:', result.value)
+          }
+        }
+        return { result, onDetect }
+      }
+    }).mount('#app')
+  </script>
+</body>
+</html>
