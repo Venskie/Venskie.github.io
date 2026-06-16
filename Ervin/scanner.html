@@ -546,4 +546,125 @@
             const gain = ctx.createGain()
             osc.connect(gain)
             gain.connect(ctx.destination)
+            osc.frequency.value = 1260
+            osc.type = 'sine'
+            gain.gain.setValueAtTime(0.14, ctx.currentTime)
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12)
+            osc.start(ctx.currentTime)
+            osc.stop(ctx.currentTime + 0.12)
+          } catch (e) { /* silently fail */ }
+        }
+
+        function onDetect(detectedCodes) {
+          if (!detectedCodes || detectedCodes.length === 0) return
+          const value = detectedCodes[0].rawValue
+          if (!value) return
+
+          // Debounce: skip same code within 3 seconds
+          if (value === lastValue.value && debounceTimer) return
+          lastValue.value = value
+          clearTimeout(debounceTimer)
+          debounceTimer = setTimeout(() => { lastValue.value = '' }, 3000)
+
+          result.value = value
+          playBeep()
+
+          // Trigger flash animation
+          flashActive.value = false
+          nextTick(() => {
+            flashActive.value = true
+            setTimeout(() => { flashActive.value = false }, 600)
+          })
+
+          // Push to history (deduplicate top entry)
+          if (history.value.length === 0 || history.value[0].value !== value) {
+            const now = new Date()
+            history.value.unshift({
+              id: Date.now(),
+              value,
+              time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            })
+            if (history.value.length > 30) history.value.pop()
+          }
+        }
+
+        function toggleCamera() {
+          cameraActive.value = !cameraActive.value
+          if (!cameraActive.value) cameraError.value = false
+        }
+
+        function switchCamera() {
+          cameraFacing.value = cameraFacing.value === 'rear' ? 'front' : 'rear'
+          cameraKey.value++
+        }
+
+        function onCameraOn() { cameraError.value = false }
+        function onCameraOff() {}
+        function onCameraError(err) {
+          cameraError.value = true
+          console.warn('Camera error:', err)
+        }
+        async function copyResult() {
+          if (!result.value) return
+          await copyToClipboard(result.value)
+          justCopied.value = true
+          clearTimeout(copyTimer)
+          copyTimer = setTimeout(() => { justCopied.value = false }, 1800)
+        }
+
+        async function copyToClipboard(text) {
+          try {
+            await navigator.clipboard.writeText(text)
+            showToast('Copied to clipboard')
+          } catch {
+            // Fallback
+            const ta = document.createElement('textarea')
+            ta.value = text
+            ta.style.position = 'fixed'
+            ta.style.opacity = '0'
+            document.body.appendChild(ta)
+            ta.select()
+            document.execCommand('copy')
+            document.body.removeChild(ta)
+            showToast('Copied to clipboard')
+          }
+        }
+
+    function openLink() {
+          if (isUrl.value) window.open(result.value, '_blank', 'noopener')
+        }
+
+        /* ── Toast ── */
+        function showToast(msg) {
+          toastMessage.value = msg
+          toastVisible.value = true
+          clearTimeout(toastTimer)
+          toastTimer = setTimeout(() => { toastVisible.value = false }, 2200)
+        }
+
+        /* ── History ── */
+        function clearHistory() {
+          history.value = []
+          showToast('History cleared')
+        }
+
+        return {
+          result, history, cameraActive, cameraError, cameraFacing, cameraKey,
+          flashActive, justCopied, toastVisible, toastMessage,
+          statusText, isUrl, resultMeta,
+          onDetect, toggleCamera, switchCamera,
+          onCameraOn, onCameraOff, onCameraError,
+          copyResult, copyToClipboard, openLink,
+          clearHistory
+        }
+      }
+    }).mount('#app')
+  </script>
+</body>
+</html>    
+
+
+
+
+            
        
