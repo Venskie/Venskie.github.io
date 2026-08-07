@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sulit.ph — Fast Food Life Hacks, Dissected</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFF6EC; --bg-alt: #FBEEDC; --card: #FFFFFF;
+    --primary: #FF5722; --primary-dark: #C2410C; --primary-soft: #FFE4D6;
+    --accent: #F59E0B; --text: #1C1410; --muted: #6B5D54;
+    --border: #F3E5D2; --success: #15803D; --maroon: #7C2D12;
+  }
+  * { -webkit-font-smoothing: antialiased; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+  .font-display { font-family: 'Bricolage Grotesque', sans-serif; letter-spacing: -0.02em; }
+
+  .ambient-bg { position: fixed; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.4; animation: float 22s infinite ease-in-out; }
+  .blob-1 { width: 520px; height: 520px; background: #FF5722; top: -220px; left: -160px; }
+  .blob-2 { width: 420px; height: 420px; background: #F59E0B; top: 30%; right: -120px; animation-delay: -7s; }
+  .blob-3 { width: 460px; height: 460px; background: #FB923C; bottom: -240px; left: 35%; animation-delay: -14s; }
+  @keyframes float { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(40px,-60px) scale(1.1); } 66% { transform: translate(-30px,40px) scale(0.95); } }
+  .grid-pattern { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(rgba(124,45,18,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(124,45,18,0.05) 1px, transparent 1px); background-size: 56px 56px; pointer-events: none; mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%); }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .item-card { cursor: pointer; transition: all 0.25s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden; background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; }
+  .item-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 28px -10px rgba(255,87,34,0.35); }
+  .item-card.selected-left { border-color: var(--primary); background: linear-gradient(135deg, #FFF6EC, #FFE4D6); box-shadow: 0 6px 20px -6px rgba(255,87,34,0.45); }
+  .item-card.selected-left::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary), var(--accent)); }
+  .item-card.selected-right { border-color: var(--maroon); background: linear-gradient(135deg, #FFF6EC, #FCD9C2); box-shadow: 0 6px 20px -6px rgba(124,45,18,0.45); }
+  .item-card.selected-right::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--maroon), var(--primary-dark)); }
+
+  .btn-primary { background: var(--text); color: var(--bg); transition: all 0.2s; cursor: pointer; border: none; }
+  .btn-primary:hover { background: var(--primary); transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--text); border: 1.5px solid var(--border); transition: all 0.2s; cursor: pointer; }
+  .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+  .metric-bar { height: 10px; background: var(--bg-alt); border-radius: 999px; overflow: hidden; position: relative; }
+  .metric-fill { height: 100%; border-radius: 999px; transition: width 0.9s cubic-bezier(0.34,1.56,0.64,1); background: linear-gradient(90deg, var(--primary), var(--accent)); }
+  .metric-fill.right { background: linear-gradient(90deg, var(--maroon), var(--primary-dark)); }
+
+  .sulit-badge { background: var(--success); color: white; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; display: inline-flex; align-items: center; gap: 4px; }
+  .lugi-badge { background: #DC2626; color: white; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  .reveal { opacity: 0; animation: slideUp 0.7s ease-out forwards; }
+
+  .resto-tab { transition: all 0.25s; cursor: pointer; background: var(--card); border: 1.5px solid var(--border); }
+  .resto-tab:hover { border-color: var(--primary); }
+  .resto-tab.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+  .scroll-area::-webkit-scrollbar { width: 6px; }
+  .scroll-area::-webkit-scrollbar-track { background: transparent; }
+  .scroll-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .scroll-area::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+  .insight-card { background: linear-gradient(135deg, #1C1410, #2D1A10); color: var(--bg); position: relative; overflow: hidden; }
+  .insight-card::before { content: ''; position: absolute; top: -50%; right: -30%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,87,34,0.18) 0%, transparent 50%); }
+
+  .stat-num { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .highlight-text { background: linear-gradient(180deg, transparent 60%, rgba(255,87,34,0.28) 60%); padding: 0 4px; }
+
+  .combo-bar { height: 28px; background: var(--bg-alt); border-radius: 8px; overflow: hidden; position: relative; }
+  .combo-fill { height: 100%; border-radius: 8px; display: flex; align-items: center; padding: 0 10px; color: white; font-weight: 700; font-size: 11px; transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1); }
+
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .marquee { display: flex; gap: 48px; animation: marquee 50s linear infinite; white-space: nowrap; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--text); color: var(--bg); padding: 12px 24px; border-radius: 999px; font-weight: 600; font-size: 14px; box-shadow: 0 12px 32px -8px rgba(0,0,0,0.3); z-index: 100; opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  .food-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .verdict-glow { background: linear-gradient(135deg, rgba(255,87,34,0.08), rgba(245,158,11,0.08)); border: 1.5px solid var(--primary); }
+  .vs-circle { background: var(--text); color: var(--bg); width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 18px; box-shadow: 0 8px 24px -8px rgba(0,0,0,0.3); position: relative; z-index: 5; }
+  .swap-btn { cursor: pointer; background: none; border: none; padding: 0; font: inherit; color: inherit; }
+  .swap-btn:hover { color: var(--primary); }
+
+  .calc-budget-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 999px; background: var(--bg-alt); outline: none; }
+  .calc-budget-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 4px solid var(--card); box-shadow: 0 2px 12px -2px rgba(255,87,34,0.5); transition: transform 0.15s; }
+  .calc-budget-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  .calc-budget-slider::-moz-range-thumb { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 4px solid var(--card); box-shadow: 0 2px 12px -2px rgba(255,87,34,0.5); }
+  .goal-btn { cursor: pointer; transition: all 0.2s; background: var(--card); border: 1.5px solid var(--border); text-align: center; }
+  .goal-btn:hover { border-color: var(--primary); }
+  .goal-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .calc-result-card { transition: all 0.3s; }
+  .calc-result-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px -8px rgba(255,87,34,0.15); }
+
+  .branch-card { transition: all 0.2s; }
+  .branch-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .pulse-dot { animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,87,34, 0.5); } 70% { box-shadow: 0 0 0 10px rgba(255,87,34, 0); } 100% { box-shadow: 0 0 0 0 rgba(255,87,34, 0); } }
+</style>
+</head>
+<body>
+
+<div class="ambient-bg"><div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
+<div class="grid-pattern"></div>
+
+<nav class="sticky top-0 z-50 backdrop-blur-xl border-b border-[var(--border)]" style="background: rgba(255,246,236,0.8);">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 py-4 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-2">
+      <div class="w-9 h-9 rounded-xl bg-[var(--text)] flex items-center justify-center relative overflow-hidden">
+        <div class="absolute inset-0" style="background: linear-gradient(135deg, var(--primary), var(--accent));"></div>
+        <span class="relative font-display font-extrabold text-white text-lg">S</span>
+      </div>
+      <div class="leading-none">
+        <div class="font-display font-extrabold text-xl">Sulit<span class="text-[var(--primary)]">.ph</span></div>
+        <div class="text-[10px] uppercase tracking-widest text-[var(--muted)]">Fast food, dissected</div>
+      </div>
+    </a>
+    <div class="hidden md:flex items-center gap-8 text-sm font-semibold">
+      <a href="#compare" class="hover:text-[var(--primary)] transition">Compare</a>
+      <a href="#combos" class="hover:text-[var(--primary)] transition">Combos</a>
+      <a href="#calculator" class="hover:text-[var(--primary)] transition">Calculator</a>
+      <a href="#locator" class="hover:text-[var(--primary)] transition">Branches</a>
+      <a href="#hacks" class="hover:text-[var(--primary)] transition">Life Hacks</a>
+    </div>
+    <a href="#calculator" class="btn-primary px-5 py-2.5 rounded-full text-sm font-semibold inline-block">Sulit Calculator</a>
+  </div>
+</nav>
+
+<header class="relative px-5 md:px-8 pt-12 md:pt-20 pb-16 md:pb-24 max-w-7xl mx-auto">
+  <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+    <div class="lg:col-span-7 reveal">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--primary-soft)] mb-6" style="border: 1px solid rgba(255,87,34,0.2);">
+        <span class="w-2 h-2 rounded-full bg-[var(--primary)] animate-pulse"></span>
+        <span class="text-xs font-bold uppercase tracking-wider text-[var(--primary-dark)]">Para sa gutom na Pilipino</span>
+      </div>
+      <h1 class="font-display font-extrabold text-5xl md:text-7xl lg:text-8xl leading-[0.92] mb-6">
+        Bawal ang<br>
+        <span class="relative inline-block"><span class="relative z-10">lugi</span>
+        <svg class="absolute -bottom-2 left-0 w-full" height="14" viewBox="0 0 200 14" fill="none"><path d="M2 11C40 4 80 4 120 7C160 10 180 6 198 3" stroke="#FF5722" stroke-width="5" stroke-linecap="round"/></svg></span>
+        <span class="text-[var(--primary)]">.</span><br>Sa Jollibee.
+      </h1>
+      <p class="text-lg md:text-xl text-[var(--muted)] max-w-xl leading-relaxed mb-8">
+        We dissected every item on the menu — calories per peso, protein per peso, hidden combo savings, and the truly sulit picks. Pick two. See who wins.
+      </p>
+      <div class="flex flex-wrap items-center gap-3 mb-10">
+        <a href="#compare" class="btn-primary px-6 py-3.5 rounded-full text-sm font-bold inline-flex items-center gap-2">
+          Start comparing <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#locator" class="btn-ghost px-6 py-3.5 rounded-full text-sm font-bold inline-block">Find branches near me</a>
+      </div>
+      <div class="grid grid-cols-3 gap-4 md:gap-8 max-w-lg">
+        <div><div class="stat-num text-3xl md:text-4xl text-[var(--primary)]" data-target="62">0</div><div class="text-xs uppercase tracking-wider text-[var(--muted)] font-semibold mt-1">Items dissected</div></div>
+        <div><div class="stat-num text-3xl md:text-4xl text-[var(--primary)]">₱<span data-target="847">0</span></div><div class="text-xs uppercase tracking-wider text-[var(--muted)] font-semibold mt-1">Max savings found</div></div>
+        <div><div class="stat-num text-3xl md:text-4xl text-[var(--primary)]"><span data-target="5">0</span></div><div class="text-xs uppercase tracking-wider text-[var(--muted)] font-semibold mt-1">Restaurants covered</div></div>
+      </div>
+    </div>
+    <div class="lg:col-span-5 reveal" style="animation-delay: 0.2s">
+      <div class="relative">
+        <div class="card p-6 shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500" style="box-shadow: 0 25px 50px -12px rgba(255,87,34,0.15);">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Today's verdict</span>
+            <span class="sulit-badge">Sulit Pick</span>
+          </div>
+          <div class="flex items-center gap-3 mb-5">
+            <div class="food-icon bg-[var(--primary-soft)]"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 13h16M5 13c0-4 3-7 7-7s7 3 7 7M7 17h10M9 20h6" stroke="#FF5722" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div class="flex-1"><div class="font-display font-bold text-lg leading-tight">Burger Steak (3pc)</div><div class="text-xs text-[var(--muted)]">vs 3 × single orders</div></div>
+            <div class="text-right"><div class="font-display font-extrabold text-2xl text-[var(--primary)]">₱135</div><div class="text-xs text-[var(--muted)] line-through">₱165</div></div>
+          </div>
+          <div class="space-y-3 mb-4">
+            <div><div class="flex justify-between text-xs mb-1.5"><span class="font-semibold">Calories per peso</span><span class="font-bold text-[var(--success)]">4.37 cal/₱</span></div><div class="metric-bar"><div class="metric-fill" style="width: 88%"></div></div></div>
+            <div><div class="flex justify-between text-xs mb-1.5"><span class="font-semibold">Protein per peso</span><span class="font-bold text-[var(--success)]">0.21 g/₱</span></div><div class="metric-bar"><div class="metric-fill" style="width: 76%"></div></div></div>
+          </div>
+          <div class="text-xs text-[var(--muted)] pt-3 border-t border-[var(--border)]">You save <span class="font-bold text-[var(--success)]">₱30</span> and get the same amount of food. Always order the 3pc.</div>
+        </div>
+        <div class="card absolute -bottom-6 -left-6 p-4 shadow-xl hidden md:block" style="transform: rotate(-3deg);">
+          <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse"></div><span class="text-xs font-bold">Inasal Pecho + Rice = 99₱</span></div>
+        </div>
+        <div class="card absolute -top-4 -right-4 p-3 shadow-xl hidden md:block" style="transform: rotate(4deg);">
+          <div class="text-xs font-bold flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>Top 5 sulit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="border-y border-[var(--border)] py-4 overflow-hidden" style="background: rgba(251,238,220,0.6);">
+  <div class="marquee text-sm font-semibold text-[var(--muted)]">
+    <span>2 Yumburgers &gt; 1 Double Yumburger</span><span>•</span>
+    <span>2 × 1pc Chickenjoy Combo &gt; 2pc + rice + drink</span><span>•</span>
+    <span>Mang Inasal Pecho has highest protein-per-peso</span><span>•</span>
+    <span>KFC Famous Bowl is a calorie bomb</span><span>•</span>
+    <span>Spaghetti + Yumburger combo = ₱18 savings</span><span>•</span>
+    <span>Peach Mango Pie = highest cal-per-peso dessert</span><span>•</span>
+    <span>Find the nearest sulit branch near you</span><span>•</span>
+    <span>2 Yumburgers &gt; 1 Double Yumburger</span><span>•</span>
+    <span>2 × 1pc Chickenjoy Combo &gt; 2pc + rice + drink</span><span>•</span>
+    <span>Mang Inasal Pecho has highest protein-per-peso</span><span>•</span>
+    <span>KFC Famous Bowl is a calorie bomb</span><span>•</span>
+    <span>Spaghetti + Yumburger combo = ₱18 savings</span><span>•</span>
+    <span>Peach Mango Pie = highest cal-per-peso dessert</span><span>•</span>
+    <span>Find the nearest sulit branch near you</span><span>•</span>
+  </div>
+</div>
+
+<!-- COMPARE -->
+<section id="compare" class="px-5 md:px-8 py-16 md:py-24 max-w-7xl mx-auto">
+  <div class="mb-10 md:mb-14">
+    <div class="flex items-center gap-2 mb-3"><span class="text-xs font-bold uppercase tracking-widest text-[var(--primary)]">01 / Compare</span><div class="h-px flex-1 bg-[var(--border)]"></div></div>
+    <h2 class="font-display font-extrabold text-4xl md:text-6xl leading-[0.95] mb-3">Pick two. See who's<br>actually <span class="highlight-text">sulit</span>.</h2>
+    <p class="text-lg text-[var(--muted)] max-w-2xl">Tap an item on the left. Tap an item on the right. We break down price, calories, protein, weight, and the real value metrics that matter when you're hungry.</p>
+  </div>
+  <div class="flex flex-wrap gap-2 mb-8" id="restoTabs">
+    <button class="resto-tab active px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2" data-resto="jollibee"><span class="w-2 h-2 rounded-full bg-[var(--primary)]"></span> Jollibee</button>
+    <button class="resto-tab px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2" data-resto="mcdo"><span class="w-2 h-2 rounded-full bg-[var(--accent)]"></span> McDonald's</button>
+    <button class="resto-tab px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2" data-resto="chowking"><span class="w-2 h-2 rounded-full bg-[var(--maroon)]"></span> Chowking</button>
+    <button class="resto-tab px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2" data-resto="kfc"><span class="w-2 h-2 rounded-full bg-red-700"></span> KFC</button>
+    <button class="resto-tab px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2" data-resto="inasal"><span class="w-2 h-2 rounded-full bg-red-800"></span> Mang Inasal</button>
+    <div class="ml-auto flex items-center gap-2 text-xs text-[var(--muted)]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> Prices based on Metro Manila stores, 2024</div>
+  </div>
+  <div class="grid lg:grid-cols-12 gap-6">
+    <div class="lg:col-span-3"><div class="card p-4 h-full"><div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-[var(--primary)]"></div><span class="font-display font-bold text-sm uppercase tracking-wider">Pick A</span></div><span class="text-xs text-[var(--muted)]" id="leftCount">0 items</span></div><div class="scroll-area space-y-2 max-h-[480px] overflow-y-auto pr-1" id="leftList"></div></div></div>
+    <div class="lg:col-span-6"><div class="card p-6 md:p-8 h-full" id="comparisonPanel"></div></div>
+    <div class="lg:col-span-3"><div class="card p-4 h-fu
