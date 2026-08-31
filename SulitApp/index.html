@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sulit.ph — Fast Food Life Hacks, Dissected</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FF5722">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sulit.ph">
+<style>
+  :root {
+    --bg: #FFF6EC; --bg-alt: #FBEEDC; --card: #FFFFFF;
+    --primary: #FF5722; --primary-dark: #C2410C; --primary-soft: #FFE4D6;
+    --accent: #F59E0B; --text: #1C1410; --muted: #6B5D54;
+    --border: #F3E5D2; --success: #15803D; --maroon: #7C2D12;
+  }
+  * { -webkit-font-smoothing: antialiased; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+  .font-display { font-family: 'Bricolage Grotesque', sans-serif; letter-spacing: -0.02em; }
+
+  .ambient-bg { position: fixed; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.4; animation: float 22s infinite ease-in-out; }
+  .blob-1 { width: 520px; height: 520px; background: #FF5722; top: -220px; left: -160px; }
+  .blob-2 { width: 420px; height: 420px; background: #F59E0B; top: 30%; right: -120px; animation-delay: -7s; }
+  .blob-3 { width: 460px; height: 460px; background: #FB923C; bottom: -240px; left: 35%; animation-delay: -14s; }
+  @keyframes float { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(40px,-60px) scale(1.1); } 66% { transform: translate(-30px,40px) scale(0.95); } }
+  .grid-pattern { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(rgba(124,45,18,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(124,45,18,0.05) 1px, transparent 1px); background-size: 56px 56px; pointer-events: none; mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%); }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .item-card { cursor: pointer; transition: all 0.25s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden; background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; }
+  .item-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 28px -10px rgba(255,87,34,0.35); }
+  .item-card.selected-left { border-color: var(--primary); background: linear-gradient(135deg, #FFF6EC, #FFE4D6); box-shadow: 0 6px 20px -6px rgba(255,87,34,0.45); }
+  .item-card.selected-left::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary), var(--accent)); }
+  .item-card.selected-right { border-color: var(--maroon); background: linear-gradient(135deg, #FFF6EC, #FCD9C2); box-shadow: 0 6px 20px -6px rgba(124,45,18,0.45); }
+  .item-card.selected-right::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--maroon), var(--primary-dark)); }
+
+  .btn-primary { background: var(--text); color: var(--bg); transition: all 0.2s; cursor: pointer; border: none; }
+  .btn-primary:hover { background: var(--primary); transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--text); border: 1.5px solid var(--border); transition: all 0.2s; cursor: pointer; }
+  .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+  .metric-bar { height: 10px; background: var(--bg-alt); border-radius: 999px; overflow: hidden; position: relative; }
+  .metric-fill { height: 100%; border-radius: 999px; transition: width 0.9s cubic-bezier(0.34,1.56,0.64,1); background: linear-gradient(90deg, var(--primary), var(--accent)); }
+  .metric-fill.right { background: linear-gradient(90deg, var(--maroon), var(--primary-dark)); }
+
+  .sulit-badge { background: var(--success); color: white; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; display: inline-flex; align-items: center; gap: 4px; }
+  .lugi-badge { background: #DC2626; color: white; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  .reveal { opacity: 0; animation: slideUp 0.7s ease-out forwards; }
+
+  .resto-tab { transition: all 0.25s; cursor: pointer; background: var(--card); border: 1.5px solid var(--border); }
+  .resto-tab:hover { border-color: var(--primary); }
+  .resto-tab.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+  .scroll-area::-webkit-scrollbar { width: 6px; }
+  .scroll-area::-webkit-scrollbar-track { background: transparent; }
+  .scroll-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .scroll-area::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+  .insight-card { background: linear-gradient(135deg, #1C1410, #2D1A10); color: var(--bg); position: relative; overflow: hidden; }
+  .insight-card::before { content: ''; position: absolute; top: -50%; right: -30%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,87,34,0.18) 0%, transparent 50%); }
+
+  .stat-num { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .highlight-text { background: linear-gradient(180deg, transparent 60%, rgba(255,87,34,0.28) 60%); padding: 0 4px; }
+
+  .combo-bar { height: 28px; background: var(--bg-alt); border-radius: 8px; overflow: hidden; position: relative; }
+  .combo-fill { height: 100%; border-radius: 8px; display: flex; align-items: center; padding: 0 10px; color: white; font-weight: 700; font-size: 11px; transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1); }
+
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .marquee { display: flex; gap: 48px; animation: marquee 50s linear infinite; white-space: nowrap; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--text); color: var(--bg); padding: 12px 24px; border-radius: 999px; font-weight: 600; font-size: 14px; box-shadow: 0 12px 32px -8px rgba(0,0,0,0.3); z-index: 100; opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  .food-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .verdict-glow { background: linear-gradient(135deg, rgba(255,87,34,0.08), rgba(245,158,11,0.08)); border: 1.5px solid var(--primary); }
+  .vs-circle { background: var(--text); color: var(--bg); width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 18px; box-shadow: 0 8px 24px -8px rgba(0,0,0,0.3); position: relative; z-index: 5; }
+  .swap-btn { cursor: pointer; background: none; border: none; padding: 0; font: inherit; color: inherit; }
+  .swap-btn:hover { color: var(--primary); }
+
+  .calc-budget-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 999px; background: var(--bg-alt); outline: none; }
+  .calc-budget-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 4px solid var(--card); box-shadow: 0 2px 12px -2px rgba(255,87,34,0.5); transition: transform 0.15s; }
+  .calc-budget-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  .calc-budget-slider::-moz-range-thumb { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 4px solid var(--card); box-shadow: 0 2px 12px -2px rgba(255,87,34,0.5); }
+  .goal-btn { cursor: pointer; transition: all 0.2s; background: var(--card); border: 1.5px solid var(--border); text-align: center; }
+  .goal-btn:hover { border-color: var(--primary); }
+  .goal-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .calc-result-card { transition: all 0.3s; }
+  .calc-result-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px -8px rgba(255,87,34,0.15); }
+
+  .branch-card { transition: all 0.2s; }
+  .branch-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .pulse-dot { animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,87,34, 0.5); } 70% { box-shadow: 0 0 0 10px rgba(255,87,34, 0); } 100% { box-shadow: 0 0 0 0 rgba(255,87,34, 0); } }
+</style>
+</head>
+<body>
+
+<div class="ambient-bg"><div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
+<div class="grid-pattern"></div>
+
+<nav class="sticky top-0 z-50 backdrop-blur-xl border-b border-[var(--border)]" style="background: rgba(255,246,236,0.8);">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 py-4 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-2">
+      <div class="w-9 h-9 rounded-xl bg-[var(--text)] flex items-center justify-center relative overflow-hidden">
+        <div class="absolute inset-0" style="background: linear-gradient(135deg, var(--primary), var(--accent));"></div>
+        <span class="relative font-display font-extrabold text-white text-lg">S</span>
+      </div>
+      <div class="leading-none">
+        <div class="font-display font-extrabold text-xl">Sulit<span class="text-[var(--primary)]">.ph</span></div>
+        <div class="text-[10px] uppercase tracking-widest text-[var(--muted)]">Fast food, dissected</div>
+      </div>
+    </a>
+    <div class="hidden md:flex items-center gap-8 text-sm font-semibold">
+      <a href="#compare" class="hover:text-[var(--primary)] transition">Compare</a>
+      <a href="#combos" class="hover:text-[var(--primary)] transition">Combos</a>
+      <a href="#calculator" class="hover:text-[var(--primary)] transition">Calculator</a>
+      <a href="#locator" class="hover:text-[var(--primary)] transition">Branches</a>
+      <a href="#hacks" class="hover:text-[var(--primary)] transition">Life Hacks</a>
+    </div>
+    <a href="#calculator" class="btn-primary px-5 py-2.5 rounded-full text-sm font-semibold inline-block">Sulit Calculator</a>
+  </div>
+</nav>
+
+<header class="relative px-5 md:px-8 pt-12 md:pt-20 pb-16 md:pb-24 max-w-7xl mx-auto">
+  <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+    <div class="lg:col-span-7 reveal">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--primary-soft)] mb-6" style="border: 1px solid rgba(255,87,34,0.2);">
+        <span class="w-2 h-2 rounded-full bg-[var(--primary)] animate-pulse"></span>
+        <span class="text-xs font-bold uppercase tracking-wider text-[var(--primary-dark)]">Para sa gutom na Pilipino</span>
+      </div>
+      <h1 class="font-display font-extrabold text-5xl md:text-7xl lg:text-8xl leading-[0.92] mb-6">
+        Bawal ang<br>
+        <span class="relative inline-block"><span class="relative z-10">lugi</span>
+        <svg class="absolute -bottom-2 left-0 w-full" height="14" viewBox="0 0 200 14" fill="none"><path d="M2 11C40 4 80 4 120 7C160 10 180 6 198 3" stroke="#FF5722" stroke-width="5" stroke-linecap="round"/></svg></span>
+        <span class="text-[var(--primary)]">.</span><br>Sa Jollibee.
+      </h1>
+      <p class="text-lg md:text-xl text-[var(--muted)] max-w-xl leading-relaxed mb-8">
+        We dissected every item on the menu — calories per peso, protein per peso, hidden combo savings, and the truly sulit picks. Pick two. See who wins.
+      </p>
+      <div class="flex flex-wrap items-center gap-3 mb-10">
+        <a href="#compare" class="btn-primary px-6 py-3.5 rounded-full text-sm font-bold inline-flex items-center gap-2">
+          Start comparing <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#locator" class="btn-ghost px-6 py-3.5 rounded-full text-sm font-bold inline-block">Find branches near me</a>
+      </div>
+      <div class="grid grid-cols-3 gap-4 md:gap-8 max-w-lg">
+        <div><div class="stat-num text-3xl md:text-4xl text-[var(--primary)]" data-target="62">0</div><div class="text-xs uppercase tracking-wider text-[var(--muted)] font-semibold mt-1">Items dissected</div></div>
+        <div><div class="stat-num text-3xl md:text-4xl text-[var(--primary)]">₱<span data-target="847">0</span></div><div class="text-xs uppercase tracking-wider text-[var(--muted)] font-semibold mt-1">Max savings found</div></div>
+        <div><div class="stat-num text-3xl md:text-4xl text-[var(--primary)]"><span data-target="5">0</span></div><div class="text-xs uppercase tracking-wider text-[var(--muted)] font-semibold mt-1">Restaurants covered</div></div>
+      </div>
+    </div>
+    <div class="lg:col-span-5 reveal" style="animation-delay: 0.2s">
+      <div class="relative">
+        <div class="card p-6 shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500" style="box-shadow: 0 25px 50px -12px rgba(255,87,34,0.15);">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Today's verdict</span>
+            <span class="sulit-badge">Sulit Pick</span>
+          </div>
+          <div class="flex items-center gap-3 mb-5">
+            <div class="food-icon bg-[var(--primary-soft)]"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 13h16M5 13c0-4 3-7 7-7s7 3 7 7M7 17h10M9 20h6" stroke="#FF5722" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div class="flex-1"><div class="font-display font-bold text-lg leading-tight">Burger Steak (3pc)</div><div class="text-xs text-[var(--muted)]">vs 3 × single orders</div></div>
+            <div class="text-right"><div class="font-display font-extrabold text-2xl text-[var(--primary)]">₱135</div><div class="text-xs text-[var(--muted)] line-through">₱165</div></div>
+          </div>
+          <div class="space-y-3 mb-4">
+            <div><div class="flex justify-between text-xs mb-1.5"><span class="font-semibold">Calories per peso</span><span class="font-bold text-[var(--success)]">4.37 cal/₱</span></div><div class="metric-bar"><div class="metric-fill" style="width: 88%"></div></div></div>
+            <div><div class="flex justify-between text-xs mb-1.5"><span class="font-semibold">Protein per peso</span><span class="font-bold text-[var(--success)]">0.21 g/₱</span></div><div class="metric-bar"><div class="metric-fill" style="width: 76%"></div></div></div>
+          </div>
+          <div class="text-xs text-[var(--muted)] pt-3 border-t border-[var(--border)]">You save <span class="font-bold text-[var(--success)]">₱30</span> and get the same amount of food. Always order the 3pc.</div>
+        </div>
+        <div class="card absolute -bottom-6 -left-6 p-4 shadow-xl hidden md:block" style="transform: rotate(-3deg);">
+          <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse"></div><span class="text-xs font-bold">Inasal Pecho + Rice = 99₱</span></div>
+        </div>
+        <div class="card absolute -top-4 -right-4 p-3 shadow-xl hidden md:block" style="transform: rotate(4deg);">
+          <div class="text-xs font-bold flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>Top 5 sulit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="border-y border-[var(--border)] py-4 overflow-hidden" style="background: rgba(251,238,220,0.6);">
+  <div class="marquee text-sm font-semibold text-[var(--muted)]">
+    <span>2 Yumburgers &gt; 1 Double Yumburger</span><span>•</span>
+    <span>2 × 1pc Chickenjoy Combo &gt; 2pc + rice + drink</span><span>•</span>
+    <span>Mang Inasal Pecho has highest protein-per-peso</span><span>•</span>
+    <span>KFC Famous Bowl is a calorie bomb</span><span>•</span>
+    <span>Spaghetti + Yumburger combo = ₱18 savings</span><span>•</span>
+    <span>Peach Mango Pie = highest cal-per-peso dessert</span><span>•</span>
+    <span>Find the nearest sulit branch near you</span><span>•</span>
+    <span>2 Yumburgers &gt; 1 Double Yumburger</span><span>•</span>
+    <span>2 × 1pc Chickenjoy Combo &gt; 2pc + rice + drink</span><span>•</span>
+    <span>Mang Inasal Pecho has highest protein-per-peso</span><span>•</span>
+    <span>KFC Famous Bowl is a calorie bomb</span><span>•</span>
+    <span>Spaghetti + Yumburger combo = ₱18 savings</span><span>•</span>
+    <span>Peach Mango Pie = highest cal-per-peso dessert</span><span>•</span>
+    <span>Find the nearest sulit branch near you</span><span>•</span>
+  </div>
+</div>
+
+<!-- COMPARE -->
+<section id="compare" class="px-5 md:px-8 py-16 md:py-24 max-w-7xl mx-auto">
+  <div class="mb-10 md:mb-14">
+    <div class="flex items-center gap-2 mb-3"><span class="text-xs font-bold uppercase tracking-widest text-[var(--primary)]">01 / Compare</span><div class="h-px flex-1 bg-[var(--border)]"></div></div>
+    <h2 class="font-display font-extrabold text-4xl md:text-6xl leading-[0.95] mb-3">Pick two. See who's<br>actually <span class="highlight-text">sulit</span>.</h2>
+    <p class="text-lg text-[var(--muted)] max-w-2xl">Tap an item on the left. Tap an item on the right. We break down price, calories, protein, weight, and the real value metrics that matter when you're hungry.</p>
+  </div>
+  <div class="flex flex-wrap gap-2 mb-8" id="restoTabs">
+    <button class="resto-tab active px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2" data-resto="jollibee"><span class="w-2 h-2 rounded-full bg-[var(--primary)]"></span> Jollibee</button>
+    <button class="resto-tab px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2" data-resto="mcdo"><span class="w-2 h-2 rounded-full bg-[var(--accent)]"></span> McDonald's</button>
+    <button class="resto-tab px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2" data-resto="chowking"><span class="w-2 h-2 rounded-full bg-[var(--maroon)]"></span> Chowking</button>
+    <button class="resto-tab px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2" data-resto="kfc"><span class="w-2 h-2 rounded-full bg-red-700"></span> KFC</button>
+    <button class="resto-tab px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2" data-resto="inasal"><span class="w-2 h-2 rounded-full bg-red-800"></span> Mang Inasal</button>
+    <div class="ml-auto flex items-center gap-2 text-xs text-[var(--muted)]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> <span id="priceMeta">Prices based on Metro Manila stores, 2024</span></div>
+  </div>
+  <div class="grid lg:grid-cols-12 gap-6">
+    <div class="lg:col-span-3">
+      <div class="card p-4 h-full">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-[var(--primary)]"></div><span class="font-display font-bold text-sm uppercase tracking-wider">Pick A</span></div>
+          <span class="text-xs text-[var(--muted)]" id="leftCount">0 items</span>
+        </div>
+        <div class="flex gap-2 mb-3">
+          <input type="text" placeholder="Search items..." data-side="left" class="list-search w-full px-3 py-2 text-sm rounded-xl border border-[var(--border)] bg-[var(--card)] outline-none focus:border-[var(--primary)]">
+          <select data-side="left" class="list-sort text-xs font-bold px-2 rounded-xl border border-[var(--border)] bg-[var(--card)]">
+            <option value="default">Sort</option>
+            <option value="price-asc">Price ↑</option>
+            <option value="price-desc">Price ↓</option>
+            <option value="cal-value">Cal/₱</option>
+            <option value="protein-value">Protein/₱</option>
+            <option value="sulit">Sulit score</option>
+          </select>
+        </div>
+        <div class="scroll-area space-y-2 max-h-[480px] overflow-y-auto pr-1" id="leftList"></div>
+      </div>
+    </div>
+    <div class="lg:col-span-6"><div class="card p-6 md:p-8 h-full" id="comparisonPanel"></div></div>
+    <div class="lg:col-span-3">
+      <div class="card p-4 h-full">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-[var(--maroon)]"></div><span class="font-display font-bold text-sm uppercase tracking-wider">Pick B</span></div>
+          <span class="text-xs text-[var(--muted)]" id="rightCount">0 items</span>
+        </div>
+        <div class="flex gap-2 mb-3">
+          <input type="text" placeholder="Search items..." data-side="right" class="list-search w-full px-3 py-2 text-sm rounded-xl border border-[var(--border)] bg-[var(--card)] outline-none focus:border-[var(--primary)]">
+          <select data-side="right" class="list-sort text-xs font-bold px-2 rounded-xl border border-[var(--border)] bg-[var(--card)]">
+            <option value="default">Sort</option>
+            <option value="price-asc">Price ↑</option>
+            <option value="price-desc">Price ↓</option>
+            <option value="cal-value">Cal/₱</option>
+            <option value="protein-value">Protein/₱</option>
+            <option value="sulit">Sulit score</option>
+          </select>
+        </div>
+        <div class="scroll-area space-y-2 max-h-[480px] overflow-y-auto pr-1" id="rightList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMBOS -->
+<section id="combos" class="px-5 md:px-8 py-16 md:py-24 max-w-7xl mx-auto">
+  <div class="mb-10 md:mb-14">
+    <div class="flex items-center gap-2 mb-3"><span class="text-xs font-bold uppercase tracking-widest text-[var(--primary)]">02 / Combo Hacker</span><div class="h-px flex-1 bg-[var(--border)]"></div></div>
+    <h2 class="font-display font-extrabold text-4xl md:text-6xl leading-[0.95] mb-3">Are combos really<br>worth it?</h2>
+    <p class="text-lg text-[var(--muted)] max-w-2xl">Spoiler: not always. We did the math on every value meal vs. buying items separately. Some save you ₱30+. Some actually cost more.</p>
+  </div>
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5" id="comboGrid"></div>
+</section>
+
+<!-- SULIT CALCULATOR -->
+<section id="calculator" class="px-5 md:px-8 py-16 md:py-24 max-w-7xl mx-auto">
+  <div class="mb-10 md:mb-14">
+    <div class="flex items-center gap-2 mb-3"><span class="text-xs font-bold uppercase tracking-widest text-[var(--primary)]">03 / Sulit Calculator</span><div class="h-px flex-1 bg-[var(--border)]"></div></div>
+    <h2 class="font-display font-extrabold text-4xl md:text-6xl leading-[0.95] mb-3">How hungry are you,<br>and with what <span class="highlight-text">budget</span>?</h2>
+    <p class="text-lg text-[var(--muted)] max-w-2xl">Set your budget. Pick your goal. We'll find the most sulit combination of items that fits — brute-forcing every possible order so you don't have to.</p>
+  </div>
+
+  <div class="grid lg:grid-cols-12 gap-6">
+    <div class="lg:col-span-4">
+      <div class="card p-6 md:p-8 sticky top-24">
+        <div class="mb-6">
+          <label class="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-3 block">Restaurant</label>
+          <div class="flex flex-wrap gap-2" id="calcRestoTabs">
+            <button class="goal-btn active px-3 py-2.5 rounded-xl text-xs font-bold" data-resto="jollibee">Jollibee</button>
+            <button class="goal-btn px-3 py-2.5 rounded-xl text-xs font-bold" data-resto="mcdo">McDo</button>
+            <button class="goal-btn px-3 py-2.5 rounded-xl text-xs font-bold" data-resto="chowking">Chowking</button>
+            <button class="goal-btn px-3 py-2.5 rounded-xl text-xs font-bold" data-resto="kfc">KFC</button>
+            <button class="goal-btn px-3 py-2.5 rounded-xl text-xs font-bold" data-resto="inasal">M. Inasal</button>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-3">
+            <label class="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Your budget</label>
+            <span class="font-display font-extrabold text-2xl text-[var(--primary)]" id="budgetDisplay">₱200</span>
+          </div>
+          <input type="range" min="50" max="500" value="200" step="10" class="calc-budget-slider" id="budgetSlider">
+          <div class="flex justify-between text-[10px] text-[var(--muted)] mt-2 font-semibold">
+            <span>₱50</span><span>₱250</span><span>₱500</span>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <label class="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-3 block">Your goal</label>
+          <div class="space-y-2" id="calcGoalTabs">
+            <button class="goal-btn active w-full px-4 py-3 rounded-xl text-sm font-bold text-left flex items-center gap-3" data-goal="calories">
+              <div class="w-8 h-8 rounded-lg bg-[var(--primary-soft)] flex items-center justify-center flex-shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF5722" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+              <div><div>Maximum food</div><div class="text-[11px] font-normal text-[var(--muted)]">Most calories per peso</div></div>
+            </button>
+            <button class="goal-btn w-full px-4 py-3 rounded-xl text-sm font-bold text-left flex items-center gap-3" data-goal="protein">
+              <div class="w-8 h-8 rounded-lg bg-[var(--primary-soft)] flex items-center justify-center flex-shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF5722" stroke-width="2.5"><path d="M6 4h12v3a6 6 0 01-12 0V4zM6 7H4v3a4 4 0 004 4M18 7h2v3a4 4 0 01-4 4M9 14v6M15 14v6"/></svg></div>
+              <div><div>Maximum protein</div><div class="text-[11px] font-normal text-[var(--muted)]">Most grams of protein</div></div>
+            </button>
+            <button class="goal-btn w-full px-4 py-3 rounded-xl text-sm font-bold text-left flex items-center gap-3" data-goal="score">
+              <div class="w-8 h-8 rounded-lg bg-[var(--primary-soft)] flex items-center justify-center flex-shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="#FF5722"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></div>
+              <div><div>Best sulit score</div><div class="text-[11px] font-normal text-[var(--muted)]">Balanced value overall</div></div>
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-6 border-t border-[var(--border)]">
+          <div class="text-xs text-[var(--muted)] leading-relaxed">
+            <strong class="text-[var(--text)]">How it works:</strong> We check every possible combination of 1–4 items that fits your budget, then rank them by your chosen goal. The top 3 show on the right.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-8">
+      <div id="calcResults"></div>
+    </div>
+  </div>
+</section>
+
+<!-- BRANCH LOCATOR -->
+<section id="locator" class="px-5 md:px-8 py-16 md:py-24 max-w-7xl mx-auto">
+  <div class="mb-10 md:mb-14">
+    <div class="flex items-center gap-2 mb-3"><span class="text-xs font-bold uppercase tracking-widest text-[var(--primary)]">04 / Branch Locator</span><div class="h-px flex-1 bg-[var(--border)]"></div></div>
+    <h2 class="font-display font-extrabold text-4xl md:text-6xl leading-[0.95] mb-3">Find the nearest<br><span class="highlight-text">sulit</span> branch.</h2>
+    <p class="text-lg text-[var(--muted)] max-w-2xl">Allow location access to find the closest branches of Jollibee, McDonald's, Chowking, KFC, and Mang Inasal within your area. Set your range and find your next meal.</p>
+  </div>
+
+  <div class="grid lg:grid-cols-12 gap-6">
+    <div class="lg:col-span-4">
+      <div class="card p-6 md:p-8 sticky top-24">
+        <div class="mb-6">
+          <button class="btn-primary w-full px-6 py-4 rounded-2xl text-sm font-bold flex items-center justify-center gap-2" id="findMeBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M12 2v3M12 19v3M22 12h-3M5 12H2"/></svg>
+            Use my location
+          </button>
+          <div class="text-xs text-center text-[var(--muted)] mt-3" id="locationStatus">Click the button to find branches near you.</div>
+        </div>
+
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-3">
+            <label class="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Search radius</label>
+            <span class="font-display font-extrabold text-2xl text-[var(--primary)]" id="radiusDisplay">5km</span>
+          </div>
+          <input type="range" min="1" max="20" value="5" step="1" class="calc-budget-slider" id="radiusSlider">
+          <div class="flex justify-between text-[10px] text-[var(--muted)] mt-2 font-semibold">
+            <span>1km</span><span>10km</span><span>20km</span>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <label class="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-3 block">Filter restaurants</label>
+          <div class="space-y-2" id="filterTabs">
+            <button class="goal-btn active w-full px-4 py-2.5 rounded-xl text-sm font-bold text-left flex items-center gap-2" data-resto="jollibee"><span class="w-2 h-2 rounded-full bg-[var(--primary)]"></span> Jollibee</button>
+            <button class="goal-btn active w-full px-4 py-2.5 rounded-xl text-sm font-bold text-left flex items-center gap-2" data-resto="mcdo"><span class="w-2 h-2 rounded-full bg-[var(--accent)]"></span> McDonald's</button>
+            <button class="goal-btn active w-full px-4 py-2.5 rounded-xl text-sm font-bold text-left flex items-center gap-2" data-resto="chowking"><span class="w-2 h-2 rounded-full bg-[var(--maroon)]"></span> Chowking</button>
+            <button class="goal-btn active w-full px-4 py-2.5 rounded-xl text-sm font-bold text-left flex items-center gap-2" data-resto="kfc"><span class="w-2 h-2 rounded-full bg-red-700"></span> KFC</button>
+            <button class="goal-btn active w-full px-4 py-2.5 rounded-xl text-sm font-bold text-left flex items-center gap-2" data-resto="inasal"><span class="w-2 h-2 rounded-full bg-red-800"></span> Mang Inasal</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-8">
+      <div id="branchResults"></div>
+    </div>
+  </div>
+</section>
+
+<!-- HACKS -->
+<section id="hacks" class="px-5 md:px-8 py-16 md:py-24 max-w-7xl mx-auto">
+  <div class="mb-10 md:mb-14">
+    <div class="flex items-center gap-2 mb-3"><span class="text-xs font-bold uppercase tracking-widest text-[var(--primary)]">05 / Life Hacks</span><div class="h-px flex-1 bg-[var(--border)]"></div></div>
+    <h2 class="font-display font-extrabold text-4xl md:text-6xl leading-[0.95] mb-3">The hacks they don't<br>put on the menu.</h2>
+    <p class="text-lg text-[var(--muted)] max-w-2xl">Proven ordering strategies that will save you money, get you more food, or both. Memorize these.</p>
+  </div>
+  <div class="grid md:grid-cols-2 gap-5" id="hacksList"></div>
+</section>
+
+<section class="px-5 md:px-8 py-16 md:py-24 max-w-7xl mx-auto">
+  <div class="insight-card rounded-3xl p-8 md:p-14 relative">
+    <div class="relative z-10 max-w-3xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
+        <span class="w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse"></span>
+        <span class="text-xs font-bold uppercase tracking-wider">The biggest insight</span>
+      </div>
+      <h3 class="font-display font-extrabold text-3xl md:text-5xl leading-[0.95] mb-5">Order the 3-piece Burger Steak. Always.</h3>
+      <p class="text-base md:text-lg leading-relaxed mb-6" style="color: rgba(255,255,255,0.8);">Three singles cost ₱165. The 3-piece combo costs ₱135. That's ₱30 saved for the exact same food — a <span style="color: var(--accent); font-weight: bold;">22% discount</span> for using a different number on the menu board. Jollibee doesn't put this on the wall.</p>
+      <div class="flex flex-wrap gap-3">
+        <div class="px-4 py-2 rounded-full text-sm font-bold" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);">Save ₱30</div>
+        <div class="px-4 py-2 rounded-full text-sm font-bold" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);">Same food</div>
+        <div class="px-4 py-2 rounded-full text-sm font-bold" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);">22% cheaper</div>
+        <div class="px-4 py-2 rounded-full text-sm font-bold" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);">0 effort</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="px-5 md:px-8 py-12 border-t border-[var(--border)] mt-8">
+  <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-8 items-start">
+    <div>
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-9 h-9 rounded-xl bg-[var(--text)] flex items-center justify-center relative overflow-hidden"><div class="absolute inset-0" style="background: linear-gradient(135deg, var(--primary), var(--accent));"></div><span class="relative font-display font-extrabold text-white text-lg">S</span></div>
+        <div class="font-display font-extrabold text-xl">Sulit<span class="text-[var(--primary)]">.ph</span></div>
+      </div>
+      <p class="text-sm text-[var(--muted)] leading-relaxed max-w-xs">Fast food life hacks, dissected for the Filipino palate. Made with hunger in Metro Manila.</p>
+    </div>
+    <div class="text-sm">
+      <div class="font-bold uppercase tracking-wider text-xs text-[var(--muted)] mb-3">Explore</div>
+      <ul class="space-y-2">
+        <li><a href="#compare" class="hover:text-[var(--primary)]">Item Compare</a></li>
+        <li><a href="#combos" class="hover:text-[var(--primary)]">Combo Hacker</a></li>
+        <li><a href="#calculator" class="hover:text-[var(--primary)]">Sulit Calculator</a></li>
+        <li><a href="#locator" class="hover:text-[var(--primary)]">Branch Locator</a></li>
+        <li><a href="#hacks" class="hover:text-[var(--primary)]">Life Hacks</a></li>
+      </ul>
+    </div>
+    <div class="text-sm">
+      <div class="font-bold uppercase tracking-wider text-xs text-[var(--muted)] mb-3">Disclaimer</div>
+      <p class="text-[var(--muted)] leading-relaxed">Prices are approximate, based on Metro Manila stores as of 2024. Actual prices may vary by location. Calorie and weight data are estimates from publicly available nutritional info. Branch locations are simulated for demonstration.</p>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto pt-8 mt-8 border-t border-[var(--border)] flex flex-col md:flex-row justify-between gap-3 text-xs text-[var(--muted)]">
+    <div>© 2024 Sulit.ph. Not affiliated with Jollibee, McDonald's, Chowking, KFC, or Mang Inasal.</div>
+    <div>Made for hungry Filipinos. Bawal ang lugi.</div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============== MENU DATA ==============
+var menu = {
+  jollibee: [
+    { id: 'j-yumburger', name: 'Yumburger', cat: 'Burger', price: 55, cal: 280, protein: 12, carbs: 30, fat: 13, weight: 110, icon: 'burger' },
+    { id: 'j-cheeseburger', name: 'Cheeseburger', cat: 'Burger', price: 65, cal: 310, protein: 14, carbs: 31, fat: 15, weight: 115, icon: 'burger' },
+    { id: 'j-double', name: 'Double Yumburger', cat: 'Burger', price: 95, cal: 440, protein: 22, carbs: 33, fat: 24, weight: 165, icon: 'burger' },
+    { id: 'j-cheesy', name: 'Cheesy Yumburger', cat: 'Burger', price: 79, cal: 340, protein: 15, carbs: 31, fat: 17, weight: 120, icon: 'burger' },
+    { id: 'j-c1', name: 'Chickenjoy 1pc', cat: 'Chicken', price: 92, cal: 340, protein: 21, carbs: 18, fat: 22, weight: 140, icon: 'chicken' },
+    { id: 'j-c2', name: 'Chickenjoy 2pc', cat: 'Chicken', price: 182, cal: 680, protein: 42, carbs: 36, fat: 44, weight: 280, icon: 'chicken' },
+    { id: 'j-c1combo', name: 'Chickenjoy Combo', cat: 'Combo', price: 135, cal: 540, protein: 25, carbs: 48, fat: 26, weight: 360, icon: 'chicken', desc: '1pc + rice + drink' },
+    { id: 'j-spag', name: 'Jolly Spaghetti', cat: 'Pasta', price: 82, cal: 470, protein: 14, carbs: 68, fat: 14, weight: 230, icon: 'spaghetti' },
+    { id: 'j-spagcombo', name: 'Spaghetti + Yumburger', cat: 'Combo', price: 119, cal: 750, protein: 26, carbs: 98, fat: 27, weight: 340, icon: 'spaghetti' },
+    { id: 'j-palabok', name: 'Palabok', cat: 'Pasta', price: 110, cal: 410, protein: 16, carbs: 52, fat: 16, weight: 250, icon: 'spaghetti' },
+    { id: 'j-bs1', name: 'Burger Steak 1pc', cat: 'Steak', price: 55, cal: 250, protein: 11, carbs: 18, fat: 14, weight: 120, icon: 'steak' },
+    { id: 'j-bs3', name: 'Burger Steak 3pc', cat: 'Steak', price: 135, cal: 590, protein: 28, carbs: 36, fat: 36, weight: 280, icon: 'steak' },
+    { id: 'j-hotdog', name: 'Jolly Hotdog', cat: 'Snack', price: 75, cal: 290, protein: 10, carbs: 24, fat: 18, weight: 110, icon: 'hotdog' },
+    { id: 'j-fries-r', name: 'Fries Regular', cat: 'Sides', price: 70, cal: 330, protein: 4, carbs: 42, fat: 16, weight: 115, icon: 'fries' },
+    { id: 'j-fries-l', name: 'Fries Large', cat: 'Sides', price: 95, cal: 580, protein: 7, carbs: 73, fat: 28, weight: 200, icon: 'fries' },
+    { id: 'j-pmp', name: 'Peach Mango Pie', cat: 'Dessert', price: 55, cal: 250, protein: 2, carbs: 36, fat: 11, weight: 85, icon: 'pie' },
+    { id: 'j-halo', name: 'Halo-Halo', cat: 'Dessert', price: 95, cal: 310, protein: 5, carbs: 52, fat: 9, weight: 200, icon: 'halo' },
+    { id: 'j-coke-r', name: 'Coke Regular', cat: 'Drink', price: 45, cal: 140, protein: 0, carbs: 39, fat: 0, weight: 300, icon: 'drink' },
+    { id: 'j-coke-l', name: 'Coke Large', cat: 'Drink', price: 65, cal: 240, protein: 0, carbs: 67, fat: 0, weight: 500, icon: 'drink' },
+    { id: 'j-rice', name: 'Plain Rice', cat: 'Sides', price: 25, cal: 200, protein: 4, carbs: 44, fat: 0, weight: 150, icon: 'steak' }
+  ],
+  mcdo: [
+    { id: 'm-mcchicken', name: 'McChicken', cat: 'Burger', price: 85, cal: 380, protein: 14, carbs: 36, fat: 19, weight: 140, icon: 'burger' },
+    { id: 'm-bigmac', name: 'Big Mac', cat: 'Burger', price: 185, cal: 550, protein: 25, carbs: 45, fat: 30, weight: 220, icon: 'burger' },
+    { id: 'm-cheeseburger', name: 'Cheeseburger', cat: 'Burger', price: 70, cal: 290, protein: 15, carbs: 30, fat: 12, weight: 115, icon: 'burger' },
+    { id: 'm-double', name: 'Double Cheeseburger', cat: 'Burger', price: 130, cal: 440, protein: 25, carbs: 33, fat: 23, weight: 165, icon: 'burger' },
+    { id: 'm-mccombo', name: 'McChicken Combo', cat: 'Combo', price: 145, cal: 600, protein: 18, carbs: 65, fat: 24, weight: 380, icon: 'burger', desc: 'McChicken + fries + drink' },
+    { id: 'm-nuggets6', name: 'McNuggets 6pc', cat: 'Chicken', price: 155, cal: 270, protein: 14, carbs: 16, fat: 17, weight: 100, icon: 'chicken' },
+    { id: 'm-mcspag', name: 'McSpaghetti', cat: 'Pasta', price: 75, cal: 410, protein: 12, carbs: 60, fat: 13, weight: 200, icon: 'spaghetti' },
+    { id: 'm-fries-r', name: 'Fries Regular', cat: 'Sides', price: 70, cal: 320, protein: 4, carbs: 41, fat: 15, weight: 115, icon: 'fries' },
+    { id: 'm-fries-l', name: 'Fries Large', cat: 'Sides', price: 95, cal: 560, protein: 7, carbs: 72, fat: 27, weight: 200, icon: 'fries' },
+    { id: 'm-sundae', name: 'Sundae', cat: 'Dessert', price: 50, cal: 280, protein: 5, carbs: 40, fat: 11, weight: 130, icon: 'pie' },
+    { id: 'm-applepie', name: 'Apple Pie', cat: 'Dessert', price: 45, cal: 230, protein: 2, carbs: 32, fat: 11, weight: 80, icon: 'pie' },
+    { id: 'm-coke-r', name: 'Coke Regular', cat: 'Drink', price: 45, cal: 140, protein: 0, carbs: 39, fat: 0, weight: 300, icon: 'drink' },
+    { id: 'm-rice', name: 'Plain Rice', cat: 'Sides', price: 25, cal: 200, protein: 4, carbs: 44, fat: 0, weight: 150, icon: 'steak' }
+  ],
+  chowking: [
+    { id: 'c-batchoy', name: 'La Paz Batchoy', cat: 'Soup', price: 99, cal: 380, protein: 18, carbs: 32, fat: 18, weight: 250, icon: 'spaghetti' },
+    { id: 'c-chaofan', name: 'Chao Fan', cat: 'Rice', price: 79, cal: 450, protein: 12, carbs: 62, fat: 16, weight: 280, icon: 'spaghetti' },
+    { id: 'c-chaofan-combo', name: 'Chao Fan + Siomai', cat: 'Combo', price: 115, cal: 670, protein: 22, carbs: 80, fat: 27, weight: 370, icon: 'spaghetti', desc: 'Chao Fan + 4pc siomai' },
+    { id: 'c-butterchix', name: 'Buttered Chicken', cat: 'Chicken', price: 149, cal: 480, protein: 25, carbs: 22, fat: 30, weight: 200, icon: 'chicken' },
+    { id: 'c-lauriat', name: 'Chicken Lauriat', cat: 'Combo', price: 169, cal: 720, protein: 28, carbs: 78, fat: 32, weight: 420, icon: 'chicken', desc: 'Chicken + rice + noodles + drink + dessert' },
+    { id: 'c-pansit', name: 'Pancit Canton', cat: 'Noodles', price: 89, cal: 410, protein: 14, carbs: 55, fat: 14, weight: 240, icon: 'spaghetti' },
+    { id: 'c-dumplings', name: 'Pork Siomai', cat: 'Snack', price: 65, cal: 220, protein: 10, carbs: 18, fat: 11, weight: 90, icon: 'steak' },
+    { id: 'c-rice', name: 'Plain Rice', cat: 'Sides', price: 20, cal: 200, protein: 4, carbs: 44, fat: 0, weight: 150, icon: 'steak' }
+  ],
+  kfc: [
+    { id: 'k-c1', name: 'Chicken 1pc', cat: 'Chicken', price: 99, cal: 380, protein: 22, carbs: 12, fat: 24, weight: 150, icon: 'chicken' },
+    { id: 'k-c2', name: 'Chicken 2pc', cat: 'Chicken', price: 185, cal: 760, protein: 44, carbs: 24, fat: 48, weight: 300, icon: 'chicken' },
+    { id: 'k-c1combo', name: 'Chicken Combo', cat: 'Combo', price: 135, cal: 620, protein: 26, carbs: 60, fat: 30, weight: 380, icon: 'chicken', desc: '1pc + rice + drink' },
+    { id: 'k-zinger', name: 'Zinger', cat: 'Burger', price: 95, cal: 470, protein: 18, carbs: 38, fat: 28, weight: 180, icon: 'burger' },
+    { id: 'k-zingercombo', name: 'Zinger Combo', cat: 'Combo', price: 140, cal: 710, protein: 22, carbs: 68, fat: 38, weight: 400, icon: 'burger', desc: 'Zinger + fries + drink' },
+    { id: 'k-famous', name: 'Famous Bowl', cat: 'Rice', price: 115, cal: 580, protein: 24, carbs: 58, fat: 28, weight: 300, icon: 'spaghetti' },
+    { id: 'k-mash', name: 'Mashed Potatoes', cat: 'Sides', price: 50, cal: 120, protein: 2, carbs: 18, fat: 4, weight: 110, icon: 'pie' },
+    { id: 'k-slaw', name: 'Coleslaw', cat: 'Sides', price: 50, cal: 200, protein: 1, carbs: 18, fat: 14, weight: 110, icon: 'halo' },
+    { id: 'k-fries-r', name: 'Fries Regular', cat: 'Sides', price: 65, cal: 300, protein: 4, carbs: 38, fat: 15, weight: 115, icon: 'fries' },
+    { id: 'k-rice', name: 'Rice', cat: 'Sides', price: 25, cal: 200, protein: 4, carbs: 44, fat: 0, weight: 150, icon: 'steak' },
+    { id: 'k-drink', name: 'Drink', cat: 'Drink', price: 45, cal: 140, protein: 0, carbs: 39, fat: 0, weight: 300, icon: 'drink' }
+  ],
+  inasal: [
+    { id: 'i-pecho', name: 'Pecho (Breast)', cat: 'Chicken', price: 99, cal: 420, protein: 35, carbs: 10, fat: 24, weight: 200, icon: 'chicken' },
+    { id: 'i-paa', name: 'Paa (Leg/Thigh)', cat: 'Chicken', price: 89, cal: 380, protein: 28, carbs: 10, fat: 24, weight: 180, icon: 'chicken' },
+    { id: 'i-pak-pak', name: 'Pak-pak (Wings)', cat: 'Chicken', price: 75, cal: 280, protein: 20, carbs: 8, fat: 18, weight: 120, icon: 'chicken' },
+    { id: 'i-pecho-meal', name: 'Pecho Meal', cat: 'Combo', price: 109, cal: 620, protein: 39, carbs: 54, fat: 24, weight: 350, icon: 'chicken', desc: 'Pecho + rice + drink' },
+    { id: 'i-pork-bbq', name: 'Pork BBQ (2pcs)', cat: 'Pork', price: 80, cal: 300, protein: 15, carbs: 18, fat: 18, weight: 120, icon: 'steak' },
+    { id: 'i-batchoy', name: 'Batchoy', cat: 'Soup', price: 99, cal: 380, protein: 18, carbs: 32, fat: 18, weight: 250, icon: 'spaghetti' },
+    { id: 'i-sago', name: "Sago't Gulaman", cat: 'Drink', price: 35, cal: 150, protein: 0, carbs: 38, fat: 0, weight: 300, icon: 'drink' },
+    { id: 'i-rice', name: 'Unlimited Rice', cat: 'Sides', price: 25, cal: 400, protein: 8, carbs: 88, fat: 0, weight: 300, icon: 'steak' }
+  ]
+};
+
+var restaurantNames = { jollibee: 'Jollibee', mcdo: "McDonald's", chowking: 'Chowking', kfc: 'KFC', inasal: 'Mang Inasal' };
+var brandColors = { jollibee: '#FF5722', mcdo: '#F59E0B', chowking: '#7C2D12', kfc: '#B91C1C', inasal: '#991B1B' };
+var brandLetters = { jollibee: 'J', mcdo: 'M', chowking: 'C', kfc: 'K', inasal: 'I' };
+
+var foodIcons = {
+  burger: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 11c0-3.5 3.5-6 8-6s8 2.5 8 6H4z" fill="#FFB088"/><path d="M4 11h16v1.5H4zM5 14.5h14M6 17.5h12" stroke="#7C2D12" stroke-width="1.5" stroke-linecap="round"/><path d="M3 20h18a1 1 0 001-1v-1H2v1a1 1 0 001 1z" fill="#C2410C"/></svg>',
+  chicken: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 4c3 0 6 2 6 6 0 4-3 7-7 7-2 0-4-1-5-3l-3 3-2-2 3-3c-1-1-1-3 0-5 1-2 4-3 8-3z" fill="#FFB088" stroke="#7C2D12" stroke-width="1.5"/></svg>',
+  spaghetti: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 12c0-3 4-5 9-5s9 2 9 5-4 5-9 5-9-2-9-5z" fill="#C2410C" stroke="#7C2D12" stroke-width="1.5"/><path d="M6 10c2 1 4 1 6 0M12 11c2 1 4 1 6 0M7 13c2 1 4 1 6 0" stroke="#F59E0B" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  steak: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="12" rx="9" ry="6" fill="#7C2D12" stroke="#5C1A0A" stroke-width="1.5"/><path d="M8 10c1 1 2 1 3 0M13 14c1 1 2 1 3 0" stroke="#FFB088" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  hotdog: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="18" height="6" rx="3" fill="#C2410C" stroke="#7C2D12" stroke-width="1.5"/><path d="M6 13c1 0 2-1 3-1M12 13c1 0 2-1 3-1" stroke="#FFE4D6" stroke-width="1" stroke-linecap="round"/></svg>',
+  fries: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 8h12l-1 12H7L6 8z" fill="#FF5722" stroke="#7C2D12" stroke-width="1.5"/><path d="M9 8V4M12 8V3M15 8V4" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/></svg>',
+  pie: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 12l9-7 9 7-9 8-9-8z" fill="#F59E0B" stroke="#7C2D12" stroke-width="1.5"/><path d="M8 12l4-3 4 3" stroke="#FFE4D6" stroke-width="1.2"/></svg>',
+  halo: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 10h14v8a3 3 0 01-3 3H8a3 3 0 01-3-3v-8z" fill="#FF5722" stroke="#7C2D12" stroke-width="1.5"/><circle cx="9" cy="8" r="2" fill="#F59E0B"/><circle cx="14" cy="7" r="1.5" fill="#15803D"/><path d="M5 10h14" stroke="#7C2D12" stroke-width="1.5"/></svg>',
+  drink: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 5h12l-1 16H7L6 5z" fill="#FF5722" stroke="#7C2D12" stroke-width="1.5"/><path d="M10 5V2h4v3" stroke="#7C2D12" stroke-width="1.5"/></svg>'
+};
+
+// ============== STATE ==============
+var currentResto = 'jollibee';
+var leftSelection = 'j-bs3';
+var rightSelection = 'j-c1combo';
+var calcResto = 'jollibee';
+var calcBudget = 200;
+var calcGoal = 'calories';
+var userLoc = { lat: 14.5790, lng: 120.9720, set: false };
+var locRange = 5;
+var locFilters = { jollibee: true, mcdo: true, chowking: true, kfc: true, inasal: true };
+var listState = { left: { q: '', sort: 'default' }, right: { q: '', sort: 'default' } };
+
+// ============== UTIL ==============
+function fmt(n) { return Math.round(n * 10) / 10; }
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2200);
+}
+
+function getItem(id) {
+  var keys = Object.keys(menu);
+  for (var i = 0; i < keys.length; i++) {
+    var r = keys[i];
+    for (var j = 0; j < menu[r].length; j++) {
+      if (menu[r][j].id === id) {
+        var copy = {};
+        for (var k in menu[r][j]) copy[k] = menu[r][j][k];
+        copy.resto = r;
+        return copy;
+      }
+    }
+  }
+  return null;
+}
+
+function calPerPeso(i) { return i.cal / i.price; }
+function proteinPerPeso(i) { return i.protein / i.price; }
+function gramsPerPeso(i) { return i.weight / i.price; }
+
+function sulitScore(i) {
+  var cp = Math.min(calPerPeso(i) / 6, 1);
+  var pp = Math.min(proteinPerPeso(i) / 0.3, 1);
+  var gp = Math.min(gramsPerPeso(i) / 4, 1);
+  return Math.round((cp * 0.4 + pp * 0.35 + gp * 0.25) * 100);
+}
+
+function haversine(lat1, lon1, lat2, lon2) {
+  var R = 6371;
+  var dLat = (lat2 - lat1) * Math.PI / 180;
+  var dLon = (lon2 - lon1) * Math.PI / 180;
+  var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function bestSulitId(resto) {
+  var sorted = menu[resto].slice().sort(function(a, b) { return sulitScore(b) - sulitScore(a); });
+  if (sorted[0].id === leftSelection && sorted.length > 1) return sorted[1].id;
+  return sorted[0].id;
+}
+
+// ============== ITEM LISTS ==============
+function filterAndSort(items, s) {
+  var out = items.filter(function(i) {
+    if (!s.q) return true;
+    return i.name.toLowerCase().indexOf(s.q) > -1 || i.cat.toLowerCase().indexOf(s.q) > -1;
+  });
+  if (s.sort === 'price-asc')     out.sort(function(a, b) { return a.price - b.price; });
+  if (s.sort === 'price-desc')    out.sort(function(a, b) { return b.price - a.price; });
+  if (s.sort === 'cal-value')     out.sort(function(a, b) { return calPerPeso(b) - calPerPeso(a); });
+  if (s.sort === 'protein-value') out.sort(function(a, b) { return proteinPerPeso(b) - proteinPerPeso(a); });
+  if (s.sort === 'sulit')         out.sort(function(a, b) { return sulitScore(b) - sulitScore(a); });
+  return out;
+}
+
+function itemCardHTML(i, side) {
+  var selected = side === 'left' ? leftSelection === i.id : rightSelection === i.id;
+  var selClass = side === 'left' ? 'selected-left' : 'selected-right';
+  var badge = '';
+  if (i.prevPrice) {
+    var d = i.prevPrice - i.price;
+    badge = d > 0
+      ? ' <span class="sulit-badge">▼' + d + '</span>'
+      : (d < 0 ? ' <span class="lugi-badge">▲' + (-d) + '</span>' : '');
+  }
+  return '<div class="item-card p-3 ' + (selected ? selClass : '') + '" data-id="' + i.id + '" data-side="' + side + '">' +
+    '<div class="flex items-center gap-2.5">' +
+      '<div class="food-icon" style="width:36px;height:36px;border-radius:10px;background:var(--bg-alt);">' + (foodIcons[i.icon] || '') + '</div>' +
+      '<div class="flex-1 min-w-0"><div class="font-bold text-sm leading-tight truncate">' + i.name + '</div>' +
+      '<div class="text-[11px] text-[var(--muted)]">' + i.cat + ' &middot; ' + i.cal + ' cal</div></div>' +
+      '<div class="text-right"><div class="font-display font-extrabold text-sm">₱' + i.price + '</div>' + badge + '</div>' +
+    '</div></div>';
+}
+
+function renderLists() {
+  var items = menu[currentResto];
+  var l = filterAndSort(items, listState.left);
+  var r = filterAndSort(items, listState.right);
+  var leftHTML = '', rightHTML = '';
+  for (var i = 0; i < l.length; i++) leftHTML += itemCardHTML(l[i], 'left');
+  for (var j = 0; j < r.length; j++) rightHTML += itemCardHTML(r[j], 'right');
+  document.getElementById('leftList').innerHTML = leftHTML || '<div class="text-xs text-[var(--muted)] text-center py-6">No items match.</div>';
+  document.getElementById('rightList').innerHTML = rightHTML || '<div class="text-xs text-[var(--muted)] text-center py-6">No items match.</div>';
+  document.getElementById('leftCount').textContent = l.length + ' items';
+  document.getElementById('rightCount').textContent = r.length + ' items';
+}
+
+// ============== COMPARISON ==============
+var METRICS = [
+  { label: 'Price', better: 'lower', get: function(i) { return i.price; }, fmt: function(v) { return '₱' + v; } },
+  { label: 'Calories', better: 'higher', get: function(i) { return i.cal; }, fmt: function(v) { return v + ' cal'; } },
+  { label: 'Protein', better: 'higher', get: function(i) { return i.protein; }, fmt: function(v) { return v + ' g'; } },
+  { label: 'Weight', better: 'higher', get: function(i) { return i.weight; }, fmt: function(v) { return v + ' g'; } },
+  { label: 'Cal per peso', better: 'higher', get: calPerPeso, fmt: function(v) { return fmt(v) + ' cal/₱'; } },
+  { label: 'Protein per peso', better: 'higher', get: proteinPerPeso, fmt: function(v) { return fmt(v) + ' g/₱'; } },
+  { label: 'Sulit score', better: 'higher', get: sulitScore, fmt: function(v) { return v + '/100'; } }
+];
+
+function renderComparison() {
+  var a = getItem(leftSelection);
+  var b = getItem(rightSelection);
+  var panel = document.getElementById('comparisonPanel');
+  if (!a || !b) {
+    panel.innerHTML = '<div class="text-center py-20 text-[var(--muted)] text-sm">Pick items from both lists to start the showdown.</div>';
+    return;
+  }
+  if (a.id === b.id) {
+    panel.innerHTML = '<div class="text-center py-16"><div class="text-5xl mb-4">🍔</div>' +
+      '<div class="font-display font-extrabold text-2xl mb-2">It\'s literally the same item.</div>' +
+      '<div class="text-sm text-[var(--muted)]">Pick two different ones to see who\'s more sulit.</div></div>';
+    return;
+  }
+
+  var aWins = 0, bWins = 0, rows = '';
+  for (var m = 0; m < METRICS.length; m++) {
+    var M = METRICS[m];
+    var av = M.get(a), bv = M.get(b);
+    var max = Math.max(av, bv) || 1;
+    var aw = M.better === 'lower' ? (1 - av / max) * 100 : (av / max) * 100;
+    var bw = M.better === 'lower' ? (1 - bv / max) * 100 : (bv / max) * 100;
+    var aWin = M.better === 'lower' ? av < bv : av > bv;
+    var bWin = M.better === 'lower' ? bv < av : bv > bv;
+    if (aWin) aWins++;
+    if (bWin) bWins++;
+    rows += '<div>' +
+      '<div class="flex justify-between items-baseline mb-1.5">' +
+        '<span class="font-display font-extrabold ' + (aWin ? 'text-[var(--primary)]' : 'text-[var(--muted)]') + '">' + M.fmt(av) + '</span>' +
+        '<span class="text-[10px] font-bold uppercase tracking-widest text-[var(--muted)]">' + M.label + '</span>' +
+        '<span class="font-display font-extrabold ' + (bWin ? 'text-[var(--maroon)]' : 'text-[var(--muted)]') + '">' + M.fmt(bv) + '</span>' +
+      '</div>' +
+      '<div class="flex gap-1.5">' +
+        '<div class="flex-1 h-2.5 rounded-l-full overflow-hidden flex justify-end" style="background:var(--bg-alt)"><div class="metric-fill" style="width:' + Math.max(aw, 4) + '%"></div></div>' +
+        '<div class="flex-1 h-2.5 rounded-r-full overflow-hidden" style="background:var(--bg-alt)"><div class="metric-fill right" style="width:' + Math.max(bw, 4) + '%"></div></div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function headBlock(i, color) {
+    return '<div class="text-center">' +
+      '<div class="food-icon mx-auto mb-3" style="background:var(--primary-soft)">' + (foodIcons[i.icon] || '') + '</div>' +
+      '<div class="font-display font-bold text-lg leading-tight mb-1">' + i.name + '</div>' +
+      '<div class="text-xs text-[var(--muted)] mb-2">' + i.cat + (i.desc ? ' · ' + i.desc : '') + '</div>' +
+      '<div class="font-display font-extrabold text-2xl" style="color:' + color + '">₱' + i.price + '</div>' +
+      (i.prevPrice ? '<div class="text-xs text-[var(--muted)] line-through">₱' + i.prevPrice + '</div>' : '') +
+    '</div>';
+  }
+
+  var winner, loser, wWins, lWins, verdictHTML;
+  if (aWins === bWins) {
+    verdictHTML = '<div class="verdict-glow rounded-2xl p-5 mt-2 text-center">' +
+      '<div class="font-display font-extrabold text-lg mb-1">Too close to call — ' + aWins + '–' + bWins + '</div>' +
+      '<p class="text-sm text-[var(--muted)]">Even stevens. Pick based on craving, not math.</p></div>';
+  } else {
+    winner = aWins > bWins ? a : b; loser = aWins > bWins ? b : a;
+    wWins = Math.max(aWins, bWins); lWins = Math.min(aWins, bWins);
+    var diff = Math.abs(a.price - b.price);
+    var note;
+    if (diff === 0) note = 'Same price — the ' + winner.name + ' just delivers more per peso.';
+    else if (winner.price < loser.price) note = 'Wins on value AND it\'s ₱' + diff + ' cheaper. No-brainer.';
+    else note = 'Costs ₱' + diff + ' more, but you get more per peso. Sulit if you\'re actually hungry.';
+    verdictHTML = '<div class="verdict-glow rounded-2xl p-5 mt-2">' +
+      '<div class="flex items-center justify-between mb-2">' +
+        '<div class="font-display font-extrabold text-lg">' + winner.name + ' wins ' + wWins + '–' + lWins + '</div>' +
+        '<span class="sulit-badge">Sulit Pick</span>' +
+      '</div>' +
+      '<p class="text-sm text-[var(--muted)] leading-relaxed">' + note + ' ' + loser.name + ' only takes ' + lWins + (lWins === 1 ? ' metric.' : ' metrics.') + '</p>' +
+    '</div>';
+  }
+
+  panel.innerHTML =
+    '<div class="flex items-center justify-between mb-6">' +
+      '<span class="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">' + restaurantNames[currentResto] + ' · head-to-head</span>' +
+      '<button class="swap-btn text-xs font-bold flex items-center gap-1.5" id="swapBtn">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 16V4M7 4L3 8M7 4l4 4M17 8v12M17 20l4-4M17 20l-4-4"/></svg>Swap sides</button>' +
+    '</div>' +
+    '<div class="grid items-center gap-4 mb-8" style="grid-template-columns:1fr auto 1fr;">' +
+      headBlock(a, 'var(--primary)') + '<div class="vs-circle">VS</div>' + headBlock(b, 'var(--maroon)') +
+    '</div>' +
+    '<div class="space-y-5 mb-8">' + rows + '</div>' + verdictHTML;
+
+  document.getElementById('swapBtn').addEventListener('click', function() {
+    var t = leftSelection; leftSelection = rightSelection; rightSelection = t;
+    renderLists(); renderComparison();
+  });
+}
+
+// ============== COMBOS ==============
+var combos = [
+  { resto: 'jollibee', icon: 'steak', title: 'Burger Steak 3pc', desc: 'The famous one. Same food, different number on the board.', main: '3pc combo', mainP: 135, vs: '3 × 1pc singles', vsP: 165 },
+  { resto: 'jollibee', icon: 'chicken', title: 'Chickenjoy Combo', desc: '1pc + rice + drink vs buying each separately.', main: 'Combo price', mainP: 135, vs: '1pc + rice + Coke', vsP: 162 },
+  { resto: 'jollibee', icon: 'spaghetti', title: 'Spaghetti + Yumburger', desc: 'The ₱18 quiet saver from the marquee.', main: 'Bundled', mainP: 119, vs: 'Separately', vsP: 137 },
+  { resto: 'mcdo', icon: 'burger', title: 'McChicken Combo', desc: 'McChicken + fries + drink vs à la carte.', main: 'Combo price', mainP: 145, vs: 'Bought separately', vsP: 200 },
+  { resto: 'mcdo', icon: 'burger', title: 'Double Cheeseburger', desc: 'One double vs two singles.', main: '1 × Double', mainP: 130, vs: '2 × Cheeseburger', vsP: 140 },
+  { resto: 'chowking', icon: 'spaghetti', title: 'Chao Fan + Siomai', desc: 'Chao Fan + 4pc siomai vs separate orders.', main: 'Combo price', mainP: 115, vs: 'Bought separately', vsP: 144 },
+  { resto: 'kfc', icon: 'chicken', title: 'KFC Chicken Combo', desc: '1pc + rice + drink vs building it yourself.', main: 'Combo price', mainP: 135, vs: '1pc + rice + drink', vsP: 169 },
+  { resto: 'inasal', icon: 'chicken', title: 'Pecho Meal', desc: 'Pecho + rice + drink. The protein king\'s throne.', main: 'Meal price', mainP: 109, vs: 'Pecho + rice + sago', vsP: 159 },
+  { resto: 'jollibee', icon: 'fries', title: 'The Fries Trap', desc: 'Never order two regulars. The large is the real combo.', main: '2 × Fries Regular', mainP: 140, vs: '1 × Fries Large', vsP: 95 },
+  { resto: 'jollibee', icon: 'drink', title: 'The Coke Trap', desc: 'Two regular drinks vs one large. Same thirst, ₱25 wasted.', main: '2 × Coke Regular', mainP: 90, vs: '1 × Coke Large', vsP: 65 }
+];
+
+function renderCombos() {
+  var html = '';
+  for (var i = 0; i < combos.length; i++) {
+    var c = combos[i];
+    var savings = c.vsP - c.mainP;
+    var isSulit = savings > 0;
+    var barW = Math.min(Math.abs(savings) / c.vsP * 100, 100);
+    html += '<div class="card calc-result-card p-5">' +
+      '<div class="flex items-center justify-between mb-3">' +
+        '<span class="text-[10px] font-bold uppercase tracking-widest" style="color:' + brandColors[c.resto] + '">' + restaurantNames[c.resto] + '</span>' +
+        (isSulit ? '<span class="sulit-badge">Save ₱' + savings + '</span>' : '<span class="lugi-badge">₱' + (-savings) + ' lugi</span>') +
+      '</div>' +
+      '<div class="flex items-center gap-3 mb-1">' +
+        '<div class="food-icon" style="background:var(--bg-alt)">' + (foodIcons[c.icon] || '') + '</div>' +
+        '<div class="font-display font-bold text-lg leading-tight">' + c.title + '</div>' +
+      '</div>' +
+      '<div class="text-xs text-[var(--muted)] mb-4">' + c.desc + '</div>' +
+      '<div class="space-y-2 text-sm">' +
+        '<div class="flex justify-between"><span class="text-[var(--muted)]">' + c.main + '</span><span class="font-bold ' + (isSulit ? '' : 'line-through text-[var(--muted)]') + '">₱' + c.mainP + '</span></div>' +
+        '<div class="flex justify-between"><span class="text-[var(--muted)]">' + c.vs + '</span><span class="font-bold ' + (isSulit ? 'line-through text-[var(--muted)]' : 'text-[var(--success)]') + '">₱' + c.vsP + '</span></div>' +
+      '</div>' +
+      '<div class="combo-bar mt-4"><div class="combo-fill" style="width:' + Math.max(barW, 12) + '%; background:' + (isSulit ? 'linear-gradient(90deg, var(--primary), var(--accent))' : '#DC2626') + '">' + (isSulit ? '₱' + savings + ' saved' : '₱' + (-savings) + ' sayang') + '</div></div>' +
+    '</div>';
+  }
+  document.getElementById('comboGrid').innerHTML = html;
+}
+
+// ============== SULIT CALCULATOR ==============
+function computeCalc() {
+  var items = menu[calcResto];
+  var out = [];
+  var cur = [];
+
+  function evalCombo() {
+    var cal = 0, pro = 0, sco = 0, spent = 0;
+    for (var x = 0; x < cur.length; x++) {
+      var it = items[cur[x]];
+      cal += it.cal; pro += it.protein; sco += sulitScore(it); spent += it.price;
+    }
+    out.push({ idx: cur.slice(), spent: spent, cal: cal, pro: pro, sco: Math.round(sco / cur.length), n: cur.length });
+  }
+
+  function rec(start, spent) {
+    if (cur.length >= 1) evalCombo();
+    if (cur.length >= 4) return;
+    for (var j = start; j < items.length; j++) {
+      var np = spent + items[j].price;
+      if (np <= calcBudget) {
+        cur.push(j);
+        rec(j, np);
+        cur.pop();
+      }
+    }
+  }
+
+  rec(0, 0);
+  var key = calcGoal === 'calories' ? 'cal' : (calcGoal === 'protein' ? 'pro' : 'sco');
+  out.sort(function(a, b) {
+    if (b[key] !== a[key]) return b[key] - a[key];
+    if (a.spent !== b.spent) return a.spent - b.spent;
+    return a.n - b.n;
+  });
+  return { total: out.length, top: out.slice(0, 3) };
+}
+
+function renderCalc() {
+  var res = computeCalc();
+  var el = document.getElementById('calcResults');
+  var goalNames = { calories: 'Maximum food', protein: 'Maximum protein', score: 'Best sulit score' };
+
+  if (!res.top.length) {
+    el.innerHTML = '<div class="card p-10 text-center"><div class="font-display font-bold text-lg mb-2">No combination fits ₱' + calcBudget + ' here.</div><div class="text-sm text-[var(--muted)]">Try a bigger budget — or switch to Chowking, where rice starts at ₱20.</div></div>';
+    return;
+  }
+
+  var items = menu[calcResto];
+  var maxVal = res.top[0][calcGoal === 'calories' ? 'cal' : (calcGoal === 'protein' ? 'pro' : 'sco')];
+  var html = '<div class="flex items-center justify-between mb-5">' +
+    '<span class="text-xs font-bold uppercase tracking-widest text-[var(--muted)]">Top 3 · ' + goalNames[calcGoal] + ' · under ₱' + calcBudget + '</span>' +
+    '<span class="text-[11px] text-[var(--muted)]">Brute-forced ' + res.total.toLocaleString() + ' combos</span></div>';
+
+  for (var r = 0; r < res.top.length; r++) {
+    var c = res.top[r];
+    // group repeated items
+    var groups = {};
+    for (var x = 0; x < c.idx.length; x++) groups[c.idx[x]] = (groups[c.idx[x]] || 0) + 1;
+    var chips = '', names = [];
+    for (var g in groups) {
+      var it = items[g];
+      names.push((groups[g] > 1 ? groups[g] + '× ' : '') + it.name);
+      chips += '<div class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold" style="background:var(--bg-alt)">' +
+        '<div style="width:24px;height:24px;border-radius:7px;background:var(--card);display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+        '<span style="transform:scale(0.75);transform-origin:center;display:block">' + (foodIcons[it.icon] || '') + '</span></div>' +
+        (groups[g] > 1 ? groups[g] + ' × ' : '') + it.name +
+        '<span class="text-[var(--muted)] font-semibold">₱' + (it.price * groups[g]) + '</span></div>';
+    }
+    var goalVal = calcGoal === 'calories' ? c.cal : (calcGoal === 'protein' ? c.pro : c.sco);
+    html += '<div class="card calc-result-card p-5 md:p-6 mb-4">' +
+      '<div class="flex items-center justify-between mb-4">' +
+        '<div class="flex items-center gap-3">' +
+          '<div class="w-9 h-9 rounded-full flex items-center justify-center font-display font-extrabold text-sm flex-shrink-0" style="background:var(--text);color:var(--bg)">' + (r + 1) + '</div>' +
+          '<div><div class="font-bold text-sm">' + c.n + ' item' + (c.n > 1 ? 's' : '') + '</div><div class="text-[11px] text-[var(--muted)]">' + names.join(' + ') + '</div></div>' +
+        '</div>' +
+        '<div class="text-right flex-shrink-0"><div class="font-display font-extrabold text-2xl">₱' + c.spent + '</div><div class="text-[11px] text-[var(--muted)]">₱' + (calcBudget - c.spent) + ' left</div></div>' +
+      '</div>' +
+      '<div class="flex flex-wrap gap-2 mb-4">' + chips + '</div>' +
+      '<div class="grid grid-cols-3 gap-3 text-center mb-3">' +
+        '<div class="rounded-xl py-2" style="background:var(--bg-alt)"><div class="font-display font-extrabold">' + c.cal + '</div><div class="text-[10px] uppercase tracking-wider text-[var(--muted)] font-bold">calories</div></div>' +
+        '<div class="rounded-xl py-2" style="background:var(--bg-alt)"><div class="font-display font-extrabold">' + c.pro + 'g</div><div class="text-[10px] uppercase tracking-wider text-[var(--muted)] font-bold">protein</div></div>' +
+        '<div class="rounded-xl py-2" style="background:var(--bg-alt)"><div class="font-display font-extrabold">' + c.sco + '</div><div class="text-[10px] uppercase tracking-wider text-[var(--muted)] font-bold">sulit score</div></div>' +
+      '</div>' +
+      '<div class="flex items-center gap-3"><span class="text-[10px] font-bold uppercase tracking-widest text-[var(--muted)] w-24">' + goalNames[calcGoal] + '</span>' +
+      '<div class="metric-bar flex-1"><div class="metric-fill" style="width:' + Math.max(goalVal / maxVal * 100, 4) + '%"></div></div></div>' +
+    '</div>';
+  }
+  el.innerHTML = html;
+}
+
+// ============== BRANCH LOCATOR ==============
+var branches = [
+  { resto: 'jollibee', name: 'Jollibee — SM Megamall', lat: 14.5841, lng: 121.0600, area: 'Ortigas, Pasig' },
+  { resto: 'jollibee', name: 'Jollibee — SM North EDSA', lat: 14.5996, lng: 121.0296, area: 'Quezon City' },
+  { resto: 'jollibee', name: 'Jollibee — Glorietta', lat: 14.5460, lng: 121.0228, area: 'Makati' },
+  { resto: 'jollibee', name: 'Jollibee — Cubao', lat: 14.6170, lng: 121.0610, area: 'Quezon City' },
+  { resto: 'mcdo', name: "McDonald's — Katipunan", lat: 14.5740, lng: 121.0650, area: 'Quezon City' },
+  { resto: 'mcdo', name: "McDonald's — MOA", lat: 14.5353, lng: 121.0201, area: 'Pasay' },
+  { resto: 'mcdo', name: "McDonald's — España", lat: 14.5995, lng: 120.9860, area: 'Sampaloc, Manila' },
+  { resto: 'mcdo', name: "McDonald's — BGC", lat: 14.5409, lng: 121.0353, area: 'Taguig' },
+  { resto: 'chowking', name: 'Chowking — Binondo', lat: 14.6047, lng: 120.9753, area: 'Manila' },
+  { resto: 'chowking', name: 'Chowking — Taft Ave', lat: 14.5651, lng: 120.9860, area: 'Malate, Manila' },
+  { resto: 'chowking', name: 'Chowking — Fairview', lat: 14.6687, lng: 121.0330, area: 'Quezon City' },
+  { resto: 'chowking', name: 'Chowking — Marikina', lat: 14.6300, lng: 121.1120, area: 'Marikina' },
+  { resto: 'kfc', name: 'KFC — Robinsons Galleria', lat: 14.5745, lng: 121.0612, area: 'Ortigas, Pasig' },
+  { resto: 'kfc', name: 'KFC — Greenbelt', lat: 14.5490, lng: 121.0215, area: 'Makati' },
+  { resto: 'kfc', name: 'KFC — Eastwood', lat: 14.6160, lng: 121.0780, area: 'Quezon City' },
+  { resto: 'kfc', name: 'KFC — Trinoma', lat: 14.5959, lng: 121.0330, area: 'Quezon City' },
+  { resto: 'inasal', name: 'Mang Inasal — Taft Ave', lat: 14.5621, lng: 120.9832, area: 'Malate, Manila' },
+  { resto: 'inasal', name: 'Mang Inasal — Sta. Mesa', lat: 14.5990, lng: 121.0130, area: 'Manila' },
+  { resto: 'inasal', name: 'Mang Inasal — Taguig', lat: 14.5200, lng: 121.0700, area: 'Taguig' },
+  { resto: 'inasal', name: 'Mang Inasal — Pasig', lat: 14.5850, lng: 121.0750, area: 'Pasig' }
+];
+
+function renderBranches() {
+  var list = [];
+  for (var i = 0; i < branches.length; i++) {
+    var b = branches[i];
+    if (!locFilters[b.resto]) continue;
+    var d = haversine(userLoc.lat, userLoc.lng, b.lat, b.lng);
+    if (d <= locRange) { var c = {}; for (var k in b) c[k] = b[k]; c.dist = d; list.push(c); }
+  }
+  list.sort(function(a, b) { return a.dist - b.dist; });
+
+  var html = '';
+  if (!list.length) {
+    html = '<div class="card p-10 text-center text-[var(--muted)]">No branches within ' + locRange + 'km — widen your search radius.</div>';
+  } else {
+    for (var j = 0; j < list.length; j++) {
+      var br = list[j];
+      var maps = 'https://www.google.com/maps/dir/?api=1&destination=' + br.lat + ',' + br.lng;
+      var nearest = (j === 0 && userLoc.set);
+      html += '<div class="card branch-card p-5 flex items-center gap-4 mb-3">' +
+        '<div class="food-icon font-display font-extrabold text-lg" style="background:' + brandColors[br.resto] + '22;color:' + brandColors[br.resto] + '">' + brandLetters[br.resto] + '</div>' +
+        '<div class="flex-1 min-w-0">' +
+          '<div class="font-bold text-sm flex items-center gap-2">' + (nearest ? '<span class="w-2.5 h-2.5 rounded-full pulse-dot" style="background:var(--primary)"></span>' : '') + br.name + (nearest ? ' <span class="sulit-badge">Nearest</span>' : '') + '</div>' +
+          '<div class="text-xs text-[var(--muted)]">' + br.area + ' · ' + restaurantNames[br.resto] + '</div>' +
+        '</div>' +
+        '<div class="text-right flex-shrink-0">' +
+          '<div class="font-display font-extrabold">' + (br.dist < 1 ? Math.round(br.dist * 1000) + 'm' : fmt(br.dist) + 'km') + '</div>' +
+          '<a href="' + maps + '" target="_blank" rel="noopener" class="text-xs font-bold text-[var(--primary)]">Directions →</a>' +
+        '</div>' +
+      '</div>';
+    }
+  }
+  document.getElementById('branchResults').innerHTML = html;
+  var status = document.getElementById('locationStatus');
+  status.textContent = (userLoc.set ? list.length + ' branches within ' + locRange + 'km of you' : 'Demo: ' + list.length + ' branches within ' + locRange + 'km of Manila center — tap "Use my location" for real distances.');
+}
+
+// ============== HACKS ==============
+var hacks = [
+  { icon: 'burger', title: '2 Yumburgers > 1 Double Yumburger', body: 'Two singles cost ₱110 vs ₱95 for the Double — but per peso, the singles win: 5.1 cal/₱ vs 4.6. Only order the Double if you need 440 calories in one hand.', tags: ['5.1 cal/₱', 'More bun', 'Crunch ×2'] },
+  { icon: 'steak', title: 'The 3pc Burger Steak rule', body: 'Three 1pc orders cost ₱165. The 3pc costs ₱135. Same food, ₱30 free. This is the single best move on the Jollibee menu.', tags: ['Save ₱30', '22% off', '0 effort'] },
+  { icon: 'spaghetti', title: 'The ₱18 combo secret', body: "Jolly Spaghetti + Yumburger bundled is ₱119. Separately it's ₱137. Bundles aren't always hype — this one quietly saves you a jeepney fare.", tags: ['Save ₱18', '750 cal total'] },
+  { icon: 'chicken', title: 'Pecho is the protein king', body: "Mang Inasal's Pecho delivers 0.35g of protein per peso — the highest on this entire site. Gym people, this is your spot. Add unlimited rice and you're at 39g protein for ₱134.", tags: ['0.35g protein/₱', 'Gym-approved'] },
+  { icon: 'pie', title: 'Peach Mango Pie = best dessert value', body: '4.5 cal per peso. Nothing else in the dessert section comes close. Halo-Halo is ambience; the pie is math.', tags: ['4.5 cal/₱', '₱55'] },
+  { icon: 'fries', title: 'Never order two regular fries', body: 'Two regulars: ₱140 and 660 cal. One large: ₱95 and 580 cal. The large is ₱45 cheaper for nearly the same potato. The classic lugi trap.', tags: ['Save ₱45', 'Same potato'] },
+  { icon: 'steak', title: 'Unlimited rice is a cheat code', body: "₱25 for unlimited rice at Mang Inasal. Even at two refills that's 16 cal/₱ — the highest calorie value on the site. Paa + unlimited rice = ₱114, 780+ cal.", tags: ['16 cal/₱', '₱25'] },
+  { icon: 'spaghetti', title: 'Famous Bowl: bulk tool, not value tool', body: "580 cal in one bowl looks sulit, but at ₱115 it's 5.0 cal/₱ — middle of the pack. Order it when you're bulking, not when you're budgeting.", tags: ['580 cal', 'Middle tier'] }
+];
+
+function renderHacks() {
+  var html = '';
+  for (var i = 0; i < hacks.length; i++) {
+    var h = hacks[i];
+    var tags = '';
+    for (var t = 0; t < h.tags.length; t++) {
+      tags += '<span class="px-3 py-1 rounded-full text-[11px] font-bold" style="background:var(--primary-soft);color:var(--primary-dark)">' + h.tags[t] + '</span>';
+    }
+    html += '<div class="card p-6">' +
+      '<div class="flex items-start gap-4">' +
+        '<div class="food-icon flex-shrink-0" style="background:var(--primary-soft)">' + (foodIcons[h.icon] || '') + '</div>' +
+        '<div>' +
+          '<div class="font-display font-bold text-lg mb-2 leading-tight">' + h.title + '</div>' +
+          '<p class="text-sm text-[var(--muted)] leading-relaxed mb-4">' + h.body + '</p>' +
+          '<div class="flex flex-wrap gap-2">' + tags + '</div>' +
+        '</div>' +
+      '</div></div>';
+  }
+  document.getElementById('hacksList').innerHTML = html;
+}
+
+// ============== COUNTERS ==============
+function animateCounters() {
+  document.querySelectorAll('[data-target]').forEach(function(el) {
+    var target = parseInt(el.dataset.target, 10);
+    var start = null;
+    function step(ts) {
+      if (!start) start = ts;
+      var p = Math.min((ts - start) / 1400, 1);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))).toLocaleString();
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+// ============== LIVE PRICE LAYER ==============
+function timeAgo(iso) {
+  var m = Math.floor((Date.now() - new Date(iso)) / 60000);
+  if (m < 60) return m + ' min ago';
+  if (m < 1440) return Math.floor(m / 60) + 'h ago';
+  return Math.floor(m / 1440) + 'd ago';
+}
+
+function fetchPrices() {
+  fetch('prices.json?t=' + Date.now())
+    .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+    .then(function(data) {
+      Object.keys(data.prices || {}).forEach(function(r) {
+        menu[r].forEach(function(item) {
+          if (data.prices[r][item.id] !== undefined && data.prices[r][item.id] !== item.price) {
+            item.prevPrice = item.price;
+            item.price = data.prices[r][item.id];
+          }
+        });
+      });
+      renderLists(); renderComparison(); renderCalc();
+      var meta = document.getElementById('priceMeta');
+      if (meta) meta.textContent = 'Live prices · updated ' + timeAgo(data.updatedAt);
+      showToast('Live prices loaded — ' + timeAgo(data.updatedAt));
+    })
+    .catch(function() { /* bundled prices remain — silent fallback */ });
+}
+
+// ============== EVENT WIRING ==============
+document.querySelectorAll('#restoTabs .resto-tab').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    currentResto = btn.dataset.resto;
+    document.querySelectorAll('#restoTabs .resto-tab').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    var la = getItem(leftSelection), rb = getItem(rightSelection);
+    if (!la || la.resto !== currentResto) leftSelection = menu[currentResto][0].id;
+    if (!rb || rb.resto !== currentResto) rightSelection = bestSulitId(currentResto);
+    renderLists(); renderComparison();
+  });
+});
+
+document.querySelectorAll('.list-search, .list-sort').forEach(function(el) {
+  el.addEventListener('input', function() {
+    listState[el.dataset.side][el.classList.contains('list-search') ? 'q' : 'sort'] = el.value.toLowerCase ? el.value.toLowerCase() : el.value;
+    renderLists();
+  });
+});
+
+function wireList(id, setter) {
+  document.getElementById(id).addEventListener('click', function(e) {
+    var card = e.target.closest('.item-card');
+    if (!card) return;
+    setter(card.dataset.id);
+    renderLists(); renderComparison();
+  });
+}
+wireList('leftList', function(id) { leftSelection = id; });
+wireList('rightList', function(id) { rightSelection = id; });
+
+document.querySelectorAll('#calcRestoTabs .goal-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    calcResto = btn.dataset.resto;
+    document.querySelectorAll('#calcRestoTabs .goal-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    renderCalc();
+  });
+});
+
+var calcTimer = null;
+document.getElementById('budgetSlider').addEventListener('input', function() {
+  calcBudget = parseInt(this.value, 10);
+  document.getElementById('budgetDisplay').textContent = '₱' + calcBudget;
+  clearTimeout(calcTimer);
+  calcTimer = setTimeout(renderCalc, 120);
+});
+
+document.querySelectorAll('#calcGoalTabs .goal-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    calcGoal = btn.dataset.goal;
+    document.querySelectorAll('#calcGoalTabs .goal-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    renderCalc();
+  });
+});
+
+document.getElementById('findMeBtn').addEventListener('click', function() {
+  if (!navigator.geolocation) {
+    document.getElementById('locationStatus').textContent = 'Geolocation not supported on this device.';
+    return;
+  }
+  document.getElementById('locationStatus').textContent = 'Locating you…';
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude, set: true };
+    renderBranches();
+    showToast('Found you — nearest branch highlighted.');
+  }, function() {
+    document.getElementById('locationStatus').textContent = 'Location blocked — using Manila center for demo distances.';
+    showToast('Location blocked — showing demo distances.');
+  }, { enableHighAccuracy: true, timeout: 10000 });
+});
+
+document.getElementById('radiusSlider').addEventListener('input', function() {
+  locRange = parseInt(this.value, 10);
+  document.getElementById('radiusDisplay').textContent = locRange + 'km';
+  renderBranches();
+});
+
+document.querySelectorAll('#filterTabs .goal-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var r = btn.dataset.resto;
+    locFilters[r] = !locFilters[r];
+    btn.classList.toggle('active', locFilters[r]);
+    renderBranches();
+  });
+});
+
+// ============== INIT ==============
+(function init() {
+  var totalItems = Object.keys(menu).reduce(function(n, r) { return n + menu[r].length; }, 0);
+  var itemsCounter = document.querySelector('[data-target="62"]');
+  if (itemsCounter) itemsCounter.dataset.target = totalItems;
+
+  animateCounters();
+  renderLists();
+  renderComparison();
+  renderCombos();
+  renderCalc();
+  renderBranches();
+  renderHacks();
+  fetchPrices();
+})();
+
+// ============== SERVICE WORKER REGISTRATION ==============
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js').then(function(reg) {
+      reg.addEventListener('updatefound', function() {
+        var newWorker = reg.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener('statechange', function() {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            showToast('Fresh version ready — updating…');
+            newWorker.postMessage('SKIP_WAITING');
+          }
+        });
+      });
+    });
+
+    var refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function() {
+      if (refreshing) return;
+      refreshing = true;
+      setTimeout(function() { location.reload(); }, 800);
+    });
+  });
+
+  window.addEventListener('offline', function() {
+    showToast("You're offline — cached prices only. Bawal ang lugi pa rin!");
+  });
+}
+</script>
+</body>
+</html>
